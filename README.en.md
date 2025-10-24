@@ -10,12 +10,12 @@ Next, the script will run and prompt you to log in with your AppleID account (if
 The script will then offer several commands to choose from.  
 
 **Description of script commands:**  
-1.Search for the app and download the latest version (if you have already logged in with your AppleID);  
-2.Enter the application ID and download the latest version (if you know the application ID);  
-3.Enter the application ID and download (with a choice of version) (if you know the application ID);  
-4.Display the list of application IDs and download the latest version;  
-5.Displaying the list of application IDs and downloading (with a choice of version);  
-6.Revoke your AppleID data.
+1.Search for the app and download the latest version (if you have already logged in with your AppleID)  
+2.Enter the application ID and download the latest version (if you know the application ID)  
+3.Enter the application ID and download (with a choice of version) (if you know the application ID)  
+4.Display the list of application IDs and download the latest version  
+5.Display the list of application IDs and downloading (with a choice of version)  
+6.Revoke your AppleID data
 
 Application search does not search for everything, the easiest way to find the application ID is to know its link in the AppStore (for example, we search for an application in the search engine, find the link in the AppStore, and we need the numbers that come after the id from this link.  
 <details>
