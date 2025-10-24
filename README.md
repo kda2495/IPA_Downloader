@@ -1,4 +1,6 @@
 # IPA_Downloader
+[![en](https://img.shields.io/badge/lang-en-red.svg)](https://github.com/kda2495/IPA_Downloader/blob/main/README.en.md)
+
 PowerShell скрипт (для Windows) для загрузки ipa-файлов ранее загруженных приложений (работает в связке с [IPATool](https://github.com/majd/ipatool))  
 ## Описание
 Cкрипт позволяет загружать приложения, которые ранее были загружены через Ваш AppleID (аналог iMazing) для дальнейшей установки на устройства (к примеру, через [3uTools](https://www.3u.com/)).
