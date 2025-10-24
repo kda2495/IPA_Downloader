@@ -12,12 +12,12 @@ Next, the script will run and prompt you to log in with your AppleID account (if
 The script will then offer several commands to choose from.  
 
 **Description of script commands:**  
-1.Search for the app and download the latest version
-2.Enter the app ID and download the latest version
-3.Enter the app ID and download (with a choice of version)
-4.Display the list of app IDs and download the latest version
-5.Display the list of app IDs and download (with a choice of version)
-6.Revoke your AppleID data from IPATool
+1.Search for the app and download the latest version  
+2.Enter the app ID and download the latest version  
+3.Enter the app ID and download (with a choice of version)  
+4.Display the list of app IDs and download the latest version  
+5.Display the list of app IDs and download (with a choice of version)  
+6.Revoke your AppleID data from IPATool  
 
 App search does not search for everything, the easiest way to find the app ID is to know its link in the AppStore (for example, we search for an app in the search engine, find the link in the AppStore, and we need the numbers that come after the id from this link.  
 <details>
