@@ -1,4 +1,6 @@
 # IPA_Downloader
+[![ru](https://img.shields.io/badge/lang-ru-red.svg)](https://github.com/kda2495/IPA_Downloader/blob/main/README.md)
+
 PowerShell script (for Windows) for downloading ipa files of previously downloaded applications (works in conjunction with [IPATool](https://github.com/majd/ipatool))  
 ## Description
 The script allows you to download apps that were previously downloaded with your AppleID (similar to iMazing) for further installation on devices (for example, via [3uTools](https://www.3u.com/)).
