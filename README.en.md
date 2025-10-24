@@ -29,8 +29,8 @@ Also, some application IDs can be output using commands 4 and 5.
 
 Next, we enter these numbers (App ID) (or paste them with the right mouse button into the script window, if previously copied to the clipboard), when the script prompts "Enter the app ID to download" and press Enter.  
 <details>
- <summary>Screenshot 2</summary>
-<img width="976" height="513" alt="2" src="https://github.com/user-attachments/assets/a74893be-def6-487a-886e-a06d6a1722ee" />  
+  <summary>Screenshot 2</summary>
+<img width="978" height="512" alt="2" src="https://github.com/user-attachments/assets/22e22f5c-7927-4c82-b53f-bb34058d6c36" />
 </details>
 
 After downloading, the IPA_Downloader/Apps folder will contain a file with the name of the app ID and the version of the app (for example, for Активы Онлайн (Сбербанк): 6742457200_16.13.0.ipa).  
@@ -41,7 +41,7 @@ Next, apps downloaded with this script can be installed via 3uTools (connect the
 In the script, select commands 3 or 5, enter the app ID, then the script will give us a comma-separated list of versions (versions are sorted from first to last), enter the version we need, and after downloading, install it via 3uTools.  
 <details>
  <summary>Screenshot 3</summary>
-<img width="980" height="512" alt="3" src="https://github.com/user-attachments/assets/1a97ec5c-bdcb-415c-8073-0c96549a9a84" />
+<img width="977" height="509" alt="3" src="https://github.com/user-attachments/assets/1180476b-4ee3-40d2-9b83-43b29fe45b51" />
 </details>
 
 An important note. If the app is not available in your region or has been removed from the AppStore, then if there is an update in the AppStore, it will be displayed, but there will be an error when trying to update. To update, you need to delete the old version of the application, download the new version via IPA_Downloader and install via 3uTools.
