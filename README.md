@@ -23,7 +23,7 @@ Cкрипт позволяет загружать приложения, кото
 <img width="389" height="36" alt="1" src="https://github.com/user-attachments/assets/fefcabfe-ac65-4386-ba37-3b2fe3bd0f92" />  
 </details>
   
-Либо ищем через сайт Appmagic.rocks (вверху справа вводим название приложения в поле Search for app or publisher...), далее переходим на страницу приложения и в ссылке будет номер ID. 
+Либо ищем через сайт [Appmagic.rocks](https://appmagic.rocks/) (вверху справа вводим название приложения в поле Search for app or publisher...), далее переходим на страницу приложения и в ссылке будет номер ID. 
 
 Также некоторые ID приложений можно вывести используя команды 4 и 5.  
 
