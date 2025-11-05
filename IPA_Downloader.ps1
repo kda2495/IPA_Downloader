@@ -1,4 +1,4 @@
-﻿Write-Host "IPA_Downloader 1.0.8 (скрипт создан kda2495)" -ForegroundColor Black -BackgroundColor Yellow
+Write-Host "IPA_Downloader 1.0.9 (скрипт создан kda2495)" -ForegroundColor Black -BackgroundColor Yellow
 if (!(Test-Path ".\Apps")) {
 	$null = New-Item -Path ".\Apps" -ItemType "Directory"
 }
@@ -62,7 +62,7 @@ while (Get-ChildItem -Path "$env:USERPROFILE\.ipatool" -Filter "account.") {
 		Write-Host "========================================" -ForegroundColor Green
 		$app_ID = Read-Host "Введите ID приложения для поиска"
 		.\ipatool.exe list-versions -i $app_ID --keychain-passphrase "1"
-		$app_version = Read-Host "Введите версию для загрузки"
+		$app_version = Read-Host "Введите версию приложения для загрузки"
 		.\ipatool.exe get-version-metadata -i $app_ID --external-version-id $app_version --keychain-passphrase "1"
 		.\ipatool.exe download -i $app_ID --external-version-id $app_version --keychain-passphrase "1"
 			if (Test-Path ".\*.ipa.tmp") {
@@ -77,8 +77,33 @@ while (Get-ChildItem -Path "$env:USERPROFILE\.ipatool" -Filter "account.") {
 		4 {
 		Write-Host "========================================" -ForegroundColor Green
 		$apps_ID_list = Invoke-WebRequest https://raw.githubusercontent.com/kda2495/IPA_Downloader/refs/heads/main/Apps_ID_List.txt | Select-Object -Expand Content
-		Write-Host $apps_ID_list
-		$app_ID = Read-Host "Введите ID приложения для загрузки"
+		$lines = $apps_ID_list -split "`n" | Where-Object { $_.Trim() -ne "" }
+		for ($i = 0; $i -lt $lines.Count; $i++) {
+			$index = $i + 1
+			Write-Host ("{0}. {1}" -f $index, $lines[$i])
+		}
+		$selection = Read-Host "Введите номер (1-$($lines.Count)) или ID приложения для загрузки"
+		$idx = 0
+		if ($selection -match '^\d{1,3}$' -and [int]::TryParse($selection, [ref]$idx) -and $idx -ge 1 -and $idx -le $lines.Count) {
+			$selectedLine = $lines[$idx - 1]
+			$ids = @([System.Text.RegularExpressions.Regex]::Matches($selectedLine, '\b\d{6,}\b') | ForEach-Object { $_.Value })
+			if ($ids.Count -eq 1) {
+				$app_ID = $ids[0]
+			} elseif ($ids.Count -gt 1) {
+				Write-Host "В строке найдено несколько ID приложений: " ($ids -join ', ')
+				$app_ID = Read-Host "Уточните, какой ID приложения использовать"
+			} else {
+				$app_ID = Read-Host "ID приложения не найден в выбранной строке. Введите ID приложения вручную"
+			}
+		} else {
+			$app_ID = $selection
+		}
+		$app_ID = [string]$app_ID
+		if ([System.Text.RegularExpressions.Regex]::IsMatch($app_ID, '\b\d{6,}\b')) {
+			$app_ID = [System.Text.RegularExpressions.Regex]::Match($app_ID, '\b\d{6,}\b').Value
+		}
+		$app_ID = $app_ID.Trim()
+		Write-Host ("Выбран ID: {0}" -f $app_ID)
 		.\ipatool.exe download -i $app_ID --keychain-passphrase "1"
 			if (Test-Path ".\*.ipa.tmp") {
 				Start-Sleep 1
@@ -92,10 +117,35 @@ while (Get-ChildItem -Path "$env:USERPROFILE\.ipatool" -Filter "account.") {
 		5 {
 		Write-Host "========================================" -ForegroundColor Green
 		$apps_ID_list = Invoke-WebRequest https://raw.githubusercontent.com/kda2495/IPA_Downloader/refs/heads/main/Apps_ID_List.txt | Select-Object -Expand Content
-		Write-Host $apps_ID_list
-		$app_ID = Read-Host "Введите ID приложения для поиска"
+		$lines = $apps_ID_list -split "`n" | Where-Object { $_.Trim() -ne "" }
+		for ($i = 0; $i -lt $lines.Count; $i++) {
+			$index = $i + 1
+			Write-Host ("{0}. {1}" -f $index, $lines[$i])
+		}
+		$selection = Read-Host "Введите номер (1-$($lines.Count)) или ID приложения для поиска"
+		$idx = 0
+		if ($selection -match '^\d{1,3}$' -and [int]::TryParse($selection, [ref]$idx) -and $idx -ge 1 -and $idx -le $lines.Count) {
+			$selectedLine = $lines[$idx - 1]
+			$ids = @([System.Text.RegularExpressions.Regex]::Matches($selectedLine, '\b\d{6,}\b') | ForEach-Object { $_.Value })
+			if ($ids.Count -eq 1) {
+				$app_ID = $ids[0]
+			} elseif ($ids.Count -gt 1) {
+				Write-Host "В строке найдено несколько ID приложений: " ($ids -join ', ')
+				$app_ID = Read-Host "Уточните, какой ID приложения использовать"
+			} else {
+				$app_ID = Read-Host "ID приложения не найден в выбранной строке. Введите ID приложения вручную"
+			}
+		} else {
+			$app_ID = $selection
+		}
+		$app_ID = [string]$app_ID
+		if ([System.Text.RegularExpressions.Regex]::IsMatch($app_ID, '\b\d{6,}\b')) {
+			$app_ID = [System.Text.RegularExpressions.Regex]::Match($app_ID, '\b\d{6,}\b').Value
+		}
+		$app_ID = $app_ID.Trim()
+		Write-Host ("Выбран ID: {0}" -f $app_ID)
 		.\ipatool.exe list-versions -i $app_ID --keychain-passphrase "1"
-		$app_version = Read-Host "Введите версию для загрузки"
+		$app_version = Read-Host "Введите версию приложения для загрузки"
 		.\ipatool.exe get-version-metadata -i $app_ID --external-version-id $app_version --keychain-passphrase "1"
 		.\ipatool.exe download -i $app_ID --external-version-id $app_version --keychain-passphrase "1"
 			if (Test-Path ".\*.ipa.tmp") {
