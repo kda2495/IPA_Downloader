@@ -50,9 +50,6 @@ An important note. If the app is not available in your region or has been remove
 
 ## Windows 7 support
 Windows 7 has 2 limitations:  
-1\. There is no support for the latest versions of the Go language (IPATool is written in Go);  
-2\. PowerShell 2.0 is installed by default, so the script does not work properly.  
-<ins>**Solution:**</ins>  
 1\. To add IPATool support, you need to patch ipatool.exe with this patch:  
 [GoWin7Fixer](https://github.com/stunndard/golangwin7patch/releases/tag/v0.2)  
 Launch GoWin7Fixer.exe and either transfer ipatool.exe directly on the program window, or click Open and specify ipatool.exe.  
