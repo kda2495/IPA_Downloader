@@ -49,12 +49,24 @@ In the script, select commands 3 or 5, enter the app ID, then the script will gi
 An important note. If the app is not available in your region or has been removed from the AppStore, then if there is an update in the AppStore, it will be displayed, but there will be an error when trying to update. To update, you need to delete the old version of the application, download the new version via IPA_Downloader and install via 3uTools.
 
 ## Windows 7 support
-To work properly on Windows 7, you need to install update KB2506143, which adds PowerShell 3.0 support  
+Windows 7 has 2 limitations:  
+1\. There is no support for the latest versions of the Go language (IPATool is written in Go);  
+2\. PowerShell 2.0 is installed by default, so the script does not work properly.  
+<ins>**Solution:**</ins>  
+1\. To add IPATool support, you need to patch ipatool.exe with this patch:  
+[GoWin7Fixer](https://github.com/stunndard/golangwin7patch/releases/tag/v0.2)  
+Launch GoWin7Fixer.exe and either transfer ipatool.exe directly on the program window, or click Open and specify ipatool.exe.  
+<details>
+<summary>Screenshot</summary>
+<img width="878" height="595" alt="5" src="https://github.com/user-attachments/assets/64d4086b-4f96-4f56-a2b3-be308f8b34bf" />
+</details>
+
+2\. To add PowerShell 3.0 support, you need to install the KB2506143 update:  
 [Download link](https://www.microsoft.com/en-us/download/details.aspx?id=34595)  
 For Windows 7 x64: Windows6.1-KB2506143-x64.msu  
-For Windows 7 x86 (32): Windows6.1-KB2506143-x86.msu  
+For Windows 7 x86: Windows6.1-KB2506143-x86.msu  
 <details>
- <summary>Screenshot 4</summary>
+<summary>Screenshot</summary>
 <img width="972" height="617" alt="4" src="https://github.com/user-attachments/assets/586ad840-6f3f-4d6d-9f73-fda18b838642" />
 </details>
 Without this update, the download of the list of apps with commands 4-5 will not be available.
