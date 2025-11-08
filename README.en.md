@@ -52,7 +52,7 @@ An important note. If the app is not available in your region or has been remove
 Windows 7 has 2 limitations:  
 1\. To add IPATool support, you need to patch ipatool.exe with this patch:  
 [GoWin7Fixer](https://github.com/stunndard/golangwin7patch/releases/tag/v0.2)  
-Launch GoWin7Fixer.exe and either transfer ipatool.exe directly on the program window, or click Open and specify ipatool.exe.  
+Launch GoWin7Fixer.exe and, either transfer ipatool.exe directly on the program window, or click Open and specify the path to ipatool.exe.  
 <details>
 <summary>Screenshot</summary>
 <img width="878" height="595" alt="5" src="https://github.com/user-attachments/assets/64d4086b-4f96-4f56-a2b3-be308f8b34bf" />
