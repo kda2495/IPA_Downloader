@@ -47,3 +47,14 @@ In the script, select commands 3 or 5, enter the app ID, then the script will gi
 </details>
 
 An important note. If the app is not available in your region or has been removed from the AppStore, then if there is an update in the AppStore, it will be displayed, but there will be an error when trying to update. To update, you need to delete the old version of the application, download the new version via IPA_Downloader and install via 3uTools.
+
+## Windows 7 support
+To work properly on Windows 7, you need to install update KB2506143, which adds PowerShell 3.0 support  
+[Download link](https://www.microsoft.com/en-us/download/details.aspx?id=34595)  
+For Windows 7 x64: Windows6.1-KB2506143-x64.msu  
+For Windows 7 x86 (32): Windows6.1-KB2506143-x86.msu  
+<details>
+ <summary>Screenshot 4</summary>
+<img width="972" height="617" alt="4" src="https://github.com/user-attachments/assets/586ad840-6f3f-4d6d-9f73-fda18b838642" />
+</details>
+Without this update, the download of the list of apps with commands 4-5 will not be available.
