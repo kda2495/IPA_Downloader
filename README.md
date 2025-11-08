@@ -51,7 +51,7 @@ Cкрипт позволяет загружать приложения, кото
 ## Поддержка Windows 7
 1\. Для добавления поддержки IPATool, необходимо применить к ipatool.exe данный патч:  
 [GoWin7Fixer](https://github.com/stunndard/golangwin7patch/releases/tag/v0.2)  
-Запускаете GoWin7Fixer.exe и либо переносите ipatool.exe прямо на окно с программой, либо нажимаете Open и указываете ipatool.exe.
+Запускаете GoWin7Fixer.exe и, либо переносите ipatool.exe прямо на окно с программой, либо нажимаете Open и указываете путь к ipatool.exe.
 <details>
 <summary>Скриншот</summary>
 <img width="878" height="595" alt="5" src="https://github.com/user-attachments/assets/64d4086b-4f96-4f56-a2b3-be308f8b34bf" />
