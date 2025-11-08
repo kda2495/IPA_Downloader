@@ -21,7 +21,7 @@ The script will then offer several commands to choose from.
 
 App search does not search for everything, the easiest way to find the app ID is to know its link in the AppStore (for example, we search for an app in the search engine, find the link in the AppStore, and we need the numbers that come after the id from this link.  
 <details>
- <summary>Screenshot 1</summary>
+ <summary>Screenshot</summary>
 <img width="389" height="36" alt="1" src="https://github.com/user-attachments/assets/fefcabfe-ac65-4386-ba37-3b2fe3bd0f92" />  
 </details>
   
@@ -31,7 +31,7 @@ Also, some application IDs can be output using commands 4 and 5.
 
 Next, we enter these numbers (App ID) (or paste them with the right mouse button into the script window, if previously copied to the clipboard), when the script prompts "Enter the app ID to download" and press Enter.  
 <details>
-  <summary>Screenshot 2</summary>
+  <summary>Screenshot</summary>
 <img width="978" height="512" alt="2" src="https://github.com/user-attachments/assets/22e22f5c-7927-4c82-b53f-bb34058d6c36" />
 </details>
 
@@ -42,7 +42,7 @@ Next, apps downloaded with this script can be installed via 3uTools (connect the
 ## Downloading earlier versions of the app
 In the script, select commands 3 or 5, enter the app ID, then the script will give us a comma-separated list of versions (versions are sorted from first to last), enter the version we need, and after downloading, install it via 3uTools.  
 <details>
- <summary>Screenshot 3</summary>
+ <summary>Screenshot</summary>
 <img width="977" height="509" alt="3" src="https://github.com/user-attachments/assets/1180476b-4ee3-40d2-9b83-43b29fe45b51" />
 </details>
 
