@@ -21,7 +21,7 @@ Cкрипт позволяет загружать приложения, кото
 
 Поиск приложений ищет не все, легче всего найти ID приложения, зная его ссылку в AppStore (к примеру, ищем в поисковике приложение, находим ссылку в AppStore и нам из этой ссылки нужны числа, которые идут после id. 
 <details>
- <summary>Скриншот 1</summary>
+ <summary>Скриншот</summary>
 <img width="389" height="36" alt="1" src="https://github.com/user-attachments/assets/fefcabfe-ac65-4386-ba37-3b2fe3bd0f92" />  
 </details>
 
@@ -31,7 +31,7 @@ Cкрипт позволяет загружать приложения, кото
 
 Далее эти числа (ID приложения) вводим (или вставляем с помощью правой кнопки мыши в окно скрипта, если ранее скопировали в буфер обмена), когда скрипт запросит "Введите ID приложения для загрузки" и нажимаем Enter.  
 <details>
- <summary>Скриншот 2</summary>
+ <summary>Скриншот</summary>
 <img width="976" height="513" alt="2" src="https://github.com/user-attachments/assets/a74893be-def6-487a-886e-a06d6a1722ee" />  
 </details>
 
@@ -42,19 +42,31 @@ Cкрипт позволяет загружать приложения, кото
 ## Загрузка более ранних версий приложения
 В скрипте выбираем команды 3 или 5, вводим ID приложения, далее скрипт выдаст нам список версий через запятую (версии отсортированы от первой к последней), вводим нужную нам версию, после загрузки устанавливаем через 3uTools. 
 <details>
- <summary>Скриншот 3</summary>
+ <summary>Скриншот</summary>
 <img width="980" height="512" alt="3" src="https://github.com/user-attachments/assets/1a97ec5c-bdcb-415c-8073-0c96549a9a84" />
 </details>
 
 Важное замечание. Если приложение недоступно в Вашем регионе или удалено из AppStore, то при наличии обновления в AppStore оно будет отображаться, но при попытке обновления будет ошибка. Для обновления необходимо удалить старую версию приложения, загрузить новую версию через IPA_Downloader и установить через 3uTools. 
 
 ## Поддержка Windows 7
-Для полноценной работы на Windows 7 необходимо установить обновление KB2506143, добавляющее поддержку PowerShell 3.0  
+В Windows 7 имеются 2 ограничения:  
+1\. Отсутствует поддержка последних версий языка Go (IPATool написан на Go);  
+2\. По умолчанию установлен PowerShell 2.0, поэтому скрипт не работает полноценно.  
+<ins>**Решение:**</ins>  
+1\. Для добавления поддержки IPATool, необходимо пропатчить ipatool.exe данным патчером:  
+[GoWin7Fixer](https://github.com/stunndard/golangwin7patch/releases/tag/v0.2)  
+Запускаете GoWin7Fixer.exe и либо переносите ipatool.exe прямо на окно с программой, либо нажимаете Open и указываете ipatool.exe.
+<details>
+<summary>Скриншот</summary>
+<img width="878" height="595" alt="5" src="https://github.com/user-attachments/assets/64d4086b-4f96-4f56-a2b3-be308f8b34bf" />
+</details>
+
+2\. Для добавления поддержки PowerShell 3.0 необходимо установить обновление KB2506143:  
 [Ссылка для загрузки](https://www.microsoft.com/en-us/download/details.aspx?id=34595)  
 Для Windows 7 x64: Windows6.1-KB2506143-x64.msu  
-Для Windows 7 x86 (32): Windows6.1-KB2506143-x86.msu  
+Для Windows 7 x86: Windows6.1-KB2506143-x86.msu  
 <details>
- <summary>Скриншот 4</summary>
+ <summary>Скриншот</summary>
 <img width="972" height="617" alt="4" src="https://github.com/user-attachments/assets/586ad840-6f3f-4d6d-9f73-fda18b838642" />
 </details>
 Без данного обновления не будет доступна загрузка списка приложений с командами 4-5.
