@@ -8,13 +8,13 @@ if (!(Test-Path "$env:USERPROFILE\.ipatool")) {
 if (Get-ChildItem -Path "$env:USERPROFILE\.ipatool" -Filter "account.") {
 	Write-Host "========================================" -ForegroundColor Green
 	Write-Host "Login with AppleID is completed.`nYour AppleID:"
-	.\ipatool.exe auth info --keychain-passphrase "1"
+	.\ipatool auth info --keychain-passphrase "1"
 }
 while (!(Get-ChildItem -Path "$env:USERPROFILE\.ipatool" -Filter "account.")) {
 	Write-Host "========================================" -ForegroundColor Green
 	Write-Host "Login with AppleID isn't completed."
 	$apple_ID = Read-Host "Enter AppleID"
-	.\ipatool.exe auth login --email $apple_ID --keychain-passphrase "1"
+	.\ipatool auth login --email $apple_ID --keychain-passphrase "1"
 }
 while (Get-ChildItem -Path "$env:USERPROFILE\.ipatool" -Filter "account.") {
 	Write-Host "========================================" -ForegroundColor Green
@@ -33,9 +33,9 @@ while (Get-ChildItem -Path "$env:USERPROFILE\.ipatool" -Filter "account.") {
 		1 {
 		Write-Host "========================================" -ForegroundColor Green
 		$app_name = Read-Host "Enter the name of the app to search"
-		.\ipatool.exe search $app_name --keychain-passphrase "1" --limit 20
+		.\ipatool search $app_name --keychain-passphrase "1" --limit 20
 		$app_ID = Read-Host "Enter the app ID to download"
-		.\ipatool.exe download -i $app_ID --keychain-passphrase "1"
+		.\ipatool download -i $app_ID --keychain-passphrase "1"
 			if (Test-Path ".\*.ipa.tmp") {
 				Start-Sleep 1
 				Remove-Item .\*.ipa
@@ -48,7 +48,7 @@ while (Get-ChildItem -Path "$env:USERPROFILE\.ipatool" -Filter "account.") {
 		2 {
 		Write-Host "========================================" -ForegroundColor Green
 		$app_ID = Read-Host "Enter the app ID to download"
-		.\ipatool.exe download -i $app_ID --keychain-passphrase "1"
+		.\ipatool download -i $app_ID --keychain-passphrase "1"
 			if (Test-Path ".\*.ipa.tmp") {
 				Start-Sleep 1
 				Remove-Item .\*.ipa
@@ -61,10 +61,10 @@ while (Get-ChildItem -Path "$env:USERPROFILE\.ipatool" -Filter "account.") {
 		3 {
 		Write-Host "========================================" -ForegroundColor Green
 		$app_ID = Read-Host "Enter the app ID to search"
-		.\ipatool.exe list-versions -i $app_ID --keychain-passphrase "1"
+		.\ipatool list-versions -i $app_ID --keychain-passphrase "1"
 		$app_version = Read-Host "Enter the version of the app to download"
-		.\ipatool.exe get-version-metadata -i $app_ID --external-version-id $app_version --keychain-passphrase "1"
-		.\ipatool.exe download -i $app_ID --external-version-id $app_version --keychain-passphrase "1"
+		.\ipatool get-version-metadata -i $app_ID --external-version-id $app_version --keychain-passphrase "1"
+		.\ipatool download -i $app_ID --external-version-id $app_version --keychain-passphrase "1"
 			if (Test-Path ".\*.ipa.tmp") {
 				Start-Sleep 1
 				Remove-Item .\*.ipa
@@ -104,7 +104,7 @@ while (Get-ChildItem -Path "$env:USERPROFILE\.ipatool" -Filter "account.") {
 		}
 		$app_ID = $app_ID.Trim()
 		Write-Host ("Selected app ID: {0}" -f $app_ID)
-		.\ipatool.exe download -i $app_ID --keychain-passphrase "1"
+		.\ipatool download -i $app_ID --keychain-passphrase "1"
 			if (Test-Path ".\*.ipa.tmp") {
 				Start-Sleep 1
 				Remove-Item .\*.ipa
@@ -144,10 +144,10 @@ while (Get-ChildItem -Path "$env:USERPROFILE\.ipatool" -Filter "account.") {
 		}
 		$app_ID = $app_ID.Trim()
 		Write-Host ("Selected ID: {0}" -f $app_ID)
-		.\ipatool.exe list-versions -i $app_ID --keychain-passphrase "1"
+		.\ipatool list-versions -i $app_ID --keychain-passphrase "1"
 		$app_version = Read-Host "Enter the version of the app to download"
-		.\ipatool.exe get-version-metadata -i $app_ID --external-version-id $app_version --keychain-passphrase "1"
-		.\ipatool.exe download -i $app_ID --external-version-id $app_version --keychain-passphrase "1"
+		.\ipatool get-version-metadata -i $app_ID --external-version-id $app_version --keychain-passphrase "1"
+		.\ipatool download -i $app_ID --external-version-id $app_version --keychain-passphrase "1"
 			if (Test-Path ".\*.ipa.tmp") {
 				Start-Sleep 1
 				Remove-Item .\*.ipa
@@ -160,13 +160,14 @@ while (Get-ChildItem -Path "$env:USERPROFILE\.ipatool" -Filter "account.") {
 		6 {
 		Write-Host "========================================" -ForegroundColor Green
 		Write-Host "AppleID revoked."
-		.\ipatool.exe auth revoke
+		.\ipatool auth revoke
 			while (!(Get-ChildItem -Path "$env:USERPROFILE\.ipatool" -Filter "account.")) {
 				Write-Host "========================================" -ForegroundColor Green
 				Write-Host "Login with AppleID isn't completed."
 				$apple_ID = Read-Host "Enter AppleID"
-				.\ipatool.exe auth login --email $apple_ID --keychain-passphrase "1"
+				.\ipatool auth login --email $apple_ID --keychain-passphrase "1"
 			}
 		}
 	}
+
 }
