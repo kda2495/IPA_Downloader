@@ -1,4 +1,4 @@
-Write-Host "IPA_Downloader 1.0.9.1 (скрипт создан kda2495)" -ForegroundColor Black -BackgroundColor Yellow
+Write-Host "IPA_Downloader 1.0.9 (скрипт создан kda2495)" -ForegroundColor Black -BackgroundColor Yellow
 if (!(Test-Path ".\Apps")) {
 	$null = New-Item -Path ".\Apps" -ItemType "Directory"
 }
@@ -41,7 +41,7 @@ while (Get-ChildItem -Path "$env:USERPROFILE\.ipatool" -Filter "account.") {
 				Remove-Item .\*.ipa
 				Get-ChildItem *.ipa.tmp | Rename-Item -NewName { $_.Name -replace '.ipa.tmp','.ipa' }
 			}
-			foreach ($file in Get-ChildItem *.ipa){
+			foreach ($file in Get-ChildItem *.ipa) {
 				Move-Item -Path $file.fullname -Destination .\Apps -Force
 			}
 		}
@@ -54,7 +54,7 @@ while (Get-ChildItem -Path "$env:USERPROFILE\.ipatool" -Filter "account.") {
 				Remove-Item .\*.ipa
 				Get-ChildItem *.ipa.tmp | Rename-Item -NewName { $_.Name -replace '.ipa.tmp','.ipa' }
 			}
-			foreach ($file in Get-ChildItem *.ipa){
+			foreach ($file in Get-ChildItem *.ipa) {
 				Move-Item -Path $file.fullname -Destination .\Apps -Force
 			}
 		}
@@ -70,7 +70,7 @@ while (Get-ChildItem -Path "$env:USERPROFILE\.ipatool" -Filter "account.") {
 				Remove-Item .\*.ipa
 				Get-ChildItem *.ipa.tmp | Rename-Item -NewName { $_.Name -replace '.ipa.tmp','.ipa' }
 			}
-			foreach ($file in Get-ChildItem *.ipa){
+			foreach ($file in Get-ChildItem *.ipa) {
 				Move-Item -Path $file.fullname -Destination .\Apps -Force
 			}
 		}
@@ -153,7 +153,7 @@ while (Get-ChildItem -Path "$env:USERPROFILE\.ipatool" -Filter "account.") {
 				Remove-Item .\*.ipa
 				Get-ChildItem *.ipa.tmp | Rename-Item -NewName { $_.Name -replace '.ipa.tmp','.ipa' }
 			}
-			foreach ($file in Get-ChildItem *.ipa){
+			foreach ($file in Get-ChildItem *.ipa) {
 				Move-Item -Path $file.fullname -Destination .\Apps -Force
 			}
 		}
@@ -170,5 +170,3 @@ while (Get-ChildItem -Path "$env:USERPROFILE\.ipatool" -Filter "account.") {
 		}
 	}
 }
-
-
