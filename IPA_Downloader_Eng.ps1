@@ -41,7 +41,7 @@ while (Get-ChildItem -Path "$env:USERPROFILE\.ipatool" -Filter "account.") {
 				Remove-Item .\*.ipa
 				Get-ChildItem *.ipa.tmp | Rename-Item -NewName { $_.Name -replace '.ipa.tmp','.ipa' }
 			}
-			foreach ($file in Get-ChildItem *.ipa){
+			foreach ($file in Get-ChildItem *.ipa) {
 				Move-Item -Path $file.fullname -Destination .\Apps -Force
 			}
 		}
@@ -54,7 +54,7 @@ while (Get-ChildItem -Path "$env:USERPROFILE\.ipatool" -Filter "account.") {
 				Remove-Item .\*.ipa
 				Get-ChildItem *.ipa.tmp | Rename-Item -NewName { $_.Name -replace '.ipa.tmp','.ipa' }
 			}
-			foreach ($file in Get-ChildItem *.ipa){
+			foreach ($file in Get-ChildItem *.ipa) {
 				Move-Item -Path $file.fullname -Destination .\Apps -Force
 			}
 		}
@@ -70,7 +70,7 @@ while (Get-ChildItem -Path "$env:USERPROFILE\.ipatool" -Filter "account.") {
 				Remove-Item .\*.ipa
 				Get-ChildItem *.ipa.tmp | Rename-Item -NewName { $_.Name -replace '.ipa.tmp','.ipa' }
 			}
-			foreach ($file in Get-ChildItem *.ipa){
+			foreach ($file in Get-ChildItem *.ipa) {
 				Move-Item -Path $file.fullname -Destination .\Apps -Force
 			}
 		}
@@ -110,7 +110,7 @@ while (Get-ChildItem -Path "$env:USERPROFILE\.ipatool" -Filter "account.") {
 				Remove-Item .\*.ipa
 				Get-ChildItem *.ipa.tmp | Rename-Item -NewName { $_.Name -replace '.ipa.tmp','.ipa' }
 			}
-			foreach ($file in Get-ChildItem *.ipa){
+			foreach ($file in Get-ChildItem *.ipa) {
 				Move-Item -Path $file.fullname -Destination .\Apps -Force
 			}
 		}
@@ -153,7 +153,7 @@ while (Get-ChildItem -Path "$env:USERPROFILE\.ipatool" -Filter "account.") {
 				Remove-Item .\*.ipa
 				Get-ChildItem *.ipa.tmp | Rename-Item -NewName { $_.Name -replace '.ipa.tmp','.ipa' }
 			}
-			foreach ($file in Get-ChildItem *.ipa){
+			foreach ($file in Get-ChildItem *.ipa) {
 				Move-Item -Path $file.fullname -Destination .\Apps -Force
 			}
 		}
@@ -171,5 +171,6 @@ while (Get-ChildItem -Path "$env:USERPROFILE\.ipatool" -Filter "account.") {
 	}
 
 }
+
 
 
