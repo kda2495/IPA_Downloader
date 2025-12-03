@@ -1,4 +1,4 @@
-Write-Host "IPA_Downloader 1.0.9.1 (скрипт создан kda2495)" -ForegroundColor Black -BackgroundColor Yellow
+Write-Host "IPA_Downloader 1.1.0 (скрипт создан kda2495)" -ForegroundColor Black -BackgroundColor Yellow
 if (!(Test-Path ".\Apps")) {
 	$null = New-Item -Path ".\Apps" -ItemType "Directory"
 }
@@ -7,24 +7,24 @@ if (!(Test-Path "$env:USERPROFILE\.ipatool")) {
 }
 if (Get-ChildItem -Path "$env:USERPROFILE\.ipatool" -Filter "account.") {
 	Write-Host "========================================" -ForegroundColor Green
-	Write-Host "Вход с AppleID выполнен.`nДанные AppleID:"
+	Write-Host "Вход с Apple ID выполнен.`nДанные Apple ID:"
 	.\ipatool auth info --keychain-passphrase "1"
 }
 while (!(Get-ChildItem -Path "$env:USERPROFILE\.ipatool" -Filter "account.")) {
 	Write-Host "========================================" -ForegroundColor Green
-	Write-Host "Вход с AppleID не выполнен."
-	$apple_ID = Read-Host "Введите AppleID"
+	Write-Host "Вход с Apple ID не выполнен."
+	$apple_ID = Read-Host "Введите Apple ID"
 	.\ipatool auth login --email $apple_ID --keychain-passphrase "1"
 }
 while (Get-ChildItem -Path "$env:USERPROFILE\.ipatool" -Filter "account.") {
 	Write-Host "========================================" -ForegroundColor Green
 	$switch_value = Read-Host "Введите команду:
-1.Поиск приложения и загрузка последней версии
+1.Поиск приложения, покупка и загрузка последней версии
 2.Ввод ID приложения и загрузка последней версии
 3.Ввод ID приложения и загрузка (с выбором версии)
 4.Вывод списка ID приложений и загрузка последней версии
 5.Вывод списка ID приложений и загрузка (с выбором версии)
-6.Отозвать AppleID из IPATool`n"
+6.Отозвать Apple ID из IPATool`n"
 	while ("1","2","3","4","5","6" -notcontains $switch_value) {
 		Write-Host "========================================" -ForegroundColor Green
 		$switch_value = Read-Host "Неверное значение! Введите команду (от 1 до 6)`n"
@@ -33,7 +33,12 @@ while (Get-ChildItem -Path "$env:USERPROFILE\.ipatool" -Filter "account.") {
 		1 {
 		Write-Host "========================================" -ForegroundColor Green
 		$app_name = Read-Host "Введите название приложения для поиска"
-		.\ipatool search $app_name --keychain-passphrase "1" --limit 20
+		.\ipatool search $app_name --keychain-passphrase "1" --limit 10
+		$bundle_ID = Read-Host "Введите Bundle ID приложения для покупки"
+		if ([string]::IsNullOrEmpty($bundle_ID)) {
+		} else {
+			.\ipatool purchase -b $bundle_ID --keychain-passphrase "1"
+		}
 		$app_ID = Read-Host "Введите ID приложения для загрузки"
 		.\ipatool download -i $app_ID --keychain-passphrase "1"
 			if (Test-Path ".\*.ipa.tmp") {
@@ -159,12 +164,12 @@ while (Get-ChildItem -Path "$env:USERPROFILE\.ipatool" -Filter "account.") {
 		}
 		6 {
 		Write-Host "========================================" -ForegroundColor Green
-		Write-Host "AppleID отозван."
+		Write-Host "Apple ID отозван."
 		.\ipatool auth revoke
 			while (!(Get-ChildItem -Path "$env:USERPROFILE\.ipatool" -Filter "account.")) {
 				Write-Host "========================================" -ForegroundColor Green
-				Write-Host "Вход в AppleID не выполнен."
-				$apple_ID = Read-Host "Введите AppleID"
+				Write-Host "Вход в Apple ID не выполнен."
+				$apple_ID = Read-Host "Введите Apple ID"
 				.\ipatool auth login --email $apple_ID --keychain-passphrase "1"
 			}
 		}
