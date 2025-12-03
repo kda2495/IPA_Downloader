@@ -88,7 +88,7 @@ Cкрипт позволяет загружать приложения, кото
  <summary>Скриншот</summary>
 <img width="389" height="36" alt="AppStore_Link" src="https://github.com/user-attachments/assets/e73fd860-ed11-4293-8600-aef61fe3dc7f" />
 </details>
-Либо ищем через сайт [Appmagic.rocks](https://appmagic.rocks) (вверху справа вводим название приложения в поле Search for app or publisher...), далее переходим на страницу приложения и в ссылке будет номер ID.
+Либо ищем через сайт https://appmagic.rocks (вверху справа вводим название приложения в поле Search for app or publisher...), далее переходим на страницу приложения и в ссылке будет номер ID.
 Также некоторые ID приложений можно вывести используя команды 4 и 5.  
 
 ## В чем плюсы данного скрипта в сравнении с iMazing?
