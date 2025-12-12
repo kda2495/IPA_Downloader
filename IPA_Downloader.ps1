@@ -1,4 +1,4 @@
-Write-Host "IPA_Downloader 1.1.0 (скрипт создан kda2495)" -ForegroundColor Black -BackgroundColor Yellow
+Write-Host "IPA_Downloader 1.1.1 (скрипт создан kda2495)" -ForegroundColor Black -BackgroundColor Yellow
 if (!(Test-Path ".\Apps")) {
 	$null = New-Item -Path ".\Apps" -ItemType "Directory"
 }
@@ -81,7 +81,7 @@ while (Get-ChildItem -Path "$env:USERPROFILE\.ipatool" -Filter "account.") {
 		}
 		4 {
 		Write-Host "========================================" -ForegroundColor Green
-		$apps_ID_list = Invoke-WebRequest https://raw.githubusercontent.com/kda2495/IPA_Downloader/refs/heads/main/Apps_ID_List.txt | Select-Object -Expand Content
+		$apps_ID_list = Invoke-WebRequest https://raw.githubusercontent.com/kda2495/IPA_Downloader/refs/heads/main/Apps_ID_List.txt -UseBasicParsing | Select-Object -Expand Content
 		$lines = $apps_ID_list -split "`n" | Where-Object { $_.Trim() -ne "" }
 		for ($i = 0; $i -lt $lines.Count; $i++) {
 			$index = $i + 1
@@ -121,7 +121,7 @@ while (Get-ChildItem -Path "$env:USERPROFILE\.ipatool" -Filter "account.") {
 		}
 		5 {
 		Write-Host "========================================" -ForegroundColor Green
-		$apps_ID_list = Invoke-WebRequest https://raw.githubusercontent.com/kda2495/IPA_Downloader/refs/heads/main/Apps_ID_List.txt | Select-Object -Expand Content
+		$apps_ID_list = Invoke-WebRequest https://raw.githubusercontent.com/kda2495/IPA_Downloader/refs/heads/main/Apps_ID_List.txt -UseBasicParsing | Select-Object -Expand Content
 		$lines = $apps_ID_list -split "`n" | Where-Object { $_.Trim() -ne "" }
 		for ($i = 0; $i -lt $lines.Count; $i++) {
 			$index = $i + 1
