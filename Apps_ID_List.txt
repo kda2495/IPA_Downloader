@@ -8,6 +8,9 @@ Google Gemini: 6477489729
 Grok: 6670324846
 Happ: 6746188973
 Haraba: 1477603193 (Июль 2025)
+Infinity Blade: 387428400
+Infinity Blade II: 447689011
+Infinity Blade III: 610003290
 Perplexity: 1668000334
 Premier - Сериалы, фильмы, шоу: 1334187043 (Июнь 2022)
 Rave: 929775122 (Июль 2025)
