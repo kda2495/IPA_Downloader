@@ -1,6 +1,7 @@
 AmneziaVPN: 1600529900
 AmneziaWG: 6478942365
 ChatGPT: 6448311069
+Claude by Anthropic: 6473753684
 DeepSeek: 6737597349
 DefaultVPN: 6744725017
 GigaChat (G8AI): 6751318954 (Ноябрь 2025)
@@ -11,6 +12,7 @@ Haraba: 1477603193 (Июль 2025)
 Infinity Blade: 387428400
 Infinity Blade II: 447689011
 Infinity Blade III: 610003290
+Microsoft Copilot: 6472538445
 Perplexity: 1668000334
 Premier - Сериалы, фильмы, шоу: 1334187043 (Июнь 2022)
 Rave: 929775122 (Июль 2025)
@@ -20,6 +22,7 @@ Rutube Kids: 904606459 (Февраль 2021)
 S7 Airlines: 552920434 (Январь 2024)
 S7 Airlines (Учебник Путешествий): 6746844981 (Август 2025)
 S7 Airlines (Узнай Сибирь): 6755426632 (Январь 2026)
+Sora by OpenAI: 6744034028
 Spark Mail: 997102246
 Streisand: 6450534064
 Utair (Уютное небо): 1659652420 (Октябрь 2024)
@@ -169,4 +172,3 @@ V2RayTun: 6476628951
 ЮMoney: 1535767566 (Декабрь 2022)
 ЮMoney (Urania Time): 6474523183 (Май 2025)
 Яндекс Пэй: 1634422317 (Ноябрь 2025)
-
