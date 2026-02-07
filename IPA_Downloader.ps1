@@ -94,16 +94,19 @@ function Get-AppID-From-List {
 		}
 	}
 }
-while (Get-ChildItem -Path "$env:USERPROFILE\.ipatool" -Filter "account.") {
-	Write-Host "========================================" -ForegroundColor Green
-	$SwitchValue = Read-Host "Введите команду:
+$MainMenu = @"
+Введите команду:
 1.Поиск приложения и загрузка последней версии
 2.Ввод ID приложения и загрузка последней версии
 3.Ввод ID приложения и загрузка (с выбором версии)
 4.Вывод списка ID приложений и загрузка последней версии
 5.Вывод списка ID приложений и загрузка (с выбором версии)
 6.Отозвать Apple ID из IPATool
-7.Перейти на GitHub проекта`n"
+7.Перейти на GitHub проекта
+"@
+while (Get-ChildItem -Path "$env:USERPROFILE\.ipatool" -Filter "account.") {
+	Write-Host "========================================" -ForegroundColor Green
+	$SwitchValue = Read-Host $MainMenu
 	while ("1","2","3","4","5","6","7" -notcontains $SwitchValue) {
 		Write-Host "========================================" -ForegroundColor Green
 		$SwitchValue = Read-Host "Неверное значение! Введите команду (от 1 до 7)`n"
