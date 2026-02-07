@@ -1,6 +1,7 @@
-Write-Host "IPA_Downloader 1.1.2 (скрипт создан kda2495)" -ForegroundColor Black -BackgroundColor Yellow
+Write-Host "IPA_Downloader 1.1.3 (скрипт создан kda2495)" -ForegroundColor Black -BackgroundColor Yellow
 if (!(Test-Path ipatool.exe)) {
-	Write-Host "Ошибка: ipatool.exe не найден в текущей папке!" -ForegroundColor Red
+	Write-Host "Ошибка: ipatool.exe не найден в папке со скриптом." -ForegroundColor Red
+	Read-Host "Нажмите Enter для выхода"
 	exit
 }
 if (!(Test-Path ".\Apps")) {
@@ -102,7 +103,7 @@ $MainMenu = @"
 4.Вывод списка ID приложений и загрузка последней версии
 5.Вывод списка ID приложений и загрузка (с выбором версии)
 6.Отозвать Apple ID из IPATool
-7.Перейти на GitHub проекта
+7.Перейти на GitHub проекта`n
 "@
 while (Get-ChildItem -Path "$env:USERPROFILE\.ipatool" -Filter "account.") {
 	Write-Host "========================================" -ForegroundColor Green
