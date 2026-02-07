@@ -20,7 +20,7 @@
 Для загрузки приложения необходимо ввести его ID (когда скрипт запросит "Введите ID приложения для загрузки").
 <details>
  <summary>Скриншот</summary>
-  <img width="980" height="514" alt="Команда 1" src="https://github.com/user-attachments/assets/bf237f2e-df7a-4224-b0c0-a598f2e90266" />
+<img width="979" height="512" alt="Команда 1" src="https://github.com/user-attachments/assets/bb8c094f-c160-43f7-aab8-7f65491ea0a5" />
 </details>
 
 После загрузки в папке IPA_Downloader/Apps появится ipa-файл с наименованием ID и версией приложения.  
@@ -31,7 +31,7 @@
 Для загрузки приложения необходимо ввести его ID (когда скрипт запросит "Введите ID приложения для загрузки").
 <details>
  <summary>Скриншот</summary>
-  <img width="978" height="513" alt="Команда 2" src="https://github.com/user-attachments/assets/24250412-6f89-407a-97c8-8c21f82bf037" />
+<img width="979" height="512" alt="Команда 2" src="https://github.com/user-attachments/assets/bd59011e-023a-4071-afc3-59ff1155061b" />
 </details>
 
 После загрузки в папке IPA_Downloader/Apps появится ipa-файл с наименованием ID и версией приложения.  
@@ -42,7 +42,7 @@
 Для загрузки приложения необходимо ввести его ID (когда скрипт запросит "Введите ID приложения для поиска"), скрипт выдаст список версий через запятую (версии отсортированы от первой к последней), вводим нужную нам версию.
 <details>
  <summary>Скриншот</summary>
-<img width="980" height="513" alt="Команда 3" src="https://github.com/user-attachments/assets/2df8d0f7-c95c-4fd2-bbc3-e8ca16578576" />
+<img width="979" height="512" alt="Команда 3" src="https://github.com/user-attachments/assets/c6414e66-5ee6-4be6-b76d-fbb40a763277" />
 </details>
 
 После загрузки в папке IPA_Downloader/Apps появится ipa-файл с наименованием ID и версией приложения.  
@@ -57,7 +57,7 @@
 Для загрузки необходимо ввести порядковый номер приложения или его ID (когда скрипт запросит "Введите номер или ID приложения для загрузки").
 <details>
  <summary>Скриншот</summary>
-<img width="980" height="513" alt="Команда 4" src="https://github.com/user-attachments/assets/876d3630-8cee-46d9-8b30-7829dbbad183" />
+<img width="979" height="512" alt="Команда 4" src="https://github.com/user-attachments/assets/e1c662bd-57b7-4b53-854b-6fdd3658fbe7" />
 </details>
 
 После загрузки в папке IPA_Downloader/Apps появится ipa-файл с наименованием ID и версией приложения.  
@@ -69,7 +69,7 @@
 Для загрузки необходимо ввести порядковый номер приложения или его ID (когда скрипт запросит "Введите номер или ID приложения для поиска"), скрипт выдаст список версий через запятую (версии отсортированы от первой к последней), вводим нужную нам версию.
 <details>
  <summary>Скриншот</summary>
-<img width="979" height="512" alt="Команда 5" src="https://github.com/user-attachments/assets/b3ba2de9-1376-4834-aa66-ac707c4f88e4" />
+<img width="979" height="512" alt="Команда 5" src="https://github.com/user-attachments/assets/31a2233e-7e03-4acd-bce8-20105a2b9fca" />
 </details>
 
 После загрузки в папке IPA_Downloader/Apps появится ipa-файл с наименованием ID и версией приложения.  
@@ -83,7 +83,7 @@
 Скрипт осуществит выход из учетной записи Apple ID.
 <details>
  <summary>Скриншот</summary>
-<img width="979" height="511" alt="Команда 6" src="https://github.com/user-attachments/assets/bb277a07-ead0-4e3b-b3a1-96d53268af58" />
+<img width="979" height="512" alt="Команда 6" src="https://github.com/user-attachments/assets/85d0cc9d-d4c5-480e-b2c3-d74e4b37d301" />
 </details>
 
 #### <ins>7.Перейти на GitHub проекта</ins>
