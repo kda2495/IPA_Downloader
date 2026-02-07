@@ -20,7 +20,7 @@
 Для загрузки приложения необходимо ввести его ID (когда скрипт запросит "Введите ID приложения для загрузки").
 <details>
  <summary>Скриншот</summary>
-<img width="979" height="512" alt="Команда 1" src="https://github.com/user-attachments/assets/bb8c094f-c160-43f7-aab8-7f65491ea0a5" />
+<img width="979" height="512" alt="Команда 1" src="https://github.com/user-attachments/assets/d28fdd11-40ca-43b9-99dd-1ecd138fcdec" />
 </details>
 
 После загрузки в папке IPA_Downloader/Apps появится ipa-файл с наименованием ID и версией приложения.  
@@ -31,7 +31,7 @@
 Для загрузки приложения необходимо ввести его ID (когда скрипт запросит "Введите ID приложения для загрузки").
 <details>
  <summary>Скриншот</summary>
-<img width="979" height="512" alt="Команда 2" src="https://github.com/user-attachments/assets/bd59011e-023a-4071-afc3-59ff1155061b" />
+<img width="979" height="512" alt="Команда 2" src="https://github.com/user-attachments/assets/3f1c6bfe-94ef-43fa-9144-cf7f6dbecf8e" />
 </details>
 
 После загрузки в папке IPA_Downloader/Apps появится ipa-файл с наименованием ID и версией приложения.  
@@ -42,7 +42,7 @@
 Для загрузки приложения необходимо ввести его ID (когда скрипт запросит "Введите ID приложения для поиска"), скрипт выдаст список версий через запятую (версии отсортированы от первой к последней), вводим нужную нам версию.
 <details>
  <summary>Скриншот</summary>
-<img width="979" height="512" alt="Команда 3" src="https://github.com/user-attachments/assets/c6414e66-5ee6-4be6-b76d-fbb40a763277" />
+<img width="979" height="512" alt="Команда 3" src="https://github.com/user-attachments/assets/165db34a-245c-45c8-823a-b22ec3834d01" />
 </details>
 
 После загрузки в папке IPA_Downloader/Apps появится ipa-файл с наименованием ID и версией приложения.  
@@ -83,10 +83,10 @@
 Скрипт осуществит выход из учетной записи Apple ID.
 <details>
  <summary>Скриншот</summary>
-<img width="979" height="512" alt="Команда 6" src="https://github.com/user-attachments/assets/85d0cc9d-d4c5-480e-b2c3-d74e4b37d301" />
+<img width="979" height="512" alt="Команда 6" src="https://github.com/user-attachments/assets/9e6fe7f5-5e52-4ed1-8d26-538f77ce2b25" />
 </details>
 
-#### <ins>7.Перейти на GitHub проекта</ins>
+#### <ins>7.Перейти на страницу проекта в GitHub</ins>
 Скрипт осуществит открытие страницы проекта на GitHub.
 
 ## Как найти ID приложения:
