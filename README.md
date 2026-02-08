@@ -20,7 +20,7 @@
 Для загрузки приложения необходимо ввести его ID (когда скрипт запросит "Введите ID приложения для загрузки").
 <details>
  <summary>Скриншот</summary>
-<img width="979" height="512" alt="Команда 1" src="https://github.com/user-attachments/assets/d28fdd11-40ca-43b9-99dd-1ecd138fcdec" />
+<img width="979" height="512" alt="Команда 1" src="https://github.com/user-attachments/assets/8e3bbb15-6ebb-4e06-bb1c-cc13751a740d" />
 </details>
 
 После загрузки в папке IPA_Downloader/Apps появится ipa-файл с наименованием ID и версией приложения.  
@@ -31,7 +31,7 @@
 Для загрузки приложения необходимо ввести его ID (когда скрипт запросит "Введите ID приложения для загрузки").
 <details>
  <summary>Скриншот</summary>
-<img width="979" height="512" alt="Команда 2" src="https://github.com/user-attachments/assets/3f1c6bfe-94ef-43fa-9144-cf7f6dbecf8e" />
+<img width="979" height="512" alt="Команда 2" src="https://github.com/user-attachments/assets/bd2fbd7d-3cf1-4a7d-8f74-2ee2be487016" />
 </details>
 
 После загрузки в папке IPA_Downloader/Apps появится ipa-файл с наименованием ID и версией приложения.  
@@ -83,7 +83,7 @@
 Скрипт осуществит выход из учетной записи Apple ID.
 <details>
  <summary>Скриншот</summary>
-<img width="979" height="512" alt="Команда 6" src="https://github.com/user-attachments/assets/9e6fe7f5-5e52-4ed1-8d26-538f77ce2b25" />
+<img width="979" height="512" alt="Команда 6" src="https://github.com/user-attachments/assets/3a40828b-a108-460e-b39f-e5e9d77d7d55" />
 </details>
 
 #### <ins>7.Перейти на страницу проекта в GitHub</ins>
