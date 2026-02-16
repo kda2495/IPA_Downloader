@@ -1,4 +1,4 @@
-Write-Host "IPA_Downloader 1.1.5" -ForegroundColor Black -BackgroundColor Yellow
+Write-Host "IPA_Downloader 1.1.6" -ForegroundColor Black -BackgroundColor Yellow
 if (!(Test-Path ipatool.exe)) {
 	Write-Host "Ошибка: ipatool.exe не найден в папке со скриптом." -ForegroundColor Red
 	Read-Host "Нажмите Enter для выхода"
@@ -99,24 +99,23 @@ function Get-AppID-From-List {
 		}
 		Write-Host "Выбран ID: $AppID"
 		return $AppID.Trim()
-	} else {
-		if ($Selection -match '^\d+$' -and $Selection.Length -lt 6) {
-			Write-Host "Ошибка: Приложение под номером $Selection отсутствует в списке." -ForegroundColor Red
+	}
+	elseif ($Selection -match '^\d+$' -and $Selection.Length -lt 6) {
+		Write-Host "Ошибка: Приложение под номером $Selection отсутствует в списке." -ForegroundColor Red
+		return $null
+	}
+	elseif ($Selection -match '\d{6,}') {
+		$AppID = [System.Text.RegularExpressions.Regex]::Match($Selection, '\b\d{6,}\b').Value
+		if ($AppsIDList -notlike "*$AppID*") {
+			Write-Host "Ошибка: Приложение с ID $AppID отсутствует в списке." -ForegroundColor Red
 			return $null
 		}
-		elseif ($Selection -match '\d{6,}') {
-			$AppID = [System.Text.RegularExpressions.Regex]::Match($Selection, '\b\d{6,}\b').Value
-			if ($AppsIDList -notlike "*$AppID*") {
-				Write-Host "Ошибка: Приложение с ID $AppID отсутствует в списке." -ForegroundColor Red
-				return $null
-			}
-			Write-Host "Выбран ID: $AppID"
-			return $AppID.Trim()
-		}
-		else {
-			Write-Host "Ошибка: Введите номер или ID приложения." -ForegroundColor Red
-			return $null
-		}
+		Write-Host "Выбран ID: $AppID"
+		return $AppID.Trim()
+	}
+	else {
+		Write-Host "Ошибка: Введите номер или ID приложения." -ForegroundColor Red
+		return $null
 	}
 }
 $MainMenu = @"
