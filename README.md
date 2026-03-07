@@ -128,3 +128,9 @@
 <img width="972" height="617" alt="4" src="https://github.com/user-attachments/assets/586ad840-6f3f-4d6d-9f73-fda18b838642" />
 </details>
 Без данного обновления не будет доступна загрузка списка приложений через команды 4-5.
+
+## Поддержка проекта:
+IPA_Downloader полностью бесплатен, однако, если Вы хотите безвозмездно поддержать проект:  
+CloudTips: https://pay.cloudtips.ru/p/93c0b094  
+
+<img width="320" height="320" alt="qrCode" src="https://github.com/user-attachments/assets/1013fdce-2f18-4b5e-bd73-9237f691f51a" />
