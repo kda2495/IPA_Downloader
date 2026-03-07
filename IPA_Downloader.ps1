@@ -1,6 +1,6 @@
-Write-Host "IPA_Downloader 1.1.6" -ForegroundColor Black -BackgroundColor Yellow
-if (!(Test-Path ipatool.exe)) {
-	Write-Host "Ошибка: ipatool.exe не найден в папке со скриптом." -ForegroundColor Red
+Write-Host "IPA_Downloader 1.1.7" -ForegroundColor Black -BackgroundColor Yellow
+if (!(Test-Path .\ipatool.*)) {
+	Write-Host "Ошибка: ipatool не найден в папке со скриптом." -ForegroundColor Red
 	Read-Host "Нажмите Enter для выхода"
 	exit
 }
@@ -125,15 +125,16 @@ $MainMenu = @"
 3.Ввод ID приложения и загрузка (с выбором версии)
 4.Вывод списка ID приложений и загрузка последней версии
 5.Вывод списка ID приложений и загрузка (с выбором версии)
-6.Отозвать Apple ID из IPATool
-7.Перейти на страницу проекта в GitHub`n
+6.Очистить папку Apps
+7.Отозвать Apple ID из IPATool
+8.Перейти на страницу проекта в GitHub`n
 "@
 while (Test-Path "$env:USERPROFILE\.ipatool\account") {
 	Write-Host "========================================" -ForegroundColor Green
 	$SwitchValue = Read-Host $MainMenu
-	while ("1", "2", "3", "4", "5", "6", "7" -notcontains $SwitchValue) {
+	while ("1", "2", "3", "4", "5", "6", "7", "8" -notcontains $SwitchValue) {
 		Write-Host "========================================" -ForegroundColor Green
-		$SwitchValue = Read-Host "Неверное значение! Введите команду (от 1 до 7)`n"
+		$SwitchValue = Read-Host "Неверное значение! Введите команду (от 1 до 8)`n"
 	}
 	switch ($SwitchValue) {
 		1 {
@@ -168,6 +169,11 @@ while (Test-Path "$env:USERPROFILE\.ipatool\account") {
 			}
 		}
 		6 {
+			Remove-Item .\Apps\*
+			Write-Host "========================================" -ForegroundColor Green
+			Write-Host "Готово. Файлы в папке Apps удалены." -ForegroundColor Green
+		}
+		7 {
 			Write-Host "========================================" -ForegroundColor Green
 			Write-Host "Apple ID отозван."
 			.\ipatool auth revoke
@@ -178,7 +184,7 @@ while (Test-Path "$env:USERPROFILE\.ipatool\account") {
 				.\ipatool auth login --email $AppleID --keychain-passphrase $kp
 			}
 		}
-		7 {
+		8 {
 			Start-Process "https://github.com/kda2495/IPA_Downloader"
 		}
 	}
