@@ -20,7 +20,7 @@
 Для загрузки приложения необходимо ввести его ID (когда скрипт запросит "Введите ID приложения для загрузки").
 <details>
  <summary>Скриншот</summary>
-<img width="979" height="512" alt="Команда 1" src="https://github.com/user-attachments/assets/8e3bbb15-6ebb-4e06-bb1c-cc13751a740d" />
+<img width="979" height="512" alt="Команда 1" src="https://github.com/user-attachments/assets/21d3e1a0-de3d-4200-a5ab-7269064eecec" />
 </details>
 
 После загрузки в папке IPA_Downloader/Apps появится ipa-файл с наименованием ID и версией приложения.  
@@ -31,7 +31,7 @@
 Для загрузки приложения необходимо ввести его ID (когда скрипт запросит "Введите ID приложения для загрузки").
 <details>
  <summary>Скриншот</summary>
-<img width="979" height="512" alt="Команда 2" src="https://github.com/user-attachments/assets/bd2fbd7d-3cf1-4a7d-8f74-2ee2be487016" />
+<img width="979" height="512" alt="Команда 2" src="https://github.com/user-attachments/assets/7d272e2c-08c6-4d8d-b9be-bd51d1afc998" />
 </details>
 
 После загрузки в папке IPA_Downloader/Apps появится ipa-файл с наименованием ID и версией приложения.  
@@ -42,7 +42,7 @@
 Для загрузки приложения необходимо ввести его ID (когда скрипт запросит "Введите ID приложения для поиска"), скрипт выдаст список версий через запятую (версии отсортированы от первой к последней), вводим нужную нам версию.
 <details>
  <summary>Скриншот</summary>
-<img width="979" height="512" alt="Команда 3" src="https://github.com/user-attachments/assets/165db34a-245c-45c8-823a-b22ec3834d01" />
+<img width="979" height="512" alt="Команда 3" src="https://github.com/user-attachments/assets/2b84a46a-ae9c-4715-a185-b2111af68bc0" />
 </details>
 
 После загрузки в папке IPA_Downloader/Apps появится ipa-файл с наименованием ID и версией приложения.  
@@ -79,14 +79,21 @@
 **Важное замечание.** Если приложение недоступно в Вашем регионе или удалено из AppStore, то при наличии обновления в AppStore оно будет отображаться, но при попытке обновления будет ошибка.  
 Для обновления необходимо удалить старую версию приложения, загрузить новую версию через IPA_Downloader и установить через 3uTools.
 
-#### <ins>6.Отозвать данные своего Apple ID</ins>
+#### <ins>6.Очистить папку Apps</ins>
+Скрипт осуществит очистку папки Apps со всеми загруженными приложениями
+<details>
+ <summary>Скриншот</summary>
+<img width="978" height="340" alt="Команда 6" src="https://github.com/user-attachments/assets/0f29fc78-eecd-45be-b557-44321589bada" />
+</details>
+
+#### <ins>7.Отозвать данные своего Apple ID</ins>
 Скрипт осуществит выход из учетной записи Apple ID.
 <details>
  <summary>Скриншот</summary>
-<img width="979" height="512" alt="Команда 6" src="https://github.com/user-attachments/assets/3a40828b-a108-460e-b39f-e5e9d77d7d55" />
+<img width="978" height="511" alt="Команда 7" src="https://github.com/user-attachments/assets/332354e2-4064-463b-97de-b96f55db34e9" />
 </details>
 
-#### <ins>7.Перейти на страницу проекта в GitHub</ins>
+#### <ins>8.Перейти на страницу проекта в GitHub</ins>
 Скрипт осуществит открытие страницы проекта на GitHub.
 
 ## Как найти ID приложения:
