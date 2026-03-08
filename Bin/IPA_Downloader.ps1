@@ -153,7 +153,7 @@ $MainMenu = @"
 6. Установить приложения, загруженные в папку Apps
 7. Очистить папку Apps
 8. Отозвать Apple ID из IPATool
-9. Перейти на страницу проекта в GitHub`n
+9. Перейти на страницу проекта на GitHub`n
 "@
 while (Test-Path "$env:USERPROFILE\.ipatool\account") {
 	Write-Host "========================================" -ForegroundColor Green
@@ -224,4 +224,5 @@ while (Test-Path "$env:USERPROFILE\.ipatool\account") {
 			Start-Process "https://github.com/kda2495/IPA_Downloader"
 		}
 	}
+
 }
