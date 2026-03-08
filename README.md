@@ -1,6 +1,7 @@
 [![GitHub release](https://img.shields.io/github/v/release/kda2495/IPA_Downloader.svg?label=Release)](https://github.com/kda2495/IPA_Downloader/releases)
 [![License](https://img.shields.io/github/license/kda2495/IPA_Downloader.svg?label=License&color=blue)](https://github.com/kda2495/IPA_Downloader/blob/main/LICENSE)
 [![Downloads](https://img.shields.io/github/downloads/kda2495/IPA_Downloader/total?label=Downloads&color=blue)](https://github.com/kda2495/IPA_Downloader/releases)
+[![Latest Downloads](https://img.shields.io/github/downloads/kda2495/IPA_Downloader/latest/IPA_Downloader.zip?label=Latest&color=blue)](https://github.com/kda2495/IPA_Downloader/releases)
 
 # IPA_Downloader
 Скрипт для загрузки приложений из истории покупок Apple ID и установки на устройства Apple (работает с [IPATool](https://github.com/majd/ipatool)).
@@ -107,7 +108,7 @@
 К примеру, некоторые приложения были загружены мной ещё в 2020 году, iMazing их не видит для установки, а данный скрипт позволяет загрузить их и установить.
 
 ## Поддержка Windows 7:
-1\. Для добавления поддержки IPATool, необходимо применить к ipatool.exe данный патч:  
+1\. Для добавления поддержки IPATool необходимо применить к ipatool.exe данный патч:  
 [GoWin7Fixer](https://github.com/stunndard/golangwin7patch/releases/tag/v0.2)  
 Запускаете GoWin7Fixer.exe и либо переносите ipatool.exe прямо на окно с программой, либо нажимаете Open и указываете путь к ipatool.exe.
 <details>
@@ -123,7 +124,7 @@
  <summary>Скриншот</summary>
 <img width="972" height="617" alt="4" src="https://github.com/user-attachments/assets/586ad840-6f3f-4d6d-9f73-fda18b838642" />
 </details>
-Без данного обновления не будет доступна загрузка списка приложений через команды 4-5.
+Без этого обновления команды 4 и 5 для загрузки списка приложений работать не будут.  
 
 ## Поддержка проекта:
 IPA_Downloader полностью бесплатен, однако, если вы хотите безвозмездно поддержать проект, то можно это сделать по следующим реквизитам:  
