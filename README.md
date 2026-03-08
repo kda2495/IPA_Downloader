@@ -29,14 +29,14 @@
 • Для загрузки введите ID приложения, когда появится запрос: `Введите ID приложения для загрузки`
 <details>
  <summary>Скриншот (нажмите для просмотра)</summary>
-<img width="979" height="512" alt="Команда 1" src="https://github.com/user-attachments/assets/21d3e1a0-de3d-4200-a5ab-7269064eecec" />
+<img width="979" height="512" alt="Команда 1" src="https://github.com/user-attachments/assets/43f103be-e3ae-4618-a22e-8338dcd89afd" />
 </details>
 
 #### 2. Ввод ID приложения и загрузка последней версии
 • Для загрузки введите ID приложения, когда появится запрос: `Введите ID приложения для загрузки`
 <details>
  <summary>Скриншот (нажмите для просмотра)</summary>
-<img width="979" height="512" alt="Команда 2" src="https://github.com/user-attachments/assets/7d272e2c-08c6-4d8d-b9be-bd51d1afc998" />
+<img width="979" height="511" alt="Команда 2" src="https://github.com/user-attachments/assets/30bfbed7-e24f-4b40-98eb-f414aa26e886" />
 </details>
 
 #### 3. Ввод ID приложения и загрузка (с выбором версии)
@@ -45,7 +45,7 @@
 • Введите нужную версию
 <details>
  <summary>Скриншот (нажмите для просмотра)</summary>
-<img width="979" height="512" alt="Команда 3" src="https://github.com/user-attachments/assets/2b84a46a-ae9c-4715-a185-b2111af68bc0" />
+<img width="979" height="512" alt="Команда 3" src="https://github.com/user-attachments/assets/acdd06b0-ec75-49e7-b2f1-1afb86b37e73" />
 </details> 
 
 **Важное замечание.** Если приложение недоступно в вашем регионе, то при наличии обновления в AppStore оно будет отображаться, но при попытке обновления будет ошибка.  
@@ -56,7 +56,7 @@
 • Для загрузки введите порядковый номер приложения или его ID, когда появится запрос: `Введите номер или ID приложения для загрузки`  
 <details>
  <summary>Скриншот (нажмите для просмотра)</summary>
-<img width="979" height="512" alt="Команда 4" src="https://github.com/user-attachments/assets/e1c662bd-57b7-4b53-854b-6fdd3658fbe7" />
+<img width="979" height="511" alt="Команда 4" src="https://github.com/user-attachments/assets/9cda70ad-657c-471c-ba10-303bd49ac418" />
 </details>
 
 #### 5. Вывод списка ID приложений и загрузка (с выбором версии)
@@ -66,7 +66,7 @@
 • Введите нужную версию
 <details>
  <summary>Скриншот (нажмите для просмотра)</summary>
-<img width="979" height="512" alt="Команда 5" src="https://github.com/user-attachments/assets/31a2233e-7e03-4acd-bce8-20105a2b9fca" />
+<img width="979" height="512" alt="Команда 5" src="https://github.com/user-attachments/assets/a22f2c8f-3c50-4dfb-be86-94c893837f45" />
 </details>
 
 **Важное замечание.** Если приложение недоступно в вашем регионе, то при наличии обновления в AppStore оно будет отображаться, но при попытке обновления будет ошибка.  
@@ -77,19 +77,23 @@
 [Скачать iTunes (официальный сайт Apple)](https://www.apple.com/itunes/download/win64)  
 • Для установки необходимо подключить устройство к ПК через USB и разрешить подключение  
 • Скрипт установит все приложения, находящиеся в папке Apps
+<details>
+ <summary>Скриншот (нажмите для просмотра)</summary>
+<img width="979" height="512" alt="Команда 6" src="https://github.com/user-attachments/assets/327ff96e-bc1a-46e2-a47f-2d25e38b6928" />
+</details>
 
 #### 7. Очистить папку Apps
 • Скрипт очистит папку Apps со всеми загруженными приложениями
 <details>
  <summary>Скриншот (нажмите для просмотра)</summary>
-<img width="978" height="340" alt="Команда 6" src="https://github.com/user-attachments/assets/0f29fc78-eecd-45be-b557-44321589bada" />
+<img width="979" height="326" alt="Команда 7" src="https://github.com/user-attachments/assets/b1c4eaa7-441f-4026-870a-0979f2ab86ed" />
 </details>
 
 #### 8. Отозвать Apple ID из IPATool
 • Скрипт выполнит выход из Apple ID
 <details>
  <summary>Скриншот (нажмите для просмотра)</summary>
-<img width="978" height="511" alt="Команда 7" src="https://github.com/user-attachments/assets/332354e2-4064-463b-97de-b96f55db34e9" />
+<img width="979" height="512" alt="Команда 8" src="https://github.com/user-attachments/assets/b3b3760d-f696-42be-9820-963e6a06d64c" />
 </details>
 
 #### 9. Перейти на страницу проекта в GitHub
