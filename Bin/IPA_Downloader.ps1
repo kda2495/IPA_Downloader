@@ -224,5 +224,4 @@ while (Test-Path "$env:USERPROFILE\.ipatool\account") {
 			Start-Process "https://github.com/kda2495/IPA_Downloader"
 		}
 	}
-
 }
