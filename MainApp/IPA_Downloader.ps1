@@ -158,7 +158,7 @@ while (Test-Path "$env:USERPROFILE\.ipatool\account") {
 	$SwitchValue = Read-Host $MainMenu
 	while ("1", "2", "3", "4", "5", "6", "7", "8", "9" -notcontains $SwitchValue) {
 		Write-Host "========================================" -ForegroundColor Green
-		$SwitchValue = Read-Host "Неверное значение! Введите команду (от 1 до 8)`n"
+		$SwitchValue = Read-Host "Неверное значение! Введите команду (от 1 до 9)`n"
 	}
 	switch ($SwitchValue) {
 		1 {
@@ -222,4 +222,5 @@ while (Test-Path "$env:USERPROFILE\.ipatool\account") {
 			Start-Process "https://github.com/kda2495/IPA_Downloader"
 		}
 	}
+
 }
