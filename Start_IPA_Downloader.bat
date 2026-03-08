@@ -1,1 +1,0 @@
-Powershell.exe -ExecutionPolicy Bypass -Command ".\Bin\IPA_Downloader.ps1"
