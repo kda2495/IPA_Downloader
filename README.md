@@ -130,11 +130,13 @@
 1\. Скачать MSYS2_x86_64 по ссылке:  
 https://github.com/msys2/msys2-installer/releases  
 2\. Запустить MSYS2 MINGW64 и ввести:  
+```
 pacman -S \
 mingw-w64-x86_64-libimobiledevice \
 mingw-w64-x86_64-libplist \
 mingw-w64-x86_64-libusbmuxd \
 mingw-w64-x86_64-ideviceinstaller
+```
 3\. После загрузки в папке C:\msys64\mingw64\bin будут находиться обновленные библиотеки libimobiledevice.
 
 ## Поддержка проекта:
