@@ -29,14 +29,14 @@
 • Для загрузки введите ID приложения, когда появится запрос: `Введите ID приложения для загрузки`
 <details>
  <summary>Скриншот (нажмите для просмотра)</summary>
-<img width="979" height="512" alt="Команда 1" src="https://github.com/user-attachments/assets/43f103be-e3ae-4618-a22e-8338dcd89afd" />
+<img width="979" height="512" alt="Команда 1" src="https://github.com/user-attachments/assets/ca585876-648c-49d8-a9b8-7647f6053ce1" />
 </details>
 
 #### 2. Ввод ID приложения и загрузка последней версии
 • Для загрузки введите ID приложения, когда появится запрос: `Введите ID приложения для загрузки`
 <details>
  <summary>Скриншот (нажмите для просмотра)</summary>
-<img width="979" height="511" alt="Команда 2" src="https://github.com/user-attachments/assets/30bfbed7-e24f-4b40-98eb-f414aa26e886" />
+<img width="979" height="512" alt="Команда 2" src="https://github.com/user-attachments/assets/62676fa0-d66c-41e0-be21-eb6f58fa7dc5" />
 </details>
 
 #### 3. Ввод ID приложения и загрузка (с выбором версии)
@@ -45,7 +45,7 @@
 • Введите нужную версию
 <details>
  <summary>Скриншот (нажмите для просмотра)</summary>
-<img width="979" height="512" alt="Команда 3" src="https://github.com/user-attachments/assets/acdd06b0-ec75-49e7-b2f1-1afb86b37e73" />
+<img width="979" height="512" alt="Команда 3" src="https://github.com/user-attachments/assets/929b2a2d-be0e-4167-817b-9792d267bef5" />
 </details> 
 
 **Важное замечание.** Если приложение недоступно в вашем регионе, то при наличии обновления в AppStore оно будет отображаться, но при попытке обновления будет ошибка.  
@@ -79,24 +79,16 @@
 • Скрипт установит все приложения, находящиеся в папке Apps
 <details>
  <summary>Скриншот (нажмите для просмотра)</summary>
-<img width="979" height="512" alt="Команда 6" src="https://github.com/user-attachments/assets/327ff96e-bc1a-46e2-a47f-2d25e38b6928" />
+<img width="979" height="512" alt="Команда 6" src="https://github.com/user-attachments/assets/705828ec-b76b-48b7-8862-4b3703f411c8" />
 </details>
 
 #### 7. Очистить папку Apps
 • Скрипт очистит папку Apps со всеми загруженными приложениями
-<details>
- <summary>Скриншот (нажмите для просмотра)</summary>
-<img width="979" height="326" alt="Команда 7" src="https://github.com/user-attachments/assets/b1c4eaa7-441f-4026-870a-0979f2ab86ed" />
-</details>
 
 #### 8. Отозвать Apple ID из IPATool
 • Скрипт выполнит выход из Apple ID
-<details>
- <summary>Скриншот (нажмите для просмотра)</summary>
-<img width="979" height="512" alt="Команда 8" src="https://github.com/user-attachments/assets/b3b3760d-f696-42be-9820-963e6a06d64c" />
-</details>
 
-#### 9. Перейти на страницу проекта в GitHub
+#### 9. Перейти на страницу проекта на GitHub
 • Скрипт откроет страницу проекта на GitHub
 
 ## Как найти ID приложения:
