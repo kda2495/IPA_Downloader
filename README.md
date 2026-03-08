@@ -1,6 +1,6 @@
-![GitHub release](https://img.shields.io/github/v/release/kda2495/IPA_Downloader.svg?label=Release)
-![License](https://img.shields.io/github/license/kda2495/IPA_Downloader.svg?label=License&color=blue)
-![Downloads](https://img.shields.io/github/downloads/kda2495/IPA_Downloader/latest/IPA_Downloader.zip?label=Downloads&color=blue)
+[![GitHub release](https://img.shields.io/github/v/release/kda2495/IPA_Downloader.svg?label=Release)](https://github.com/kda2495/IPA_Downloader/releases)
+[![License](https://img.shields.io/github/license/kda2495/IPA_Downloader.svg?label=License&color=blue)](https://github.com/kda2495/IPA_Downloader/blob/main/LICENSE)
+[![Downloads](https://img.shields.io/github/downloads/kda2495/IPA_Downloader/latest/IPA_Downloader.zip?label=Downloads&color=blue)](https://github.com/kda2495/IPA_Downloader/releases)
 
 # IPA_Downloader
 Скрипт для загрузки приложений из истории покупок Apple ID и установки на устройства Apple (работает с [IPATool](https://github.com/majd/ipatool)).
@@ -11,7 +11,7 @@
 • Apple ID с ранее загруженными приложениями  
 
 ## Как использовать:
-1\. Дважды кликните по файлу `!Start_IPA_Downloader.bat`  
+1\. Дважды кликните по файлу `Start_IPA_Downloader.bat`  
 2\. При первом запуске потребуется вход в Apple ID:  
 • Введите Apple ID  
 • Пароль (INF enter password)  
