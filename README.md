@@ -3,11 +3,7 @@
 [![Downloads](https://img.shields.io/github/downloads/kda2495/IPA_Downloader/total?label=Downloads&color=blue)](https://github.com/kda2495/IPA_Downloader/releases)
 
 # IPA_Downloader
-Скрипт для загрузки приложений из истории покупок Apple ID и установки на устройства Apple (работает с [IPATool](https://github.com/majd/ipatool)).
-
-## В чем плюсы данного скрипта в сравнении с iMazing?
-Данный скрипт позволяет загрузить любые приложения, которые ранее загружались под Apple ID (даже недоступные в данный момент в российском регионе, либо удаленные из AppStore), а не только те, что видит iMazing (за определенное время).  
-К примеру, некоторые приложения были загружены мной ещё в 2020 году, iMazing их не видит для установки, а данный скрипт позволяет загрузить их и установить.
+Скрипт для загрузки приложений из истории покупок Apple ID и установки на устройства Apple (работает на базе [IPATool](https://github.com/majd/ipatool)).
 
 ## Требования:
 • Windows 10/11 x64  
