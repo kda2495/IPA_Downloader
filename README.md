@@ -9,6 +9,7 @@
 • Windows 10/11 x64  
 • Установленный драйвер AppleMobileDeviceSupport (входит в состав iTunes):  
 [Ссылка для загрузки iTunes](https://www.apple.com/itunes/download/win64)  
+Вместо полной установки iTunes можно выполнить выборочную установку AppleMobileDeviceSupport64.msi, распаковав установщик iTunes любым архиватором  
 • Интернет-соединение  
 • Аккаунт Apple ID с ранее загруженными приложениями  
 
