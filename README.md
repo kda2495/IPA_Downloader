@@ -133,8 +133,8 @@
 • Нажмите ОК  
 
 ## Обновление библиотек libimobiledevice для установки приложений:
-**1\. Скачать MSYS2_x86_64 по ссылке:**  
-[Ссылка для загрузки MSYS2](https://github.com/msys2/msys2-installer/releases)  
+**1\. Скачать msys2-x86_64-latest.exe по ссылке:**  
+[Ссылка для загрузки MSYS2](https://github.com/msys2/msys2-installer/releases/tag/nightly-x86_64)  
 **2\. Запустить MSYS2 MINGW64 и ввести:**  
 ```
 pacman -S \
