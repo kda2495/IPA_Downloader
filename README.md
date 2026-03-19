@@ -6,7 +6,7 @@
 Скрипт для загрузки приложений из истории покупок Apple ID и установки на устройства Apple (работает на базе [IPATool](https://github.com/majd/ipatool)).
 
 ## Требования:
-• Windows 10/11 x64  
+• Windows 7/8/8.1/10/11 x64  
 • Установленный драйвер AppleMobileDeviceSupport (входит в состав iTunes):  
 [Ссылка для загрузки iTunes](https://www.apple.com/itunes/download/win64)  
 Вместо полной установки iTunes можно выполнить выборочную установку AppleMobileDeviceSupport64.msi, распаковав установщик iTunes любым архиватором  
@@ -16,12 +16,11 @@
 ## Как использовать:
 **1\. Дважды кликните по файлу `Start_IPA_Downloader.bat`**  
 **2\. При первом запуске потребуется вход в Apple ID:**  
-• Введите Apple ID  
-• Пароль (INF enter password)  
-• Код двухфакторной аутентификации (INF enter 2FA code)  
+• Введите Apple ID (Enter email)  
+• Пароль (Enter password)  
+• Код двухфакторной аутентификации (Enter 2FA code)  
 
 **Обратите внимание:**  
-• Пароль **не отображается при вводе** (в целях безопасности)  
 • Все действия в скрипте подтверждаются нажатием клавиши Enter  
 • Все загруженные приложения сохраняются в папку `IPA_Downloader/Apps`  
 • Имя загруженного файла содержит ID и версию приложения  
@@ -33,14 +32,14 @@
 • Для загрузки введите ID приложения, когда появится запрос: `Введите ID приложения для загрузки`
 <details>
  <summary>Скриншот (нажмите для просмотра)</summary>
-<img width="979" height="512" alt="Команда 1" src="https://github.com/user-attachments/assets/ca585876-648c-49d8-a9b8-7647f6053ce1" />
+<img width="979" height="512" alt="Команда 1" src="https://github.com/user-attachments/assets/087bea58-b5ba-4a4f-9cd4-a578d193b334" />
 </details>
 
 #### 2. Ввод ID приложения и загрузка последней версии
 • Для загрузки введите ID приложения, когда появится запрос: `Введите ID приложения для загрузки`
 <details>
  <summary>Скриншот (нажмите для просмотра)</summary>
-<img width="979" height="512" alt="Команда 2" src="https://github.com/user-attachments/assets/62676fa0-d66c-41e0-be21-eb6f58fa7dc5" />
+<img width="979" height="512" alt="Команда 2" src="https://github.com/user-attachments/assets/05bc8c5b-7167-471a-9f4b-be5c5499e0e9" />
 </details>
 
 #### 3. Ввод ID приложения и загрузка (с выбором версии)
@@ -49,7 +48,7 @@
 • Введите нужную версию
 <details>
  <summary>Скриншот (нажмите для просмотра)</summary>
-<img width="979" height="512" alt="Команда 3" src="https://github.com/user-attachments/assets/929b2a2d-be0e-4167-817b-9792d267bef5" />
+<img width="983" height="512" alt="Команда 3" src="https://github.com/user-attachments/assets/f8c91289-a69e-4448-863a-8a3f9d916c7c" />
 </details> 
 
 **Важное замечание:**  
@@ -61,7 +60,7 @@
 • Для загрузки введите порядковый номер приложения или его ID, когда появится запрос: `Введите номер или ID приложения для загрузки`  
 <details>
  <summary>Скриншот (нажмите для просмотра)</summary>
-<img width="979" height="511" alt="Команда 4" src="https://github.com/user-attachments/assets/9cda70ad-657c-471c-ba10-303bd49ac418" />
+<img width="979" height="512" alt="Команда 4" src="https://github.com/user-attachments/assets/79d24944-a172-4d12-8c50-5e61b746c8cf" />
 </details>
 
 #### 5. Вывод списка ID приложений и загрузка (с выбором версии)
@@ -71,7 +70,7 @@
 • Введите нужную версию
 <details>
  <summary>Скриншот (нажмите для просмотра)</summary>
-<img width="979" height="512" alt="Команда 5" src="https://github.com/user-attachments/assets/a22f2c8f-3c50-4dfb-be86-94c893837f45" />
+<img width="979" height="512" alt="Команда 5" src="https://github.com/user-attachments/assets/c9c5ae66-9dd5-45c4-912c-10225f32b7ce" />
 </details>
 
 **Важное замечание:**  
@@ -84,7 +83,7 @@
 • Скрипт установит все приложения, находящиеся в папке Apps
 <details>
  <summary>Скриншот (нажмите для просмотра)</summary>
-<img width="979" height="512" alt="Команда 6" src="https://github.com/user-attachments/assets/705828ec-b76b-48b7-8862-4b3703f411c8" />
+<img width="979" height="512" alt="Команда 6" src="https://github.com/user-attachments/assets/17e0fc4a-328c-478e-a97f-23612541f4ea" />
 </details>
 
 #### 7. Очистка папки Apps
@@ -107,7 +106,7 @@
 
 Список ID актуальных приложений также можно вывести с помощью команд 4 и 5.  
 
-## Поддержка Windows 7 (временно неактуально, в процессе):
+## Поддержка Windows 7:
 **1\. Обновить системные сертификаты через UpdRootsCert:**  
 [Ссылка для загрузки UpdRootsCert](https://disk.yandex.ru/d/SdHMgwJ55MTQRg)
 <details>
