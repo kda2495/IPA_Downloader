@@ -3,7 +3,7 @@
 [![Downloads](https://img.shields.io/github/downloads/kda2495/IPA_Downloader/total?label=Downloads&color=blue)](https://github.com/kda2495/IPA_Downloader/releases)
 
 # IPA_Downloader
-Скрипт для загрузки приложений из истории покупок Apple ID и установки на устройства Apple (работает на базе [IPATool](https://github.com/majd/ipatool)).
+Скрипт для загрузки приложений из истории покупок Apple ID и установки на устройства Apple (работает на базе [ipatool-cpp](https://github.com/Sorvigolova/ipatool)).
 
 ## Требования:
 • Windows 7/8/8.1/10/11 x64  
