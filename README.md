@@ -6,7 +6,7 @@
 Скрипт для загрузки приложений из истории покупок Apple ID и установки на устройства Apple (работает на базе [ipatool-cpp](https://github.com/Sorvigolova/ipatool)).
 
 ## Требования:
-• Windows 7/8/8.1/10/11 x64  
+• Windows 7-11 x64  
 • Установленный драйвер AppleMobileDeviceSupport (входит в состав iTunes):  
 [Ссылка для загрузки iTunes](https://www.apple.com/itunes/download/win64)  
 Вместо полной установки iTunes можно выполнить выборочную установку AppleMobileDeviceSupport64.msi, распаковав установщик iTunes любым архиватором  
