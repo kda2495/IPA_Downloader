@@ -1,5 +1,6 @@
 AmneziaVPN: 1600529900
 AmneziaWG: 6478942365
+AppBank (MoodPetal): 6760329045 (Март 2026)
 ChatGPT: 6448311069
 Claude by Anthropic: 6473753684
 DeepSeek: 6737597349
