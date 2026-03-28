@@ -106,6 +106,11 @@
 
 Список ID актуальных приложений также можно вывести с помощью команд 4 и 5.  
 
+## Отслеживание выхода новых приложений:
+[Приложение MoodPetal в AppStore](https://apps.apple.com/ru/app/moodpetal/id6760329045)  
+[Telegram-канал AppBank](https://t.me/appbankRu)  
+[Сайт AppBank](https://appbank.pw/)
+
 ## Поддержка Windows 7:
 **1\. Обновить системные сертификаты через UpdRootsCert:**  
 [Ссылка для загрузки UpdRootsCert](https://disk.yandex.ru/d/SdHMgwJ55MTQRg)
