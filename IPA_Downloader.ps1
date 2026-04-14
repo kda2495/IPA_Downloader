@@ -1,4 +1,40 @@
-﻿Write-Host "IPA_Downloader 3.0" -ForegroundColor Black -BackgroundColor Yellow
+Add-Type -TypeDefinition @"
+using System;
+using System.Runtime.InteropServices;
+
+public class ConsoleFont {
+    [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Unicode)]
+    public struct CONSOLE_FONT_INFO_EX {
+        public uint cbSize;
+        public uint nFont;
+        public short dwFontSizeX;
+        public short dwFontSizeY;
+        public int FontFamily;
+        public int FontWeight;
+        [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 32)]
+        public string FaceName;
+    }
+
+    [DllImport("kernel32.dll", SetLastError = true)]
+    public static extern bool SetCurrentConsoleFontEx(IntPtr hConsoleOutput, bool bMaximumWindow, ref CONSOLE_FONT_INFO_EX lpConsoleCurrentFontEx);
+
+    [DllImport("kernel32.dll", SetLastError = true)]
+    public static extern IntPtr GetStdHandle(int nStdHandle);
+
+    public static void SetFont(string fontName, short fontSize = 12) {
+        IntPtr hConsole = GetStdHandle(-11); // STD_OUTPUT_HANDLE
+        CONSOLE_FONT_INFO_EX fontInfo = new CONSOLE_FONT_INFO_EX();
+        fontInfo.cbSize = (uint)Marshal.SizeOf(fontInfo);
+        fontInfo.FaceName = fontName;
+        fontInfo.dwFontSizeY = fontSize;
+        SetCurrentConsoleFontEx(hConsole, false, ref fontInfo);
+    }
+}
+"@
+#Устанавливаем шрифт Consolas и кодировку UTF8:
+[ConsoleFont]::SetFont("Consolas", 16)
+[Console]::OutputEncoding = [System.Text.Encoding]::UTF8
+Write-Host "IPA_Downloader 3.1" -ForegroundColor Black -BackgroundColor Yellow
 #Проверка на наличие папки Apps:
 if (!(Test-Path ".\Apps")) {
 	$null = New-Item -Path ".\Apps" -ItemType "Directory" -Force
