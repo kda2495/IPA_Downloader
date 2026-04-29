@@ -107,7 +107,6 @@
 Список ID актуальных приложений также можно вывести с помощью команд 4 и 5.  
 
 ## Отслеживание выхода новых приложений:
-[Приложение MoodPetal в AppStore](https://apps.apple.com/ru/app/moodpetal/id6760329045)  
 [Telegram-канал AppBank](https://t.me/appbankRu)  
 [Сайт AppBank](https://appbank.pw/)
 
