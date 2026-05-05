@@ -1,40 +1,40 @@
 Add-Type -TypeDefinition @"
 using System;
 using System.Runtime.InteropServices;
-
 public class ConsoleFont {
-    [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Unicode)]
-    public struct CONSOLE_FONT_INFO_EX {
-        public uint cbSize;
-        public uint nFont;
-        public short dwFontSizeX;
-        public short dwFontSizeY;
-        public int FontFamily;
-        public int FontWeight;
-        [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 32)]
-        public string FaceName;
-    }
-
-    [DllImport("kernel32.dll", SetLastError = true)]
-    public static extern bool SetCurrentConsoleFontEx(IntPtr hConsoleOutput, bool bMaximumWindow, ref CONSOLE_FONT_INFO_EX lpConsoleCurrentFontEx);
-
-    [DllImport("kernel32.dll", SetLastError = true)]
-    public static extern IntPtr GetStdHandle(int nStdHandle);
-
-    public static void SetFont(string fontName, short fontSize = 12) {
-        IntPtr hConsole = GetStdHandle(-11); // STD_OUTPUT_HANDLE
-        CONSOLE_FONT_INFO_EX fontInfo = new CONSOLE_FONT_INFO_EX();
-        fontInfo.cbSize = (uint)Marshal.SizeOf(fontInfo);
-        fontInfo.FaceName = fontName;
-        fontInfo.dwFontSizeY = fontSize;
-        SetCurrentConsoleFontEx(hConsole, false, ref fontInfo);
-    }
+	[StructLayout(LayoutKind.Sequential, CharSet = CharSet.Unicode)]
+	public struct CONSOLE_FONT_INFO_EX {
+		public uint cbSize;
+		public uint nFont;
+		public short dwFontSizeX;
+		public short dwFontSizeY;
+		public int FontFamily;
+		public int FontWeight;
+		[MarshalAs(UnmanagedType.ByValTStr, SizeConst = 32)]
+		public string FaceName;
+	}
+	[DllImport("kernel32.dll", SetLastError = true)]
+	public static extern bool SetCurrentConsoleFontEx(IntPtr hConsoleOutput, bool bMaximumWindow, ref CONSOLE_FONT_INFO_EX lpConsoleCurrentFontEx);
+	[DllImport("kernel32.dll", SetLastError = true)]
+	public static extern IntPtr GetStdHandle(int nStdHandle);
+	public static void SetFont(string fontName, short fontSize = 12) {
+		IntPtr hConsole = GetStdHandle(-11); // STD_OUTPUT_HANDLE
+		CONSOLE_FONT_INFO_EX fontInfo = new CONSOLE_FONT_INFO_EX();
+		fontInfo.cbSize = (uint)Marshal.SizeOf(fontInfo);
+		fontInfo.FaceName = fontName;
+		fontInfo.dwFontSizeY = fontSize;
+		SetCurrentConsoleFontEx(hConsole, false, ref fontInfo);
+	}
 }
 "@
 #Устанавливаем шрифт Consolas и кодировку UTF8:
 [ConsoleFont]::SetFont("Consolas", 16)
 [Console]::OutputEncoding = [System.Text.Encoding]::UTF8
-Write-Host "IPA_Downloader 3.1" -ForegroundColor Black -BackgroundColor Yellow
+Write-Host "IPA_Downloader 3.3" -ForegroundColor Black -BackgroundColor Yellow
+#Функция разделителя:
+function Separator {
+	Write-Host "========================================" -ForegroundColor Green
+}
 #Проверка на наличие папки Apps:
 if (!(Test-Path ".\Apps")) {
 	$null = New-Item -Path ".\Apps" -ItemType "Directory" -Force
@@ -55,6 +55,7 @@ foreach ($file in $CheckMainAppFiles) {
 	}
 }
 if ($MissingMainAppFiles.Count -gt 0) {
+	Separator
 	Write-Host "Ошибка: Следующие файлы не найдены в папке MainApp:" -ForegroundColor Red
 	$MissingMainAppFiles | ForEach-Object { Write-Host "$_" -ForegroundColor Red }
 	Read-Host "Нажмите Enter для выхода"
@@ -71,7 +72,7 @@ if ($OSVersion.Major -eq 6 -and $OSVersion.Minor -eq 1) {
 }
 #Проверка наличия файла account в папке .ipatool:
 if (Test-Path "$env:USERPROFILE\.ipatool\account") {
-	Write-Host "========================================" -ForegroundColor Green
+	Separator
 	Write-Host "Вход в аккаунт Apple ID выполнен.`nДанные аккаунта Apple ID:"
 	.\MainApp\ipatool.exe auth info
 }
@@ -79,7 +80,7 @@ if (Test-Path "$env:USERPROFILE\.ipatool\account") {
 function Connect-AppleID {
 	while (!(Test-Path "$env:USERPROFILE\.ipatool\account")) {
 		Remove-Item "$env:USERPROFILE\.ipatool\cookies" -Force -ErrorAction SilentlyContinue
-		Write-Host "========================================" -ForegroundColor Green
+		Separator
 		Write-Host "Вход в аккаунт Apple ID не выполнен."
 		.\MainApp\ipatool.exe auth login
 	}
@@ -88,8 +89,13 @@ function Connect-AppleID {
 function Move-IPA-Files {
 	$IPAFiles = Get-ChildItem -Filter "*.ipa"
 	if ($IPAFiles) {
-		$IPAFiles | Move-Item -Destination ".\Apps" -Force
-		Write-Host "Готово. Файл сохранен в папку Apps." -ForegroundColor Green
+		foreach ($file in $IPAFiles) {
+			$DestPath = Join-Path (Get-Location) ".\Apps\$($file.Name)"
+			Move-Item -Path $file.FullName -Destination $DestPath -Force
+			Separator
+			Write-Host "Готово. Файл сохранен в папку Apps." -ForegroundColor Green
+			Get-iOS-MinVersion -SpecificFile $DestPath
+		}
 	}
 }
 #Универсальная функция валидации числового ввода:
@@ -101,41 +107,82 @@ function Test-NumericInput {
 	if ([string]::IsNullOrWhiteSpace($InputValue)) {
 		if ($Type -eq "ID") {
 			Write-Host "Ошибка: ID приложения не введен." -ForegroundColor Red
-		} else {
-			Write-Host "Ошибка: Версия приложения не введена." -ForegroundColor Red
+		} elseif ($Type -eq "VersionsQuantity") {
+			Write-Host "Ошибка: Количество версий для отображения не введено." -ForegroundColor Red
 		}
 		return $false
 	}
 	if ($InputValue -notmatch '^\d+$') {
 		if ($Type -eq "ID") {
-			Write-Host "Ошибка: ID приложения должен состоять только из цифр." -ForegroundColor Red
-		} else {
-			Write-Host "Ошибка: Версия приложения должна состоять только из цифр." -ForegroundColor Red
+			Write-Host "Ошибка: Введен неверный ID приложения." -ForegroundColor Red
+		} elseif ($Type -eq "VersionsQuantity") {
+			Write-Host "Ошибка: Количество версий для отображения введено неверно." -ForegroundColor Red
 		}
 		return $false
 	}
 	return $true
 }
-#Функция загрузки ipa файлов:
+#Функция загрузки ipa-файлов:
 function IPA-Download($AppID) {
-	if (!(Test-NumericInput -InputValue $AppID -Type "ID")) {
-		return
-	}
+	if (!(Test-NumericInput -InputValue $AppID -Type "ID")) { return }
+	Separator
 	.\MainApp\ipatool.exe download -i $AppID --purchase
 	Move-IPA-Files
 }
-#Функция загрузки ipa файлов с выбором версии:
+#Функция загрузки ipa-файлов с выбором версии:
 function IPA-Download-With-Version($AppID) {
-	if (!(Test-NumericInput -InputValue $AppID -Type "ID")) {
+	if (!(Test-NumericInput -InputValue $AppID -Type "ID")) { return }
+	#Получаем список ID:
+	$RawOutput = .\MainApp\ipatool.exe list-versions -i $AppID 2>$null
+	#Если вывод пустой, сразу выходим:
+	if ([string]::IsNullOrEmpty($RawOutput)) {
+		Write-Host "Ошибка: Введен неверный ID приложения." -ForegroundColor Red
 		return
 	}
-	.\MainApp\ipatool.exe list-versions -i $AppID
-	$AppVersion = Read-Host "Введите версию приложения для загрузки"
-	if (!(Test-NumericInput -InputValue $AppVersion -Type "Version")) {
+	#Извлекаем ID версий только если RawOutput не пуст:
+	$RawVersions = [regex]::Matches($RawOutput, '(?<=")\d+(?=")') | ForEach-Object { $_.Value }
+	#Запрос количества версий:
+	Separator
+	$VersionsQuantity = Read-Host "Введите количество версий для отображения"
+	if (!(Test-NumericInput -InputValue $VersionsQuantity -Type "VersionsQuantity")) { return }
+	if ([int]$VersionsQuantity -le 0) {
+		Write-Host "Ошибка: Количество версий должно быть больше 0." -ForegroundColor Red
 		return
 	}
-	.\MainApp\ipatool.exe get-version-metadata -i $AppID --external-version-id $AppVersion
-	.\MainApp\ipatool.exe download -i $AppID --external-version-id $AppVersion
+	$RecentVersions = $RawVersions | Select-Object -Last $VersionsQuantity
+	[array]::Reverse($RecentVersions)
+	$VersionMapping = @()
+	$Counter = 1
+	Separator
+	Write-Host ("{0,-3} {1,-12} {2}" -f "№", "ID версии", "Версия")
+	foreach ($VersionID in $RecentVersions) {
+		#Запрос метаданных:
+		$Meta = .\MainApp\ipatool.exe get-version-metadata -i $AppID --external-version-id $VersionID 2>$null
+		$DisplayVersion = if ($Meta -match 'displayVersion=([^\s,]+)') { $Matches[1] } else { "N/A" }
+		Write-Host ("{0,-3} {1,-12} {2}" -f $Counter, $VersionID, $DisplayVersion)
+		$VersionMapping += [PSCustomObject]@{ Index = $Counter; ID = $VersionID; Version = $DisplayVersion }
+		$Counter++
+	}
+	Separator
+	$MaxIndex = $VersionMapping.Count
+	$Version = Read-Host "Введите номер (1-$MaxIndex) или введите ID версии"
+	Separator
+	if ([string]::IsNullOrWhiteSpace($Version)) {
+		Write-Host "Ошибка: Номер или ID версии не введен." -ForegroundColor Red
+		return $null
+	}
+	#Ищем совпадение по порядковому номеру или по точному ID версии:
+	$SelectedObject = $VersionMapping | Where-Object { $_.Index -eq $Version -or $_.ID -eq $Version }
+	if ($SelectedObject) {
+		Write-Host "Выбрана версия: $($SelectedObject.Version)"
+		Separator
+		$FinalID = $SelectedObject.ID
+	} else {
+		#Если ввод не совпал ни с индексом, ни с существующим ID в списке:
+		Write-Host "Ошибка: Неверный ввод. Введите число от 1 до $MaxIndex." -ForegroundColor Red
+		return
+	}
+	.\MainApp\ipatool.exe download -i $AppID --external-version-id $FinalID
 	Move-IPA-Files
 }
 #Функция получения списка приложений со страницы проекта на GitHub:
@@ -151,7 +198,9 @@ function Get-AppID-From-List {
 		$Index = $i + 1
 		Write-Host ("{0}. {1}" -f $Index, $Lines[$i])
 	}
+	Separator
 	$Selection = Read-Host "Введите номер (1-$($Lines.Count)) или ID приложения для загрузки"
+	Separator
 	if ([string]::IsNullOrWhiteSpace($Selection)) {
 		Write-Host "Ошибка: ID приложения не введен." -ForegroundColor Red
 		return $null
@@ -178,11 +227,50 @@ function Get-AppID-From-List {
 			return $null
 		}
 		Write-Host "Выбран ID: $AppID"
+		Separator
 		return $AppID.Trim()
 	}
 	else {
 		Write-Host "Ошибка: Введите номер или ID приложения." -ForegroundColor Red
 		return $null
+	}
+}
+#Функция проверки минимальной версии iOS для файлов в папке Apps:
+function Get-iOS-MinVersion {
+	param (
+		[string]$SpecificFile = $null
+	)
+	if (![string]::IsNullOrWhiteSpace($SpecificFile)) {
+		$FilesToProcess = @(Get-Item -Path $SpecificFile -ErrorAction SilentlyContinue)
+	} else {
+		$FilesToProcess = Get-ChildItem -Path ".\Apps\*.ipa" -ErrorAction SilentlyContinue
+	}
+	if (-not $FilesToProcess) {
+		Write-Host "В папке Apps нет приложений." -ForegroundColor Red
+		return
+	}
+	Add-Type -AssemblyName System.IO.Compression.FileSystem
+	Separator
+	Write-Host ("{0,-3} {1,-25} {2}" -f "№", "Название файла", "Мин. iOS")
+	$Counter = 1
+	foreach ($file in $FilesToProcess) {
+		$iOSmin = "N/A"
+		try {
+			$Zip = [System.IO.Compression.ZipFile]::OpenRead($file.FullName)
+			$PlistEntry = $Zip.Entries | Where-Object { $_.FullName -match 'Payload/.*\.app/Info\.plist$' } | Select-Object -First 1
+			if ($PlistEntry) {
+				$Reader = New-Object System.IO.StreamReader($PlistEntry.Open())
+				$Content = $Reader.ReadToEnd()
+				$Reader.Close()
+				if ($Content -match '<key>MinimumOSVersion</key>\s*<string>([^<]+)</string>') {
+					$iOSmin = $Matches[1]
+				}
+			}
+			$Zip.Dispose()
+		} catch { $iOSmin = "Error" }
+		$PrintName = if ($file.Name.Length -gt 25) { $file.Name.Substring(0,22) + "..." } else { $file.Name }
+		Write-Host ("{0,-3} {1,-25} {2}" -f $Counter, $PrintName, "$iOSmin+")
+		$Counter++
 	}
 }
 #Вход с Apple ID:
@@ -195,40 +283,43 @@ $MainMenu = @"
 3. Ввод ID приложения и загрузка (с выбором версии)
 4. Вывод списка ID приложений и загрузка последней версии
 5. Вывод списка ID приложений и загрузка (с выбором версии)
-6. Установка приложений, загруженных в папку Apps
-7. Очистка папки Apps
-8. Выход из аккаунта Apple ID
-9. Страница проекта на GitHub`n
+6. Показать минимальную версию iOS для ipa-файлов в папке Apps
+7. Установка приложений, загруженных в папку Apps
+8. Очистка папки Apps
+9. Выход из аккаунта Apple ID
+10. Страница проекта на GitHub`n
 "@
 #Работа скрипта, если вход с Apple ID выполнен:
 while (Test-Path "$env:USERPROFILE\.ipatool\account") {
-	Write-Host "========================================" -ForegroundColor Green
+	Separator
 	$SwitchValue = Read-Host $MainMenu
 	#Пункты меню:
 	switch ($SwitchValue) {
 		#1. Поиск приложения и загрузка последней версии:
 		1 {
-			Write-Host "========================================" -ForegroundColor Green
+			Separator
 			$AppName = Read-Host "Введите название приложения для поиска"
+			Separator
 			.\MainApp\ipatool.exe search $AppName --limit 10 2> $null
+			Separator
 			$AppID = Read-Host "Введите ID приложения для загрузки"
 			IPA-Download $AppID
 		}
 		#2. Ввод ID приложения и загрузка последней версии:
 		2 {
-			Write-Host "========================================" -ForegroundColor Green
+			Separator
 			$AppID = Read-Host "Введите ID приложения для загрузки"
 			IPA-Download $AppID
 		}
 		#3. Ввод ID приложения и загрузка (с выбором версии):
 		3 {
-			Write-Host "========================================" -ForegroundColor Green
+			Separator
 			$AppID = Read-Host "Введите ID приложения для поиска"
 			IPA-Download-With-Version $AppID
 		}
 		#4. Вывод списка ID приложений и загрузка последней версии:
 		4 {
-			Write-Host "========================================" -ForegroundColor Green
+			Separator
 			$AppID = Get-AppID-From-List
 			if ($null -ne $AppID) {
 				IPA-Download $AppID
@@ -236,14 +327,18 @@ while (Test-Path "$env:USERPROFILE\.ipatool\account") {
 		}
 		#5. Вывод списка ID приложений и загрузка (с выбором версии):
 		5 {
-			Write-Host "========================================" -ForegroundColor Green
+			Separator
 			$AppID = Get-AppID-From-List
 			if ($null -ne $AppID) {
 				IPA-Download-With-Version $AppID
 			}
 		}
-		#6. Установка приложений, загруженных в папку Apps:
+		#6. Показать минимальную версию iOS для ipa-файлов в папке Apps:
 		6 {
+			Get-iOS-MinVersion
+		}
+		#7. Установка приложений, загруженных в папку Apps:
+		7 {
 			if (Test-Path ".\Apps\*.ipa") {
 				Get-ChildItem ".\Apps\*.ipa" | ForEach-Object {
 					.\MainApp\ideviceinstaller.exe install "$($_.FullName)"
@@ -253,21 +348,22 @@ while (Test-Path "$env:USERPROFILE\.ipatool\account") {
 				Write-Host "Ошибка: В папке Apps отсутствуют приложения." -ForegroundColor Red
 			}
 		}
-		#7. Очистка папки Apps:
-		7 {
+		
+		#8. Очистка папки Apps:
+		8 {
 			Remove-Item ".\Apps\*" -Force -ErrorAction SilentlyContinue
-			Write-Host "========================================" -ForegroundColor Green
+			Separator
 			Write-Host "Готово. Файлы в папке Apps удалены." -ForegroundColor Green
 		}
-		#8. Отзыв Apple ID из IPATool:
-		8 {
-			Write-Host "========================================" -ForegroundColor Green
+		#9. Отзыв Apple ID из IPATool:
+		9 {
+			Separator
 			Write-Host "Выполнен выход из аккаунта Apple ID."
 			.\MainApp\ipatool.exe auth revoke
 			Connect-AppleID
 		}
-		#9. Страница проекта на GitHub:
-		9 {
+		#10. Страница проекта на GitHub:
+		10 {
 			Start-Process "https://github.com/kda2495/IPA_Downloader"
 		}
 		#Стандартный вывод в случае ввода неверного пункта меню:
