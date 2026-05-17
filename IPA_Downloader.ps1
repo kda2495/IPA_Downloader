@@ -53,6 +53,7 @@ if (Test-Path $LangConfigFile) {
 	Set-Content -Path $LangConfigFile -Value $Global:CurrentLang -Force
 }
 
+# Перевод текста:
 $LangStrings = @{
 	"RU" = @{
 		"MissingFiles" = "Ошибка: Следующие файлы не найдены в папке MainApp:"
@@ -70,7 +71,7 @@ $LangStrings = @{
 		"AskVerNum" = "Введите номер или введите ID версии"
 		"SelectedVer" = "Выбрана версия:"
 		"ListLoadError" = "Ошибка загрузки списка приложений."
-		"AskAppNum" = "Введите номер или ID приложения для загрузки"
+		"AskAppNum" = "Введите номера приложений для загрузки"
 		"SelectedApp" = "Выбрано приложение:"
 		"NoApps" = "Ошибка: В папке Apps нет приложений."
 		"HeaderFileName" = "Название файла"
@@ -112,7 +113,7 @@ $LangStrings = @{
 		"AskVerNum" = "Enter the number or enter the Version ID"
 		"SelectedVer" = "Selected version:"
 		"ListLoadError" = "Error loading the application list."
-		"AskAppNum" = "Enter the number or App ID to download"
+		"AskAppNum" = "Enter the numbers of apps to download"
 		"SelectedApp" = "Selected app:"
 		"NoApps" = "Error: There are no applications in the Apps folder."
 		"HeaderFileName" = "File name"
@@ -140,12 +141,13 @@ $LangStrings = @{
 	}
 }
 
+# Функция перевода текста:
 function Get-Lang($Key) {
 	return $LangStrings[$Global:CurrentLang][$Key]
 }
 
 # Версия скрипта:
-Write-Host "IPA_Downloader 3.4" -ForegroundColor Black -BackgroundColor Yellow
+Write-Host "IPA_Downloader 3.5" -ForegroundColor Black -BackgroundColor Yellow
 
 # Функция разделителя:
 function Separator {
@@ -318,12 +320,14 @@ function IPA-Download-With-Version($AppId) {
 
 	Separator
 	$VersionsQuantity = Read-Host (Get-Lang "AskVerCount")
-	if (!(Test-NumericInput -InputValue $VersionsQuantity)) { return }
-	if ([int]$VersionsQuantity -le 0) {
+	
+	$VerQty = 0
+	if (![int]::TryParse($VersionsQuantity, [ref]$VerQty) -or $VerQty -le 0) {
 		Write-Host (Get-Lang "InvalidInput") -ForegroundColor Red
 		return
 	}
-	$RecentVersions = $RawVersions | Select-Object -Last $VersionsQuantity
+
+	$RecentVersions = $RawVersions | Select-Object -Last $VerQty
 	[array]::Reverse($RecentVersions)
 	$VersionMapping = @()
 	$Counter = 1
@@ -342,7 +346,13 @@ function IPA-Download-With-Version($AppId) {
 	
 	if (!(Test-NumericInput -InputValue $Version)) { return }
 
-	$SelectedObject = $VersionMapping | Where-Object { $_.Index -eq $Version -or $_.ID -eq $Version }
+	$VersionInt = 0
+	$IsInt = [int]::TryParse($Version, [ref]$VersionInt)
+
+	$SelectedObject = $VersionMapping | Where-Object { 
+		($IsInt -and $_.Index -eq $VersionInt) -or $_.ID -eq $Version 
+	}
+
 	if ($SelectedObject) {
 		Write-Host "$((Get-Lang 'SelectedVer')) $($SelectedObject.Version)"
 		Separator
@@ -355,8 +365,8 @@ function IPA-Download-With-Version($AppId) {
 	Move-IPA-Files
 }
 
-# Функция получения списка приложений:
-function Get-AppID-From-List {
+# Функция получения списка выбранных приложений (поддерживает диапазоны и перечисления):
+function Get-Apps-From-List {
 	try {
 		$AppsIdList = Invoke-WebRequest "https://raw.githubusercontent.com/kda2495/IPA_Downloader/refs/heads/main/Apps_ID_List.txt" -UseBasicParsing -ErrorAction Stop | Select-Object -Expand Content
 	} catch {
@@ -370,43 +380,74 @@ function Get-AppID-From-List {
 	}
 	Separator
 	$Selection = Read-Host "$((Get-Lang 'AskAppNum')) (1-$($Lines.Count))"
-	Separator
 	
-	if (!(Test-NumericInput -InputValue $Selection)) { return $null }
-	
-	$SelectedIndex = 0
-	$SelectedLine = $null
-
-	if ([int]::TryParse($Selection, [ref]$SelectedIndex) -and $SelectedIndex -ge 1 -and $SelectedIndex -le $Lines.Count) {
-		$SelectedLine = $Lines[$SelectedIndex - 1]
-		$AppId = [System.Text.RegularExpressions.Regex]::Match($SelectedLine, '\b\d{6,}\b').Value
-		if (!(Test-NumericInput -InputValue $AppId)) { return $null }
-	}
-	elseif ($Selection.Length -lt 6) {
+	if ([string]::IsNullOrWhiteSpace($Selection)) {
 		Write-Host (Get-Lang "InvalidInput") -ForegroundColor Red
 		return $null
 	}
-	else {
-		$AppId = [System.Text.RegularExpressions.Regex]::Match($Selection, '\b\d{6,}\b').Value
-		$SelectedLine = $Lines | Where-Object { $_ -like "*$AppId*" } | Select-Object -First 1
-		if (!$SelectedLine) {
+
+	$SelectedIndices = @()
+	$Parts = $Selection -split ','
+
+	foreach ($Part in $Parts) {
+		$Part = $Part.Trim()
+		if ($Part -match '^\d+-\d+$') {
+			$Range = $Part -split '-'
+			$Start = 0
+			$End = 0
+			# Безопасное чтение диапазона чисел без падений от переполнения:
+			if (![int]::TryParse($Range[0], [ref]$Start) -or ![int]::TryParse($Range[1], [ref]$End)) {
+				Write-Host (Get-Lang "InvalidInput") -ForegroundColor Red
+				return $null
+			}
+			if ($Start -le $End) { $SelectedIndices += $Start..$End } else { $SelectedIndices += $End..$Start }
+		} elseif ($Part -match '^\d+$') {
+			$Val = 0
+			# Безопасное чтение одиночного числа:
+			if (![int]::TryParse($Part, [ref]$Val)) {
+				Write-Host (Get-Lang "InvalidInput") -ForegroundColor Red
+				return $null
+			}
+			$SelectedIndices += $Val
+		} else {
 			Write-Host (Get-Lang "InvalidInput") -ForegroundColor Red
 			return $null
 		}
 	}
 
-	if ($SelectedLine -match '^(.+?):\s*\d') {
-		$AppName = $Matches[1].Trim()
+	# Оставляем только уникальные индексы, входящие в диапазон списка:
+	$SelectedIndices = $SelectedIndices | Select-Object -Unique | Where-Object { $_ -ge 1 -and $_ -le $Lines.Count }
+
+	if ($SelectedIndices.Count -eq 0) {
+		Write-Host (Get-Lang "InvalidInput") -ForegroundColor Red
+		return $null
 	}
 
-	Write-Host "$((Get-Lang 'SelectedApp')) $AppName"
-	return $AppId.Trim()
+	$SelectedApps = @()
+	foreach ($Idx in $SelectedIndices) {
+		$SelectedLine = $Lines[$Idx - 1]
+		$AppId = [System.Text.RegularExpressions.Regex]::Match($SelectedLine, '\b\d{6,}\b').Value
+		
+		$AppName = "Unknown"
+		if ($SelectedLine -match '^(.+?):\s*\d') {
+			$AppName = $Matches[1].Trim()
+		}
+
+		if (![string]::IsNullOrEmpty($AppId)) {
+			$SelectedApps += [PSCustomObject]@{
+				Id = $AppId.Trim()
+				Name = $AppName
+			}
+		}
+	}
+	return $SelectedApps
 }
 
 # Функция проверки минимальной версии iOS:
 function Get-iOS-MinVersion {
 	$FilesToProcess = Get-ChildItem -Path ".\Apps\*.ipa" -ErrorAction SilentlyContinue
 	if (-not $FilesToProcess) {
+		Separator
 		Write-Host (Get-Lang "NoApps") -ForegroundColor Red
 		return
 	}
@@ -425,7 +466,7 @@ function Get-iOS-MinVersion {
 # Вход с Apple ID:
 Connect-AppleID
 
-# Основной цикл работы:
+# Основной цикл:
 while (Test-Path "$env:USERPROFILE\.ipatool\account") {
 	Separator
 	# Динамическая сборка меню на выбранном языке
@@ -446,6 +487,7 @@ $((Get-Lang 'Menu11'))`n
 
 	$SwitchValue = Read-Host $MainMenu
 	switch ($SwitchValue) {
+		# 1. Поиск приложения и загрузка последней версии:
 		1 {
 			Separator
 			$AppName = Read-Host (Get-Lang "AskSearch")
@@ -455,58 +497,81 @@ $((Get-Lang 'Menu11'))`n
 			$AppId = Read-Host (Get-Lang "AskIdDownload")
 			IPA-Download $AppId
 		}
+		# 2. Ввод ID приложения и загрузка последней версии:
 		2 {
 			Separator
 			$AppId = Read-Host (Get-Lang "AskIdDownload")
 			IPA-Download $AppId
 		}
+		# 3. Ввод ID приложения и загрузка (с выбором версии):
 		3 {
 			Separator
 			$AppId = Read-Host (Get-Lang "AskIdSearch")
 			IPA-Download-With-Version $AppId
 		}
+		# 4. Вывод списка ID приложений и загрузка последней версии:
 		4 {
 			Separator
-			$AppId = Get-AppID-From-List
-			if ($null -ne $AppId) { IPA-Download $AppId }
+			$SelectedApps = Get-Apps-From-List
+			if ($null -ne $SelectedApps) {
+				foreach ($App in $SelectedApps) {
+					Separator
+					Write-Host "$((Get-Lang 'SelectedApp')) $($App.Name)"
+					IPA-Download $App.Id
+				}
+			}
 		}
+		# 5. Вывод списка ID приложений и загрузка (с выбором версии):
 		5 {
 			Separator
-			$AppId = Get-AppID-From-List
-			if ($null -ne $AppId) { IPA-Download-With-Version $AppId }
+			$SelectedApps = Get-Apps-From-List
+			if ($null -ne $SelectedApps) {
+				foreach ($App in $SelectedApps) {
+					Separator
+					Write-Host "$((Get-Lang 'SelectedApp')) $($App.Name)"
+					IPA-Download-With-Version $App.Id
+				}
+			}
 		}
+		# 6. Показать минимальную версию iOS для ipa-файлов в папке Apps:
 		6 {
 			Get-iOS-MinVersion
 		}
+		# 7. Установка приложений, загруженных в папку Apps:
 		7 {
 			if (Test-Path ".\Apps\*.ipa") {
 				Get-ChildItem ".\Apps\*.ipa" | ForEach-Object {
+					Separator
 					.\MainApp\ideviceinstaller.exe install "$($_.FullName)"
 				}
 			} else {
+				Separator
 				Write-Host (Get-Lang "ErrNoApps") -ForegroundColor Red
 			}
 		}
+		# 8. Очистка папки Apps:
 		8 {
 			if (Test-Path ".\Apps\*.ipa") {
-				Get-ChildItem ".\Apps\*.ipa" | ForEach-Object {
-					Remove-Item ".\Apps\*" -Force -ErrorAction SilentlyContinue
-					Separator
-					Write-Host (Get-Lang "AppsCleared")
-				}
+				Remove-Item ".\Apps\*" -Force -ErrorAction SilentlyContinue
+				Separator
+				Write-Host (Get-Lang "AppsCleared")
 			} else {
+				Separator
 				Write-Host (Get-Lang "ErrNoApps") -ForegroundColor Red
 			}
 		}
+		# 9. Выход из аккаунта Apple ID:
 		9 {
 			Separator
 			Write-Host (Get-Lang "LoggedOut")
 			.\MainApp\ipatool.exe auth revoke
 			Connect-AppleID
 		}
+		# 10. Страница проекта на GitHub:
 		10 {
 			Start-Process "https://github.com/kda2495/IPA_Downloader"
 		}
+		# 11. Сменить язык (Change Language):
 		11 {
 			# Переключение языка и запись значения в файл:
 			if ($Global:CurrentLang -eq "RU") {
@@ -519,6 +584,10 @@ $((Get-Lang 'Menu11'))`n
 			Separator
 			Write-Host (Get-Lang "LangChanged")
 		}
-		default { Write-Host (Get-Lang "InvalidMenu") -ForegroundColor Red }
+		# Неверный ввод:
+		default {
+			Separator
+			Write-Host (Get-Lang "InvalidMenu") -ForegroundColor Red
+		}
 	}
 }
