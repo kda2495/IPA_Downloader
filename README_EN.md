@@ -47,11 +47,11 @@ To update such apps, you must delete the old version from your device, download 
 
 #### 4. Show list of App IDs and download the latest version
 • A predefined list of applications will be displayed.  
-• To download, enter the app's index number or its App ID when prompted: `Enter the number or App ID to download`  
+• To download, enter the apps' index numbers when prompted: `Enter the numbers of apps to download`  
 
 #### 5. Show list of App IDs and download (with version selection)
 • A predefined list of applications will be displayed.  
-• To download, enter the app's index number or its App ID when prompted: `Enter the number or App ID to search`  
+• To download, enter the apps' index numbers when prompted: `Enter the numbers of apps to download`  
 • The script will ask for the number of versions you want to display.  
 • The script will show a list of available application versions (from newest to oldest).  
 • To download, enter the version index number or the specific Version ID.  
