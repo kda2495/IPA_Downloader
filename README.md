@@ -1,8 +1,8 @@
 [![GitHub release](https://img.shields.io/github/v/release/kda2495/IPA_Downloader.svg?label=Release)](https://github.com/kda2495/IPA_Downloader/releases)
 [![License](https://img.shields.io/github/license/kda2495/IPA_Downloader.svg?label=License&color=blue)](https://github.com/kda2495/IPA_Downloader/blob/main/LICENSE)
 [![Downloads](https://img.shields.io/github/downloads/kda2495/IPA_Downloader/total?label=Downloads&color=blue)](https://github.com/kda2495/IPA_Downloader/releases)
-
 # IPA_Downloader
+[![English README](https://img.shields.io/badge/README-English-blue.svg)](README_EN.md)  
 Скрипт для загрузки приложений из истории покупок Apple ID и установки на устройства Apple (работает на базе [ipatool-cpp](https://github.com/Sorvigolova/ipatool)).
 
 ## Требования:
