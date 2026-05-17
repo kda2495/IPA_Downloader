@@ -28,8 +28,8 @@ Instead of installing the full iTunes package, you can perform a custom installa
 
 ## Script Commands Overview:
 #### 1. Search for an app and download the latest version
-• Enter the name of the application you want to find.  
-• The script will display the search results.  
+• Enter the name of the application you want to find  
+• The script will display the search results  
 • To download, enter the App ID when prompted: `Enter the App ID to download`
 
 #### 2. Enter App ID and download the latest version
@@ -37,51 +37,51 @@ Instead of installing the full iTunes package, you can perform a custom installa
 
 #### 3. Enter App ID and download (with version selection)
 • Enter the App ID when prompted: `Enter the App ID to search`  
-• The script will ask for the number of versions you want to display.  
-• The script will show a list of available application versions (from newest to oldest).  
-• To download, enter the version index number or the specific Version ID.  
+• The script will ask for the number of versions you want to display  
+• The script will show a list of available application versions (from newest to oldest)  
+• To download, enter the version index number or the specific Version ID  
 
 **Important Note:**  
 If an application is unavailable in your region, it will still show up if an update is available in the AppStore, but trying to update it directly will result in an error.  
 To update such apps, you must delete the old version from your device, download the new version via IPA_Downloader, and then reinstall it.
 
 #### 4. Show list of App IDs and download the latest version
-• A predefined list of applications will be displayed.  
+• A predefined list of applications will be displayed  
 • To download, enter the apps' index numbers when prompted: `Enter the numbers of apps to download`  
 
 #### 5. Show list of App IDs and download (with version selection)
-• A predefined list of applications will be displayed.  
+• A predefined list of applications will be displayed  
 • To download, enter the apps' index numbers when prompted: `Enter the numbers of apps to download`  
-• The script will ask for the number of versions you want to display.  
-• The script will show a list of available application versions (from newest to oldest).  
-• To download, enter the version index number or the specific Version ID.  
+• The script will ask for the number of versions you want to display  
+• The script will show a list of available application versions (from newest to oldest)  
+• To download, enter the version index number or the specific Version ID  
 
 **Important Note:**  
 If an application is unavailable in your region, it will still show up if an update is available in the AppStore, but trying to update it directly will result in an error.  
 To update such apps, you must delete the old version from your device, download the new version via IPA_Downloader, and then reinstall it.
 
 #### 6. Show minimum iOS version for ipa files in Apps folder
-• The script will display the minimum iOS version required for installation for all `.ipa` files currently located in the `Apps` folder.  
+• The script will display the minimum iOS version required for installation for all `.ipa` files currently located in the `Apps` folder  
 
 #### 7. Install apps downloaded to the Apps folder
-• Make sure you have iTunes installed from the official Apple website, or the `AppleMobileDeviceSupport` driver package (bundled with iTunes).  
-• Connect your device to the PC via USB and trust the computer.  
-• The script will automatically install all applications found in the `Apps` folder.
+• Make sure you have iTunes installed from the official Apple website, or the `AppleMobileDeviceSupport` driver package (bundled with iTunes)  
+• Connect your device to the PC via USB and trust the computer  
+• The script will automatically install all applications found in the `Apps` folder
 
 **Important Note:**  
 To install the app, the name of the ipa-file must be in Latin characters.
 
 #### 8. Clear Apps folder
-• The script will wipe the `Apps` folder, deleting all downloaded applications.
+• The script will wipe the `Apps` folder, deleting all downloaded applications
 
 #### 9. Log out of Apple ID account
-• The script will securely log out of your Apple ID account.
+• The script will securely log out of your Apple ID account
 
 #### 10. GitHub project page
-• The script will open the official project page on GitHub in your default browser.
+• The script will open the official project page on GitHub in your default browser
 
 #### 11. Change Language (Сменить язык)
-• Toggles the script interface language.
+• Toggles the script interface language
 
 ## How to find an App ID:
 To find an App ID, you need to know its AppStore URL link (for example, search for the app via a search engine, open its AppStore link, and copy the numeric identifier that comes right after `id`).  
