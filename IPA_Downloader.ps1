@@ -217,7 +217,7 @@ function Get-IPA-Metadata {
 	$Metadata = [PSCustomObject]@{
 		AppName = "App"
 		Version = "0"
-		MinIOS  = "N/A"
+		MinIOS = "N/A"
 	}
 	
 	try {
