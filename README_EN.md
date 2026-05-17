@@ -3,6 +3,7 @@
 [![Downloads](https://img.shields.io/github/downloads/kda2495/IPA_Downloader/total?label=Downloads&color=blue)](https://github.com/kda2495/IPA_Downloader/releases)
 
 # IPA_Downloader
+[![Russian README](https://img.shields.io/badge/README-Russian-blue.svg)](README.md)  
 A script for downloading applications from your Apple ID purchase history and installing them onto Apple devices (powered by [ipatool-cpp](https://github.com/Sorvigolova/ipatool)).
 
 ## Requirements:
