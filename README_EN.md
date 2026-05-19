@@ -39,24 +39,26 @@ Instead of installing the full iTunes package, you can perform a custom installa
 • Enter the App ID when prompted: `Enter the App ID to search`  
 • The script will ask for the number of versions you want to display  
 • The script will show a list of available application versions (from newest to oldest)  
-• To download, enter the version index number or the specific Version ID  
+• To download, enter the version index number or the specific Version ID when prompted: `Enter index number or Version ID`
 
 **Important Note:**  
 If an application is unavailable in your region, it will still show up if an update is available in the AppStore, but trying to update it directly will result in an error.  
 To update such apps, you must delete the old version from your device, download the new version via IPA_Downloader, and then reinstall it.
 
 #### 4. Show list of App IDs and download the latest version
-• A predefined list of applications will be displayed  
+• The script will prompt you to select a list to download (either from the GitHub repository or a list of previously downloaded applications)  
+• The selected list of applications will be displayed  
 • To download, enter the apps' index numbers when prompted: `Enter the numbers of apps to download`  
 (for example: 1, 2, 3-5)  
 
 #### 5. Show list of App IDs and download (with version selection)
-• A predefined list of applications will be displayed  
-• To download, enter the apps' index numbers when prompted: `Enter the numbers of apps to download`  
+• The script will prompt you to select a list to download (either from the GitHub repository or a list of previously downloaded applications)  
+• The selected list of applications will be displayed  
+• Enter the apps' index numbers when prompted: `Enter the numbers of apps to download`  
 (for example: 1, 2, 3-5)  
 • The script will ask for the number of versions you want to display  
 • The script will show a list of available application versions (from newest to oldest)  
-• To download, enter the version index number or the specific Version ID  
+• To download, enter the version index number or the specific Version ID when prompted: `Enter index number or Version ID`
 
 **Important Note:**  
 If an application is unavailable in your region, it will still show up if an update is available in the AppStore, but trying to update it directly will result in an error.  
@@ -73,8 +75,10 @@ To update such apps, you must delete the old version from your device, download 
 **Important Note:**  
 To install the app, the name of the ipa-file must be in Latin characters.
 
-#### 8. Clear Apps folder
-• The script will wipe the `Apps` folder, deleting all downloaded applications
+#### 8. Clear data
+• The script will clean up the following data (with an option to choose):
+• The list of previously downloaded applications
+• The `Apps` folder, deleting all downloaded applications
 
 #### 9. Log out of Apple ID account
 • The script will securely log out of your Apple ID account
