@@ -48,7 +48,7 @@ if (Test-Path $LangConfigFile) {
 		$Global:CurrentLang = "RU"
 	}
 } else {
-	# Язык по умолчанию при первом запуске:
+	# Язык по умолчанию при первом запуске (русский):
 	$Global:CurrentLang = "RU"
 	Set-Content -Path $LangConfigFile -Value $Global:CurrentLang -Force
 }
@@ -56,24 +56,23 @@ if (Test-Path $LangConfigFile) {
 # Перевод текста:
 $LangStrings = @{
 	"RU" = @{
-		"MissingFiles" = "Ошибка: Следующие файлы не найдены в папке MainApp:"
+		"ErrorMissingFiles" = "Ошибка: Следующие файлы не найдены в папке MainApp:"
 		"PressEnter" = "Нажмите Enter для выхода"
 		"AuthSuccess" = "Вход в аккаунт Apple ID выполнен.`nДанные аккаунта Apple ID:"
 		"AuthFail" = "Вход в аккаунт Apple ID не выполнен."
 		"FileSaved" = "Готово. Файл сохранен в папку Apps."
 		"FileName" = "Название файла:"
 		"MinIOS" = "Минимальная версия iOS:"
-		"InvalidInput" = "Ошибка: Неверный ввод."
-		"NotPurchased" = "Ошибка: Приложение не приобретено на данном аккаунте Apple ID."
+		"ErrorInvalidInput" = "Ошибка: Неверный ввод."
+		"ErrorNotPurchased" = "Ошибка: Приложение не приобретено на данном аккаунте Apple ID."
 		"AskVerCount" = "Введите количество версий для отображения"
 		"HeaderVerID" = "ID версии"
 		"HeaderVersion" = "Версия"
 		"AskVerNum" = "Введите номер или введите ID версии"
 		"SelectedVer" = "Выбрана версия:"
-		"ListLoadError" = "Ошибка загрузки списка приложений."
+		"ErrorListLoadError" = "Ошибка загрузки списка приложений."
 		"AskAppNum" = "Введите номера приложений для загрузки"
 		"SelectedApp" = "Выбрано приложение:"
-		"NoApps" = "Ошибка: В папке Apps нет приложений."
 		"HeaderFileName" = "Название файла"
 		"HeaderMinIOS" = "Мин. iOS"
 		"MenuTitle" = "Введите команду:"
@@ -84,38 +83,46 @@ $LangStrings = @{
 		"Menu5" = "5. Вывод списка ID приложений и загрузка (с выбором версии)"
 		"Menu6" = "6. Показать минимальную версию iOS для ipa-файлов в папке Apps"
 		"Menu7" = "7. Установка приложений, загруженных в папку Apps"
-		"Menu8" = "8. Очистка папки Apps"
+		"Menu8" = "8. Очистка данных"
 		"Menu9" = "9. Выход из аккаунта Apple ID"
 		"Menu10" = "10. Страница проекта на GitHub"
 		"Menu11" = "11. Сменить язык (Change Language)"
 		"AskSearch" = "Введите название приложения для поиска"
 		"AskIdDownload" = "Введите ID приложения для загрузки"
 		"AskIdSearch" = "Введите ID приложения для поиска"
-		"ErrNoApps" = "Ошибка: В папке Apps отсутствуют приложения."
+		"ErrorNoApps" = "Ошибка: В папке Apps отсутствуют приложения."
 		"AppsCleared" = "Готово. Файлы в папке Apps удалены."
+		"ListCleared" = "Готово. Список загруженных приложений очищен."
 		"LoggedOut" = "Выполнен выход из аккаунта Apple ID."
-		"InvalidMenu" = "Неверный ввод. Попробуйте снова."
 		"LangChanged" = "Язык успешно изменен на Русский."
+		"AlreadyInList" = "Уже есть в списке: {0} - {1}"
+		"AddedToList" = "Добавлено в список: {0} - {1}"
+		"ListMenuTitle" = "Выберите список для загрузки:"
+		"ListMenu1" = "1. Полный список приложений (GitHub)"
+		"ListMenu2" = "2. Список ранее загруженных приложений"
+		"ErrorHistoryEmpty" = "Ошибка: История загрузок пуста."
+		"ClearMenuTitle" = "Выберите данные для очистки:"
+		"ClearMenu1" = "1. Очистка списка ранее загруженных приложений"
+		"ClearMenu2" = "2. Очистка папки Apps"		
 	}
 	"EN" = @{
-		"MissingFiles" = "Error: The following files were not found in the MainApp folder:"
+		"ErrorMissingFiles" = "Error: The following files were not found in the MainApp folder:"
 		"PressEnter" = "Press Enter to exit"
 		"AuthSuccess" = "Apple ID account login successful.`nApple ID account details:"
-		"AuthFail" = "Apple ID account login is not completed."
+		"AuthFail" = "Not authenticated with Apple ID."
 		"FileSaved" = "Done. File saved to the Apps folder."
 		"FileName" = "File name:"
 		"MinIOS" = "Minimum iOS version:"
-		"InvalidInput" = "Error: Invalid input."
-		"NotPurchased" = "Error: The app is not purchased on this Apple ID account."
+		"ErrorInvalidInput" = "Error: Invalid input."
+		"ErrorNotPurchased" = "Error: The app is not purchased on this Apple ID account."
 		"AskVerCount" = "Enter the number of versions to display"
 		"HeaderVerID" = "Version ID"
 		"HeaderVersion" = "Version"
-		"AskVerNum" = "Enter the number or enter the Version ID"
+		"AskVerNum" = "Enter index number or Version ID"
 		"SelectedVer" = "Selected version:"
-		"ListLoadError" = "Error loading the application list."
-		"AskAppNum" = "Enter the numbers of apps to download"
+		"ErrorListLoadError" = "Failed to load the application list."
+		"AskAppNum" = "Enter index numbers of apps to download"
 		"SelectedApp" = "Selected app:"
-		"NoApps" = "Error: There are no applications in the Apps folder."
 		"HeaderFileName" = "File name"
 		"HeaderMinIOS" = "Min. iOS"
 		"MenuTitle" = "Enter a command:"
@@ -126,18 +133,27 @@ $LangStrings = @{
 		"Menu5" = "5. Show list of App IDs and download (with version selection)"
 		"Menu6" = "6. Show minimum iOS version for ipa files in Apps folder"
 		"Menu7" = "7. Install apps downloaded to the Apps folder"
-		"Menu8" = "8. Clear Apps folder"
+		"Menu8" = "8. Clear data"
 		"Menu9" = "9. Log out of Apple ID account"
 		"Menu10" = "10. GitHub project page"
 		"Menu11" = "11. Change Language (Сменить язык)"
 		"AskSearch" = "Enter the application name to search"
 		"AskIdDownload" = "Enter the App ID to download"
 		"AskIdSearch" = "Enter the App ID to search"
-		"ErrNoApps" = "Error: No applications found in the Apps folder."
-		"AppsCleared" = "Done. Files in the Apps folder have been deleted."
+		"ErrorNoApps" = "Error: No applications found in the Apps folder."
+		"AppsCleared" = "Done. Apps folder has been cleared."
+		"ListCleared" = "Done. List of downloaded apps cleared."
 		"LoggedOut" = "Successfully logged out of the Apple ID account."
-		"InvalidMenu" = "Invalid input. Please try again."
 		"LangChanged" = "Language successfully changed to English."
+		"AlreadyInList" = "Already in the list: {0} - {1}"
+		"AddedToList" = "Added to the list: {0} - {1}"
+		"ListMenuTitle" = "Select list source:"
+		"ListMenu1" = "1. Full application list (GitHub)"
+		"ListMenu2" = "2. List of previously downloaded apps"
+		"ErrorHistoryEmpty" = "Error: Download history is empty."
+		"ClearMenuTitle" = "Select data to clear:"
+		"ClearMenu1" = "1. Clear list of previously downloaded apps"
+		"ClearMenu2" = "2. Clear Apps folder"		
 	}
 }
 
@@ -147,17 +163,23 @@ function Get-Lang($Key) {
 }
 
 # Версия скрипта:
-Write-Host "IPA_Downloader 3.5" -ForegroundColor Black -BackgroundColor Yellow
+Write-Host "IPA_Downloader 3.6" -ForegroundColor Black -BackgroundColor Yellow
 
 # Функция разделителя:
 function Separator {
-	Write-Host "===========================================" -ForegroundColor Green
+	Write-Host "==============================================" -ForegroundColor Green
 }
 
 # Проверка на наличие папки Apps:
 if (!(Test-Path ".\Apps")) {
-	$null = New-Item -Path ".\Apps" -ItemType "Directory" -Force
+	$null = New-Item -Path ".\Apps" -ItemType "Directory"
 }
+
+# Проверка на наличие папки Lists:
+if (!(Test-Path ".\Lists")) {
+	$null = New-Item -Path ".\Lists" -ItemType "Directory"
+}
+
 
 # Проверка на наличие папки .ipatool:
 if (!(Test-Path "$env:USERPROFILE\.ipatool")) {
@@ -177,8 +199,9 @@ foreach ($File in $CheckMainAppFiles) {
 }
 if ($MissingMainAppFiles.Count -gt 0) {
 	Separator
-	Write-Host (Get-Lang "MissingFiles") -ForegroundColor Red
+	Write-Host (Get-Lang "ErrorMissingFiles") -ForegroundColor Red
 	$MissingMainAppFiles | ForEach-Object { Write-Host "$_" -ForegroundColor Red }
+	Separator
 	Read-Host (Get-Lang "PressEnter")
 	exit
 }
@@ -253,8 +276,61 @@ function Get-IPA-Metadata {
 	return $Metadata
 }
 
+# Функция сохранения информации о загруженных ранее приложениях:
+function Save-App-To-History {
+	param (
+		[string]$AppId,
+		[string]$FinalFileName
+	)
+
+	$HistoryFile = ".\Lists\Downloaded_IDs.json"
+	
+	if (!(Test-Path ".\Lists\Downloaded_IDs.json")) {
+		$null = New-Item -Path ".\Lists\Downloaded_IDs.json" -ItemType "File" -Value ''
+	}
+	
+	$JsonRaw = Get-Content $HistoryFile -Raw -Encoding UTF8
+
+	if ([string]::IsNullOrWhiteSpace($JsonRaw)) {
+		$Data = @()
+	} else {
+		$Data = $JsonRaw | ConvertFrom-Json
+	}
+
+	if ($Data -eq $null) {
+		$Data = @()
+	}
+
+	if ($Data -isnot [System.Collections.IEnumerable]) {
+		$Data = @($Data)
+	}
+
+	foreach ($Item in $Data) {
+		if ($Item.appid -eq $AppId) {
+			Write-Host ((Get-Lang "AlreadyInList") -f $Item.name, $AppId)
+			return
+		}
+	}
+
+	$CleanName = [System.IO.Path]::GetFileNameWithoutExtension($FinalFileName)
+	$Parts = $CleanName.Split("_")
+	$AppNameOnly = $Parts[0].Trim()
+
+	$NewItem = [PSCustomObject]@{
+		name = $AppNameOnly
+		appid = $AppId
+	}
+
+	$Data = @($Data) + $NewItem
+
+	$Data | ConvertTo-Json -Depth 5 | Set-Content $HistoryFile -Encoding UTF8
+
+	Write-Host ((Get-Lang "AddedToList") -f $AppNameOnly, $AppId)
+}
+
 # Функция перемещения и автоматического переименования:
 function Move-IPA-Files {
+	param ([string]$AppId)
 	$IPAFiles = Get-ChildItem -Filter "*.ipa"
 	if ($IPAFiles) {
 		foreach ($File in $IPAFiles) {
@@ -275,6 +351,10 @@ function Move-IPA-Files {
 				Rename-Item -Path $DestPath -NewName $NewName -Force
 				Write-Host "$((Get-Lang 'FileName')) $NewName"
 				Write-Host "$((Get-Lang 'MinIOS')) $($Meta.MinIOS)+"
+
+				if (![string]::IsNullOrEmpty($AppId)) {
+					Save-App-To-History -AppId $AppId -FinalFileName $NewName
+				}
 			}
 		}
 	}
@@ -284,7 +364,8 @@ function Move-IPA-Files {
 function Test-NumericInput {
 	param ([string]$InputValue)
 	if ([string]::IsNullOrWhiteSpace($InputValue) -or $InputValue -notmatch '^\d+$') {
-		Write-Host (Get-Lang "InvalidInput") -ForegroundColor Red
+		Separator
+		Write-Host (Get-Lang "ErrorInvalidInput") -ForegroundColor Red
 		return $false
 	}
 	return $true
@@ -298,10 +379,10 @@ function IPA-Download($AppId) {
 	
 	if ($LastExitCode -ne 0) {
 		Separator
-		Write-Host (Get-Lang "NotPurchased") -ForegroundColor Red
+		Write-Host (Get-Lang "ErrorNotPurchased") -ForegroundColor Red
 		return
 	}
-	Move-IPA-Files
+	Move-IPA-Files -AppId $AppId
 }
 
 # Функция загрузки ipa-файлов с выбором версии:
@@ -312,18 +393,19 @@ function IPA-Download-With-Version($AppId) {
 	
 	if ($RawOutput -match "license is required") {
 		Separator
-		Write-Host (Get-Lang "NotPurchased") -ForegroundColor Red
+		Write-Host (Get-Lang "ErrorNotPurchased") -ForegroundColor Red
 		return
 	}
 
 	$RawVersions = [regex]::Matches($RawOutput, '(?<=")\d+(?=")') | ForEach-Object { $_.Value }
 
 	Separator
-	$VersionsQuantity = Read-Host (Get-Lang "AskVerCount")
+	$VersionsQuantity = Read-Host (Get-Lang "AskVerCount")`n
 	
 	$VerQty = 0
 	if (![int]::TryParse($VersionsQuantity, [ref]$VerQty) -or $VerQty -le 0) {
-		Write-Host (Get-Lang "InvalidInput") -ForegroundColor Red
+		Separator
+		Write-Host (Get-Lang "ErrorInvalidInput") -ForegroundColor Red
 		return
 	}
 
@@ -341,48 +423,104 @@ function IPA-Download-With-Version($AppId) {
 		$Counter++
 	}
 	Separator
-	$Version = Read-Host "$((Get-Lang 'AskVerNum')) (1-$($VersionMapping.Count))"
-	Separator
+	$Version = Read-Host "$((Get-Lang 'AskVerNum')) (1-$($VersionMapping.Count))`n"
 	
 	if (!(Test-NumericInput -InputValue $Version)) { return }
 
 	$VersionInt = 0
 	$IsInt = [int]::TryParse($Version, [ref]$VersionInt)
 
-	$SelectedObject = $VersionMapping | Where-Object { 
-		($IsInt -and $_.Index -eq $VersionInt) -or $_.ID -eq $Version 
+	$SelectedObject = $VersionMapping | Where-Object {
+		($IsInt -and $_.Index -eq $VersionInt) -or $_.ID -eq $Version
 	}
 
 	if ($SelectedObject) {
+		Separator
 		Write-Host "$((Get-Lang 'SelectedVer')) $($SelectedObject.Version)"
 		Separator
 		$FinalId = $SelectedObject.ID
 	} else {
-		Write-Host (Get-Lang "InvalidInput") -ForegroundColor Red
+		Separator
+		Write-Host (Get-Lang "ErrorInvalidInput") -ForegroundColor Red
 		return
 	}
 	.\MainApp\ipatool.exe download -i $AppId --external-version-id $FinalId
-	Move-IPA-Files
+	Move-IPA-Files -AppId $AppId
 }
 
 # Функция получения списка выбранных приложений (поддерживает диапазоны и перечисления):
 function Get-Apps-From-List {
-	try {
-		$AppsIdList = Invoke-WebRequest "https://raw.githubusercontent.com/kda2495/IPA_Downloader/refs/heads/main/Apps_ID_List.txt" -UseBasicParsing -ErrorAction Stop | Select-Object -Expand Content
-	} catch {
-		Write-Host (Get-Lang "ListLoadError") -ForegroundColor Red
+	$List_Menu = @"
+$((Get-Lang 'ListMenuTitle'))
+$((Get-Lang 'ListMenu1'))
+$((Get-Lang 'ListMenu2'))`n
+"@
+	$ListChoice = Read-Host ($List_Menu)
+
+	$Lines = @()
+
+	switch ($ListChoice) {
+		"1" {
+			try {
+				$AppsIdList = Invoke-WebRequest "https://raw.githubusercontent.com/kda2495/IPA_Downloader/refs/heads/main/Apps_ID_List.txt" -UseBasicParsing -ErrorAction Stop | Select-Object -Expand Content
+				$Lines = $AppsIdList -split "`n" | Where-Object { $_.Trim() -ne "" }
+			} catch {
+				Write-Host (Get-Lang "ErrorListLoadError") -ForegroundColor Red
+				return $null
+			}
+		}
+		"2" {
+			$HistoryFile = ".\Lists\Downloaded_IDs.json"
+			
+			if (!(Test-Path ".\Lists\Downloaded_IDs.json")) {
+				Separator
+				Write-Host (Get-Lang "ErrorHistoryEmpty") -ForegroundColor Red
+				return $null
+			}
+			
+			$JsonRaw = Get-Content $HistoryFile -Raw -Encoding UTF8
+			if ([string]::IsNullOrWhiteSpace($JsonRaw)) {
+				Separator
+				Write-Host (Get-Lang "ErrorHistoryEmpty") -ForegroundColor Red
+				return $null
+			}
+			$HistoryData = $JsonRaw | ConvertFrom-Json
+			if ($HistoryData -eq $null) {
+				Separator
+				Write-Host (Get-Lang "ErrorHistoryEmpty") -ForegroundColor Red
+				return $null
+			}
+			if ($HistoryData -isnot [System.Collections.IEnumerable]) {
+				$HistoryData = @($HistoryData)
+			}
+			foreach ($Item in $HistoryData) {
+				$Lines += "{0}: {1}" -f $Item.name, $Item.appid
+			}
+		}
+		default {
+			Separator
+			Write-Host (Get-Lang "ErrorInvalidInput") -ForegroundColor Red
+			return $null
+		}
+	}
+
+	if ($Lines.Count -eq 0) {
+		Separator
+		Write-Host (Get-Lang "ErrorInvalidInput") -ForegroundColor Red
 		return $null
 	}
-	$Lines = $AppsIdList -split "`n" | Where-Object { $_.Trim() -ne "" }
+
+	Separator
 	for ($i = 0; $i -lt $Lines.Count; $i++) {
 		$Index = $i + 1
 		Write-Host ("{0}. {1}" -f $Index, $Lines[$i])
 	}
 	Separator
-	$Selection = Read-Host "$((Get-Lang 'AskAppNum')) (1-$($Lines.Count))"
+	$Selection = Read-Host "$((Get-Lang 'AskAppNum')) (1-$($Lines.Count))`n"
 	
 	if ([string]::IsNullOrWhiteSpace($Selection)) {
-		Write-Host (Get-Lang "InvalidInput") -ForegroundColor Red
+		Separator
+		Write-Host (Get-Lang "ErrorInvalidInput") -ForegroundColor Red
 		return $null
 	}
 
@@ -397,7 +535,8 @@ function Get-Apps-From-List {
 			$End = 0
 			# Безопасное чтение диапазона чисел без падений от переполнения:
 			if (![int]::TryParse($Range[0], [ref]$Start) -or ![int]::TryParse($Range[1], [ref]$End)) {
-				Write-Host (Get-Lang "InvalidInput") -ForegroundColor Red
+				Separator
+				Write-Host (Get-Lang "ErrorInvalidInput") -ForegroundColor Red
 				return $null
 			}
 			if ($Start -le $End) { $SelectedIndices += $Start..$End } else { $SelectedIndices += $End..$Start }
@@ -405,12 +544,15 @@ function Get-Apps-From-List {
 			$Val = 0
 			# Безопасное чтение одиночного числа:
 			if (![int]::TryParse($Part, [ref]$Val)) {
-				Write-Host (Get-Lang "InvalidInput") -ForegroundColor Red
+				Separator
+				Write-Host (Get-Lang "ErrorInvalidInput") -ForegroundColor Red
 				return $null
 			}
 			$SelectedIndices += $Val
 		} else {
-			Write-Host (Get-Lang "InvalidInput") -ForegroundColor Red
+			# Если введены другие символы:
+			Separator
+			Write-Host (Get-Lang "ErrorInvalidInput") -ForegroundColor Red
 			return $null
 		}
 	}
@@ -419,7 +561,8 @@ function Get-Apps-From-List {
 	$SelectedIndices = $SelectedIndices | Select-Object -Unique | Where-Object { $_ -ge 1 -and $_ -le $Lines.Count }
 
 	if ($SelectedIndices.Count -eq 0) {
-		Write-Host (Get-Lang "InvalidInput") -ForegroundColor Red
+		Separator
+		Write-Host (Get-Lang "ErrorInvalidInput") -ForegroundColor Red
 		return $null
 	}
 
@@ -448,7 +591,7 @@ function Get-iOS-MinVersion {
 	$FilesToProcess = Get-ChildItem -Path ".\Apps\*.ipa" -ErrorAction SilentlyContinue
 	if (-not $FilesToProcess) {
 		Separator
-		Write-Host (Get-Lang "NoApps") -ForegroundColor Red
+		Write-Host (Get-Lang "ErrorNoApps") -ForegroundColor Red
 		return
 	}
 	Separator
@@ -488,29 +631,31 @@ $((Get-Lang 'Menu11'))`n
 	$SwitchValue = Read-Host $MainMenu
 	switch ($SwitchValue) {
 		# 1. Поиск приложения и загрузка последней версии:
-		1 {
+		"1" {
 			Separator
-			$AppName = Read-Host (Get-Lang "AskSearch")
-			Separator
+			$AppName = Read-Host (Get-Lang "AskSearch")`n
 			.\MainApp\ipatool.exe search $AppName --limit 10 2> $null
 			Separator
-			$AppId = Read-Host (Get-Lang "AskIdDownload")
+			$AppId = Read-Host (Get-Lang "AskIdDownload")`n
 			IPA-Download $AppId
 		}
+		
 		# 2. Ввод ID приложения и загрузка последней версии:
-		2 {
+		"2" {
 			Separator
-			$AppId = Read-Host (Get-Lang "AskIdDownload")
+			$AppId = Read-Host (Get-Lang "AskIdDownload")`n
 			IPA-Download $AppId
 		}
+		
 		# 3. Ввод ID приложения и загрузка (с выбором версии):
-		3 {
+		"3" {
 			Separator
-			$AppId = Read-Host (Get-Lang "AskIdSearch")
+			$AppId = Read-Host (Get-Lang "AskIdSearch")`n
 			IPA-Download-With-Version $AppId
 		}
+		
 		# 4. Вывод списка ID приложений и загрузка последней версии:
-		4 {
+		"4" {
 			Separator
 			$SelectedApps = Get-Apps-From-List
 			if ($null -ne $SelectedApps) {
@@ -521,8 +666,9 @@ $((Get-Lang 'Menu11'))`n
 				}
 			}
 		}
+		
 		# 5. Вывод списка ID приложений и загрузка (с выбором версии):
-		5 {
+		"5" {
 			Separator
 			$SelectedApps = Get-Apps-From-List
 			if ($null -ne $SelectedApps) {
@@ -533,12 +679,14 @@ $((Get-Lang 'Menu11'))`n
 				}
 			}
 		}
+		
 		# 6. Показать минимальную версию iOS для ipa-файлов в папке Apps:
-		6 {
+		"6" {
 			Get-iOS-MinVersion
 		}
+		
 		# 7. Установка приложений, загруженных в папку Apps:
-		7 {
+		"7" {
 			if (Test-Path ".\Apps\*.ipa") {
 				Get-ChildItem ".\Apps\*.ipa" | ForEach-Object {
 					Separator
@@ -546,48 +694,72 @@ $((Get-Lang 'Menu11'))`n
 				}
 			} else {
 				Separator
-				Write-Host (Get-Lang "ErrNoApps") -ForegroundColor Red
+				Write-Host (Get-Lang "ErrorNoApps") -ForegroundColor Red
 			}
 		}
-		# 8. Очистка папки Apps:
-		8 {
-			if (Test-Path ".\Apps\*.ipa") {
-				Remove-Item ".\Apps\*" -Force -ErrorAction SilentlyContinue
-				Separator
-				Write-Host (Get-Lang "AppsCleared")
-			} else {
-				Separator
-				Write-Host (Get-Lang "ErrNoApps") -ForegroundColor Red
+		
+		
+		# 8. Очистка данных скрипта:
+		"8" {
+			Separator
+			$Clear_Menu = @"
+$((Get-Lang 'ClearMenuTitle'))
+$((Get-Lang 'ClearMenu1'))
+$((Get-Lang 'ClearMenu2'))`n
+"@
+			$ClearChoice = Read-Host ($Clear_Menu)
+			switch ($ClearChoice) {
+				# 1. Очистка списка ранее загруженных приложений
+				"1" {
+					Remove-Item ".\Lists\Downloaded_IDs.json" -Force -ErrorAction SilentlyContinue
+					Separator
+					Write-Host (Get-Lang "ListCleared")
+				}
+				
+				# 2. Очистка папки Apps:
+				"2" {
+					if (Test-Path ".\Apps\*.ipa") {
+						Remove-Item ".\Apps\*" -Force -ErrorAction SilentlyContinue
+						Separator
+						Write-Host (Get-Lang "AppsCleared")
+					} else {
+						Separator
+						Write-Host (Get-Lang "ErrorNoApps") -ForegroundColor Red
+					}
+				}
+				
+				default {
+					Separator
+					Write-Host (Get-Lang "ErrorInvalidInput") -ForegroundColor Red
+				}
 			}
 		}
+		
 		# 9. Выход из аккаунта Apple ID:
-		9 {
+		"9" {
 			Separator
 			Write-Host (Get-Lang "LoggedOut")
 			.\MainApp\ipatool.exe auth revoke
 			Connect-AppleID
 		}
+		
 		# 10. Страница проекта на GitHub:
-		10 {
+		"10" {
 			Start-Process "https://github.com/kda2495/IPA_Downloader"
 		}
+		
 		# 11. Сменить язык (Change Language):
-		11 {
-			# Переключение языка и запись значения в файл:
-			if ($Global:CurrentLang -eq "RU") {
-				$Global:CurrentLang = "EN"
-			} else {
-				$Global:CurrentLang = "RU"
-			}
+		"11" {
+			$Global:CurrentLang = if ($Global:CurrentLang -eq "RU") {"EN" } else { "RU" }
 			Set-Content -Path $LangConfigFile -Value $Global:CurrentLang -Force
-			
 			Separator
 			Write-Host (Get-Lang "LangChanged")
 		}
+		
 		# Неверный ввод:
 		default {
 			Separator
-			Write-Host (Get-Lang "InvalidMenu") -ForegroundColor Red
+			Write-Host (Get-Lang "ErrorInvalidInput") -ForegroundColor Red
 		}
 	}
 }
