@@ -40,6 +40,9 @@ chcp 65001 > $null
 $LangConfigFile = ".\MainApp\Lang_Config.txt"
 $Global:CurrentLang = "RU"
 
+# Глобальная переменная для кэширования списка с GitHub:
+$Global:GitHubRawList = $null
+
 # Загрузка сохраненного языка или установка по умолчанию:
 if (Test-Path $LangConfigFile) {
 	$SavedLang = (Get-Content $LangConfigFile -Raw).Trim().ToUpper()
@@ -98,7 +101,6 @@ $LangStrings = @{
 		"Menu9" = "9. Выход из аккаунта Apple ID"
 		"Menu10" = "10. Страница проекта на GitHub"
 		"Menu11" = "11. Сменить язык (Change Language)"
-		"MenuCancel" = "0. Отмена (Возврат в главное меню)"
 		"MenuTitle" = "Введите команду:"
 		"MinIOS" = "Минимальная версия iOS:"
 		"NoAppsFound" = "Приложения не найдены."
@@ -152,7 +154,6 @@ $LangStrings = @{
 		"Menu9" = "9. Log out of Apple ID account"
 		"Menu10" = "10. GitHub project page"
 		"Menu11" = "11. Change Language (Сменить язык)"
-		"MenuCancel" = "0. Cancel (Return to main menu)"
 		"MenuTitle" = "Enter a command:"
 		"MinIOS" = "Minimum iOS version:"
 		"NoAppsFound" = "No applications found."
@@ -168,7 +169,7 @@ function Get-Lang($Key) {
 }
 
 # Версия скрипта:
-Write-Host "IPA_Downloader 3.7" -ForegroundColor Black -BackgroundColor Yellow
+Write-Host "IPA_Downloader 3.8" -ForegroundColor Black -BackgroundColor Yellow
 
 # Функция разделителя:
 function Separator {
@@ -243,9 +244,12 @@ function Get-IPA-Metadata {
 		$Zip = [System.IO.Compression.ZipFile]::OpenRead($IpaPath)
 		$PlistEntry = $Zip.Entries | Where-Object { $_.FullName -match 'Payload/.*\.app/Info\.plist$' } | Select-Object -First 1
 		if ($PlistEntry) {
-			$Reader = New-Object System.IO.StreamReader($PlistEntry.Open(), [System.Text.Encoding]::UTF8)
-			$Content = $Reader.ReadToEnd()
-			$Reader.Close()
+			try {
+				$Reader = New-Object System.IO.StreamReader($PlistEntry.Open(), [System.Text.Encoding]::UTF8)
+				$Content = $Reader.ReadToEnd()
+			} finally {
+				if ($null -ne $Reader) { $Reader.Dispose() }
+			}
 			
 			if ($Content -match '<key>CFBundleName</key>\s*<string>([^<]+)</string>') {
 				$Metadata.AppName = $Matches[1]
@@ -322,9 +326,36 @@ function Save-App-To-History {
 	Write-Host ((Get-Lang "AddedToList") -f $AppNameOnly, $AppId)
 }
 
+# Функция поиска имени приложения по ID в списке GitHub:
+function Get-GitHub-AppName {
+	param ([string]$AppId)
+	
+	if ($null -eq $Global:GitHubRawList) {
+		try {
+			$Global:GitHubRawList = Invoke-RestMethod -Uri "https://raw.githubusercontent.com/kda2495/IPA_Downloader/refs/heads/main/Apps_ID_List.txt" -ErrorAction SilentlyContinue
+		} catch {
+			$Global:GitHubRawList = ""
+		}
+	}
+	
+	if (![string]::IsNullOrWhiteSpace($Global:GitHubRawList)) {
+		$Lines = $Global:GitHubRawList -split "`n" | Where-Object { $_.Trim() -ne "" }
+		foreach ($Line in $Lines) {
+			$IdMatch = [System.Text.RegularExpressions.Regex]::Match($Line, '\b\d{6,}\b').Value
+			if ($IdMatch -eq $AppId -and $Line -match '^(.+?):\s*\d') {
+				return $Matches[1].Trim()
+			}
+		}
+	}
+	return $null
+}
+
 # Функция перемещения и автоматического переименования:
 function Move-IPA-Files {
-	param ([string]$AppId)
+	param (
+		[string]$AppId,
+		[string]$AppName
+	)
 	$IPAFiles = Get-ChildItem -Filter "*.ipa"
 	if ($IPAFiles) {
 		foreach ($File in $IPAFiles) {
@@ -335,7 +366,22 @@ function Move-IPA-Files {
 			
 			$Meta = Get-IPA-Metadata -IpaPath $DestPath
 			if ($Meta) {
-				$NewName = "$($Meta.AppName)_$($Meta.Version)_iOS $($Meta.MinIOS)+.ipa"
+				$FinalAppName = $Meta.AppName
+				
+				# Проверяем GitHub список, если имя неизвестно или не было передано:
+				if ([string]::IsNullOrWhiteSpace($AppName) -or $AppName -eq "Unknown") {
+					$GitHubName = Get-GitHub-AppName -AppId $AppId
+					if (![string]::IsNullOrWhiteSpace($GitHubName)) {
+						$AppName = $GitHubName
+					}
+				}
+				
+				# Применяем найденное имя, очищая его от недопустимых символов:
+				if (![string]::IsNullOrWhiteSpace($AppName) -and $AppName -ne "Unknown") {
+					$FinalAppName = $AppName -replace '[\\/:*?"<>|]', ''
+				}
+				
+				$NewName = "$($FinalAppName)_$($Meta.Version)_iOS $($Meta.MinIOS)+.ipa"
 				$TargetFile = Join-Path (Get-Location) ".\Apps\$NewName"
 				
 				if (Test-Path $TargetFile) {
@@ -397,15 +443,23 @@ function Parse-NumberSelection {
 }
 
 # Функция загрузки ipa-файлов:
-function IPA-Download($AppId) {
+function IPA-Download {
+	param (
+		[string]$AppId,
+		[string]$AppName
+	)
 	if (!(Test-NumericInput -InputValue $AppId)) { return }
 	Separator
 	.\MainApp\ipatool.exe download -i $AppId --purchase
-	Move-IPA-Files -AppId $AppId
+	Move-IPA-Files -AppId $AppId -AppName $AppName
 }
 
 # Функция загрузки ipa-файлов с выбором версии:
-function IPA-Download-With-Version($AppId) {
+function IPA-Download-With-Version {
+	param (
+		[string]$AppId,
+		[string]$AppName
+	)
 	if (!(Test-NumericInput -InputValue $AppId)) { return }
 	
 	Separator
@@ -413,8 +467,7 @@ function IPA-Download-With-Version($AppId) {
 
 	# Проверяем, не вернула ли утилита ошибку лицензии или любую другую ошибку:
 	if ($RawOutput -match "Error:") {
-		# Выводим ошибку тем цветом, который ты выберешь для системных ошибок скрипта:
-		Write-Host $RawOutput -ForegroundColor DarkRed 
+		Write-Host $RawOutput -ForegroundColor DarkRed
 		return
 	}
 
@@ -471,14 +524,13 @@ function IPA-Download-With-Version($AppId) {
 		return
 	}
 	.\MainApp\ipatool.exe download -i $AppId --external-version-id $FinalId
-	Move-IPA-Files -AppId $AppId
+	Move-IPA-Files -AppId $AppId -AppName $AppName
 }
 
 # Функция получения списка выбранных приложений (поддерживает диапазоны и перечисления):
 function Get-Apps-From-List {
 	$List_Menu = @"
-$(Get-Lang 'ListMenuTitle')
-$(Get-Lang 'MenuCancel')
+$(Get-Lang 'ListMenuTitle') $(Get-Lang 'CancelStep')
 $(Get-Lang 'ListMenu1')
 $(Get-Lang 'ListMenu2')`n
 "@
@@ -491,8 +543,10 @@ $(Get-Lang 'ListMenu2')`n
 	switch ($ListChoice) {
 		"1" {
 			try {
-				$AppsIdList = Invoke-WebRequest "https://raw.githubusercontent.com/kda2495/IPA_Downloader/refs/heads/main/Apps_ID_List.txt" -UseBasicParsing -ErrorAction Stop | Select-Object -Expand Content
-				$Lines = $AppsIdList -split "`n" | Where-Object { $_.Trim() -ne "" }
+				if ($null -eq $Global:GitHubRawList) {
+					$Global:GitHubRawList = Invoke-RestMethod -Uri "https://raw.githubusercontent.com/kda2495/IPA_Downloader/refs/heads/main/Apps_ID_List.txt" -ErrorAction Stop
+				}
+				$Lines = $Global:GitHubRawList -split "`n" | Where-Object { $_.Trim() -ne "" }
 			} catch {
 				Write-Host (Get-Lang "ErrorListLoadError") -ForegroundColor DarkRed
 				return $null
@@ -554,7 +608,7 @@ $(Get-Lang 'ListMenu2')`n
 		return $null
 	}
 
-	# Используем новую универсальную функцию:
+	# Используем универсальную функцию:
 	$SelectedIndices = Parse-NumberSelection -Selection $Selection -MaxCount $Lines.Count
 
 	if ($null -eq $SelectedIndices) {
@@ -667,7 +721,7 @@ $(Get-Lang 'Menu11')`n
 				$Selection = Read-Host "$(Get-Lang 'AskAppNum') (1-$($FoundApps.Count)) $(Get-Lang 'CancelStep')`n"
 				if ($Selection -eq '0') { continue }
 				
-				# Парсим как номера таблицы (поддержка 1, 3, 5-7):
+				# Парсим как номера таблицы:
 				$Indices = Parse-NumberSelection -Selection $Selection -MaxCount $FoundApps.Count
 				if ($null -eq $Indices) {
 					Separator
@@ -678,13 +732,13 @@ $(Get-Lang 'Menu11')`n
 					$App = $FoundApps[$Idx - 1]
 					Separator
 					Write-Host "$(Get-Lang 'SelectedApp') $($App.name)"
-					IPA-Download $App.id
+					IPA-Download -AppId $App.id -AppName $App.name
 				}
 			} else {
 				# Если ничего не найдено, запрашиваем ввод ID:
 				$AppId = Read-Host "$(Get-Lang 'AskIdDownload') $(Get-Lang 'CancelStep')`n"
 				if ($AppId -eq '0') { continue }
-				IPA-Download $AppId
+				IPA-Download -AppId $AppId
 			}
 		}
 		
@@ -693,7 +747,7 @@ $(Get-Lang 'Menu11')`n
 			Separator
 			$AppId = Read-Host "$(Get-Lang 'AskIdDownload') $(Get-Lang 'CancelStep')`n"
 			if ($AppId -eq '0') { continue }
-			IPA-Download $AppId
+			IPA-Download -AppId $AppId
 		}
 		
 		# 3. Ввод ID приложения и загрузка (с выбором версии):
@@ -701,7 +755,7 @@ $(Get-Lang 'Menu11')`n
 			Separator
 			$AppId = Read-Host "$(Get-Lang 'AskIdSearch') $(Get-Lang 'CancelStep')`n"
 			if ($AppId -eq '0') { continue }
-			IPA-Download-With-Version $AppId
+			IPA-Download-With-Version -AppId $AppId
 		}
 		
 		# 4. Вывод списка ID приложений и загрузка последней версии:
@@ -712,7 +766,7 @@ $(Get-Lang 'Menu11')`n
 				foreach ($App in $SelectedApps) {
 					Separator
 					Write-Host "$(Get-Lang 'SelectedApp') $($App.Name)"
-					IPA-Download $App.Id
+					IPA-Download -AppId $App.Id -AppName $App.Name
 				}
 			}
 		}
@@ -725,7 +779,7 @@ $(Get-Lang 'Menu11')`n
 				foreach ($App in $SelectedApps) {
 					Separator
 					Write-Host "$(Get-Lang 'SelectedApp') $($App.Name)"
-					IPA-Download-With-Version $App.Id
+					IPA-Download-With-Version -AppId $App.Id -AppName $App.Name
 				}
 			}
 		}
@@ -752,8 +806,7 @@ $(Get-Lang 'Menu11')`n
 		"8" {
 			Separator
 			$Clear_Menu = @"
-$(Get-Lang 'ClearMenuTitle')
-$(Get-Lang 'MenuCancel')
+$(Get-Lang 'ClearMenuTitle') $(Get-Lang 'CancelStep')
 $(Get-Lang 'ClearMenu1')
 $(Get-Lang 'ClearMenu2')`n
 "@
