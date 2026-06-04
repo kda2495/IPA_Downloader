@@ -36,6 +36,9 @@ Add-Type -AssemblyName System.IO.Compression.FileSystem
 [Console]::OutputEncoding = [System.Text.Encoding]::UTF8
 chcp 65001 > $null
 
+# Версия скрипта:
+Write-Host "IPA_Downloader 3.8.2" -ForegroundColor Black -BackgroundColor Yellow
+
 # Файл языка скрипта:
 $LangConfigFile = ".\MainApp\Lang_Config.txt"
 $Global:CurrentLang = "RU"
@@ -167,9 +170,6 @@ $LangStrings = @{
 function Get-Lang($Key) {
 	return $LangStrings[$Global:CurrentLang][$Key]
 }
-
-# Версия скрипта:
-Write-Host "IPA_Downloader 3.8.1" -ForegroundColor Black -BackgroundColor Yellow
 
 # Функция разделителя:
 function Separator {
