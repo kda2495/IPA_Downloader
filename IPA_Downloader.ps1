@@ -169,7 +169,7 @@ function Get-Lang($Key) {
 }
 
 # Версия скрипта:
-Write-Host "IPA_Downloader 3.8" -ForegroundColor Black -BackgroundColor Yellow
+Write-Host "IPA_Downloader 3.8.1" -ForegroundColor Black -BackgroundColor Yellow
 
 # Функция разделителя:
 function Separator {
@@ -237,7 +237,7 @@ function Get-IPA-Metadata {
 	$Metadata = [PSCustomObject]@{
 		AppName = "App"
 		Version = "0"
-		MinIOS = "N/A"
+		MinIOS = "NA"
 	}
 	
 	try {
@@ -495,7 +495,7 @@ function IPA-Download-With-Version {
 	Write-Host ("{0,-3} {1,-12} {2}" -f "№", (Get-Lang "HeaderVerID"), (Get-Lang "HeaderVersion"))
 	foreach ($VersionId in $RecentVersions) {
 		$Meta = .\MainApp\ipatool.exe get-version-metadata -i $AppId --external-version-id $VersionId 2>$null
-		$DisplayVersion = if ($Meta -match 'displayVersion=([^\s,]+)') { $Matches[1] } else { "N/A" }
+		$DisplayVersion = if ($Meta -match 'displayVersion=([^\s,]+)') { $Matches[1] } else { "NA" }
 		Write-Host ("{0,-3} {1,-12} {2}" -f $Counter, $VersionId, $DisplayVersion)
 		$VersionMapping += [PSCustomObject]@{ Index = $Counter; ID = $VersionId; Version = $DisplayVersion }
 		$Counter++
