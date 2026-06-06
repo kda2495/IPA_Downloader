@@ -37,7 +37,7 @@ Add-Type -AssemblyName System.IO.Compression.FileSystem
 chcp 65001 > $null
 
 # Версия скрипта:
-Write-Host "IPA_Downloader 3.8.2" -ForegroundColor Black -BackgroundColor Yellow
+Write-Host "IPA_Downloader 3.8.3" -ForegroundColor Black -BackgroundColor Yellow
 
 # Файл языка скрипта:
 $LangConfigFile = ".\MainApp\Lang_Config.txt"
@@ -67,7 +67,7 @@ $LangStrings = @{
 		"AskIdSearch" = "Введите ID приложения для поиска"
 		"AskSearch" = "Введите название приложения для поиска"
 		"AskVerCount" = "Введите количество версий для отображения"
-		"AskVerNum" = "Введите номер версии"
+		"AskVerNum" = "Введите номера версий для загрузки"
 		"AuthFail" = "Вход в аккаунт Apple ID не выполнен."
 		"AuthSuccess" = "Вход в аккаунт Apple ID выполнен.`nДанные аккаунта Apple ID:"
 		"CancelStep" = "(0: Отмена/Возврат в главное меню)"
@@ -87,6 +87,7 @@ $LangStrings = @{
 		"HeaderMinIOS" = "Мин. iOS"
 		"HeaderVerID" = "ID версии"
 		"HeaderVersion" = "Версия"
+		"InstallApp" = "Установка:"
 		"LangChanged" = "Язык успешно изменен на Русский."
 		"ListCleared" = "Готово. Список загруженных приложений очищен."
 		"ListMenu1" = "1. Полный список приложений (GitHub)"
@@ -140,6 +141,7 @@ $LangStrings = @{
 		"HeaderMinIOS" = "Min. iOS"
 		"HeaderVerID" = "Version ID"
 		"HeaderVersion" = "Version"
+		"InstallApp" = "Installing:"
 		"LangChanged" = "Language successfully changed to English."
 		"ListCleared" = "Done. List of downloaded apps cleared."
 		"ListMenu1" = "1. Full application list (GitHub)"
@@ -267,7 +269,9 @@ function Get-IPA-Metadata {
 	} catch {
 		return $null
 	} finally {
-		if ($Zip) { $Zip.Dispose() }
+		if ($null -ne $Zip) {
+			$Zip.Dispose()
+		}
 	}
 	
 	$Metadata.AppName = $Metadata.AppName -replace '[\\/:*?"<>|]', ''
@@ -278,7 +282,7 @@ function Get-IPA-Metadata {
 function Save-App-To-History {
 	param (
 		[string]$AppId,
-		[string]$FinalFileName
+		[string]$AppNameOnly
 	)
 
 	$HistoryFile = ".\Lists\Downloaded_IDs.json"
@@ -310,16 +314,15 @@ function Save-App-To-History {
 		}
 	}
 
-	$CleanName = [System.IO.Path]::GetFileNameWithoutExtension($FinalFileName)
-	$Parts = $CleanName.Split("_")
-	$AppNameOnly = $Parts[0].Trim()
-
 	$NewItem = [PSCustomObject]@{
 		name = $AppNameOnly
 		appid = $AppId
 	}
 
 	$Data = @($Data) + $NewItem
+
+	# Сортировка списка по имени приложения в алфавитном порядке:
+	$Data = $Data | Sort-Object -Property name
 
 	$Data | ConvertTo-Json -Depth 5 | Set-Content $HistoryFile -Encoding UTF8
 
@@ -381,7 +384,8 @@ function Move-IPA-Files {
 					$FinalAppName = $AppName -replace '[\\/:*?"<>|]', ''
 				}
 				
-				$NewName = "$($FinalAppName)_$($Meta.Version)_iOS $($Meta.MinIOS)+.ipa"
+				# Формируем имя файла и заменяем все пробелы на "_":
+				$NewName = "$($FinalAppName)_$($Meta.Version)_iOS_$($Meta.MinIOS)+.ipa" -replace '\s+', '_'
 				$TargetFile = Join-Path (Get-Location) ".\Apps\$NewName"
 				
 				if (Test-Path $TargetFile) {
@@ -393,7 +397,8 @@ function Move-IPA-Files {
 				Write-Host "$(Get-Lang 'MinIOS') $($Meta.MinIOS)+"
 
 				if (![string]::IsNullOrEmpty($AppId)) {
-					Save-App-To-History -AppId $AppId -FinalFileName $NewName
+					# Передаем оригинальное имя ($FinalAppName) для истории:
+					Save-App-To-History -AppId $AppId -AppNameOnly $FinalAppName
 				}
 			}
 		}
@@ -501,30 +506,40 @@ function IPA-Download-With-Version {
 		$Counter++
 	}
 	Separator
-	$Version = Read-Host "$(Get-Lang 'AskVerNum') (1-$($VersionMapping.Count)) $(Get-Lang 'CancelStep')`n"
 	
-	if ($Version -eq '0') { return }
-	if (!(Test-NumericInput -InputValue $Version)) { return }
-
-	$VersionInt = 0
-	$IsInt = [int]::TryParse($Version, [ref]$VersionInt)
-
-	$SelectedObject = $VersionMapping | Where-Object {
-		($IsInt -and $_.Index -eq $VersionInt) -or $_.ID -eq $Version
-	}
-
-	if ($SelectedObject) {
-		Separator
-		Write-Host "$(Get-Lang 'SelectedVer') $($SelectedObject.Version)"
-		Separator
-		$FinalId = $SelectedObject.ID
-	} else {
+	# Запрашиваем ввод, отображая доступный диапазон версий:
+	$VersionInput = Read-Host "$(Get-Lang 'AskVerNum') (1-$($VersionMapping.Count)) $(Get-Lang 'CancelStep')`n"
+	
+	if ($VersionInput -eq '0') { return }
+	if ([string]::IsNullOrWhiteSpace($VersionInput)) {
 		Separator
 		Write-Host (Get-Lang "ErrorInvalidInput") -ForegroundColor DarkRed
 		return
 	}
-	.\MainApp\ipatool.exe download -i $AppId --external-version-id $FinalId
-	Move-IPA-Files -AppId $AppId -AppName $AppName
+
+	# Обрабатываем ввод пользователя:
+	$SelectedIndices = Parse-NumberSelection -Selection $VersionInput -MaxCount $VersionMapping.Count
+	
+	if ($null -eq $SelectedIndices) {
+		Separator
+		Write-Host (Get-Lang "ErrorInvalidInput") -ForegroundColor DarkRed
+		return
+	}
+	
+	$SelectedVersions = @()
+	foreach ($Idx in $SelectedIndices) {
+		$SelectedVersions += $VersionMapping | Where-Object { $_.Index -eq $Idx }
+	}
+
+	# Запускаем скачивание для каждой выбранной версии:
+	foreach ($SelectedObject in $SelectedVersions) {
+		Separator
+		Write-Host "$(Get-Lang 'SelectedVer') $($SelectedObject.Version)"
+		Separator
+		$FinalId = $SelectedObject.ID
+		.\MainApp\ipatool.exe download -i $AppId --external-version-id $FinalId
+		Move-IPA-Files -AppId $AppId -AppName $AppName
+	}
 }
 
 # Функция получения списка выбранных приложений (поддерживает диапазоны и перечисления):
@@ -792,9 +807,23 @@ $(Get-Lang 'Menu11')`n
 		# 7. Установка приложений, загруженных в папку Apps:
 		"7" {
 			if (Test-Path ".\Apps\*.ipa") {
+				# Проверяем, является ли система Windows 7:
+				$OsVersion = [System.Environment]::OSVersion.Version
+
 				Get-ChildItem ".\Apps\*.ipa" | ForEach-Object {
 					Separator
-					.\MainApp\ideviceinstaller.exe install "$($_.FullName)"
+					Write-Host (Get-Lang "InstallApp") "$($_.Name)"
+					
+					if ($OsVersion.Major -eq 6 -and $OsVersion.Minor -eq 1) {
+						# Обход проблемы с кириллицей в названии для Windows 7:
+						$TempFile = "$env:TEMP\Temp.ipa"
+						Copy-Item -Path $_.FullName -Destination $TempFile -Force
+						.\MainApp\ideviceinstaller.exe install $TempFile
+						Remove-Item -Path $TempFile -Force -ErrorAction SilentlyContinue
+					} else {
+						# Прямая установка для Windows 8/10/11:
+						.\MainApp\ideviceinstaller.exe install "$($_.FullName)"
+					}
 				}
 			} else {
 				Separator
