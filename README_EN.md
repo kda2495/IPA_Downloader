@@ -75,9 +75,6 @@ To update such apps, you must delete the old version from your device, download 
 • Connect your device to the PC via USB and trust the computer  
 • The script will automatically install all applications found in the `Apps` folder  
 
-**Important Note:**  
-To install the app, the name of the ipa-file must contain only Latin letters and numbers.
-
 #### 9. Clear data
 • The script will clean up the following data (with an option to choose):  
 • The list of previously downloaded applications  
