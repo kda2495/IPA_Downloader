@@ -37,7 +37,7 @@ Add-Type -AssemblyName System.IO.Compression.FileSystem
 chcp 65001 > $null
 
 # Версия скрипта:
-Write-Host "IPA_Downloader 3.8.3" -ForegroundColor Black -BackgroundColor Yellow
+Write-Host "IPA_Downloader 3.8.4" -ForegroundColor Black -BackgroundColor Yellow
 
 # Файл языка скрипта:
 $LangConfigFile = ".\MainApp\Lang_Config.txt"
@@ -62,7 +62,7 @@ $LangStrings = @{
 		"AddedToList" = "Добавлено в список: {0} - {1}"
 		"AlreadyInList" = "Уже есть в списке: {0} - {1}"
 		"AppsCleared" = "Готово. Файлы в папке Apps удалены."
-		"AskAppNum" = "Введите номера приложений для загрузки"
+		"AskAppNum" = "Введите номера приложений"
 		"AskIdDownload" = "Введите ID приложения для загрузки"
 		"AskIdSearch" = "Введите ID приложения для поиска"
 		"AskSearch" = "Введите название приложения для поиска"
@@ -92,19 +92,20 @@ $LangStrings = @{
 		"ListCleared" = "Готово. Список загруженных приложений очищен."
 		"ListMenu1" = "1. Полный список приложений (GitHub)"
 		"ListMenu2" = "2. Список ранее загруженных приложений"
-		"ListMenuTitle" = "Выберите список для загрузки:"
+		"ListMenuTitle" = "Выберите список для отображения:"
 		"LoggedOut" = "Выполнен выход из аккаунта Apple ID."
 		"Menu1" = "1. Поиск приложения и загрузка последней версии"
 		"Menu2" = "2. Ввод ID приложения и загрузка последней версии"
 		"Menu3" = "3. Ввод ID приложения и загрузка (с выбором версии)"
 		"Menu4" = "4. Вывод списка ID приложений и загрузка последней версии"
 		"Menu5" = "5. Вывод списка ID приложений и загрузка (с выбором версии)"
-		"Menu6" = "6. Показать минимальную версию iOS для ipa-файлов в папке Apps"
-		"Menu7" = "7. Установка приложений, загруженных в папку Apps"
-		"Menu8" = "8. Очистка данных"
-		"Menu9" = "9. Выход из аккаунта Apple ID"
-		"Menu10" = "10. Страница проекта на GitHub"
-		"Menu11" = "11. Сменить язык (Change Language)"
+		"Menu6" = "6. Вывод списка ID приложений и покупка"
+		"Menu7" = "7. Показать минимальную версию iOS для ipa-файлов в папке Apps"
+		"Menu8" = "8. Установка приложений, загруженных в папку Apps"
+		"Menu9" = "9. Очистка данных"
+		"Menu10" = "10. Выход из аккаунта Apple ID"
+		"Menu11" = "11. Страница проекта на GitHub"
+		"Menu12" = "12. Сменить язык (Change Language)"
 		"MenuTitle" = "Введите команду:"
 		"MinIOS" = "Минимальная версия iOS:"
 		"NoAppsFound" = "Приложения не найдены."
@@ -116,7 +117,7 @@ $LangStrings = @{
 		"AddedToList" = "Added to the list: {0} - {1}"
 		"AlreadyInList" = "Already in the list: {0} - {1}"
 		"AppsCleared" = "Done. Apps folder has been cleared."
-		"AskAppNum" = "Enter index numbers of apps to download"
+		"AskAppNum" = "Enter index numbers of apps"
 		"AskIdDownload" = "Enter the App ID to download"
 		"AskIdSearch" = "Enter the App ID to search"
 		"AskSearch" = "Enter the application name to search"
@@ -153,12 +154,13 @@ $LangStrings = @{
 		"Menu3" = "3. Enter App ID and download (with version selection)"
 		"Menu4" = "4. Show list of App IDs and download the latest version"
 		"Menu5" = "5. Show list of App IDs and download (with version selection)"
-		"Menu6" = "6. Show minimum iOS version for ipa files in Apps folder"
-		"Menu7" = "7. Install apps downloaded to the Apps folder"
-		"Menu8" = "8. Clear data"
-		"Menu9" = "9. Log out of Apple ID account"
-		"Menu10" = "10. GitHub project page"
-		"Menu11" = "11. Change Language (Сменить язык)"
+		"Menu6" = "6. Show list of App IDs and purchase"
+		"Menu7" = "7. Show minimum iOS version for ipa files in Apps folder"
+		"Menu8" = "8. Install apps downloaded to the Apps folder"
+		"Menu9" = "9. Clear data"
+		"Menu10" = "10. Log out of Apple ID account"
+		"Menu11" = "11. GitHub project page"
+		"Menu12" = "12. Change Language (Сменить язык)"
 		"MenuTitle" = "Enter a command:"
 		"MinIOS" = "Minimum iOS version:"
 		"NoAppsFound" = "No applications found."
@@ -690,7 +692,8 @@ $(Get-Lang 'Menu7')
 $(Get-Lang 'Menu8')
 $(Get-Lang 'Menu9')
 $(Get-Lang 'Menu10')
-$(Get-Lang 'Menu11')`n
+$(Get-Lang 'Menu11')
+$(Get-Lang 'Menu12')`n
 "@
 
 	$SwitchValue = Read-Host $MainMenu
@@ -798,32 +801,35 @@ $(Get-Lang 'Menu11')`n
 				}
 			}
 		}
-		
-		# 6. Показать минимальную версию iOS для ipa-файлов в папке Apps:
+		# 6. Вывод списка ID приложений и покупка:
 		"6" {
+			Separator
+			$SelectedApps = Get-Apps-From-List
+			if ($null -ne $SelectedApps) {
+				foreach ($App in $SelectedApps) {
+					Separator
+					Write-Host "$(Get-Lang 'SelectedApp') $($App.Name)"
+					.\MainApp\ipatool.exe purchase -i $App.Id
+					Start-Sleep -Seconds (Get-Random -Minimum 3.0 -Maximum 6.0)
+				}
+			}
+		}
+		
+		# 7. Показать минимальную версию iOS для ipa-файлов в папке Apps:
+		"7" {
 			Get-iOS-MinVersion
 		}
 		
-		# 7. Установка приложений, загруженных в папку Apps:
-		"7" {
+		# 8. Установка приложений, загруженных в папку Apps:
+		"8" {
 			if (Test-Path ".\Apps\*.ipa") {
-				# Проверяем, является ли система Windows 7:
-				$OsVersion = [System.Environment]::OSVersion.Version
-
 				Get-ChildItem ".\Apps\*.ipa" | ForEach-Object {
 					Separator
 					Write-Host (Get-Lang "InstallApp") "$($_.Name)"
-					
-					if ($OsVersion.Major -eq 6 -and $OsVersion.Minor -eq 1) {
-						# Обход проблемы с кириллицей в названии для Windows 7:
-						$TempFile = "$env:TEMP\Temp.ipa"
-						Copy-Item -Path $_.FullName -Destination $TempFile -Force
-						.\MainApp\ideviceinstaller.exe install $TempFile
-						Remove-Item -Path $TempFile -Force -ErrorAction SilentlyContinue
-					} else {
-						# Прямая установка для Windows 8/10/11:
-						.\MainApp\ideviceinstaller.exe install "$($_.FullName)"
-					}
+					$TempFile = "$env:TEMP\Temp.ipa"
+					Copy-Item -Path $_.FullName -Destination $TempFile -Force
+					.\MainApp\ideviceinstaller.exe install $TempFile
+					Remove-Item -Path $TempFile -Force -ErrorAction SilentlyContinue
 				}
 			} else {
 				Separator
@@ -831,8 +837,8 @@ $(Get-Lang 'Menu11')`n
 			}
 		}
 		
-		# 8. Очистка данных скрипта:
-		"8" {
+		# 9. Очистка данных скрипта:
+		"9" {
 			Separator
 			$Clear_Menu = @"
 $(Get-Lang 'ClearMenuTitle') $(Get-Lang 'CancelStep')
@@ -866,21 +872,21 @@ $(Get-Lang 'ClearMenu2')`n
 			}
 		}
 		
-		# 9. Выход из аккаунта Apple ID:
-		"9" {
+		# 10. Выход из аккаунта Apple ID:
+		"10" {
 			Separator
 			Write-Host (Get-Lang "LoggedOut")
 			.\MainApp\ipatool.exe auth revoke
 			Connect-AppleID
 		}
 		
-		# 10. Страница проекта на GitHub:
-		"10" {
+		# 11. Страница проекта на GitHub:
+		"11" {
 			Start-Process "https://github.com/kda2495/IPA_Downloader"
 		}
 		
-		# 11. Сменить язык (Change Language):
-		"11" {
+		# 12. Сменить язык (Change Language):
+		"12" {
 			$Global:CurrentLang = if ($Global:CurrentLang -eq "RU") { "EN" } else { "RU" }
 			Set-Content -Path $LangConfigFile -Value $Global:CurrentLang -Force
 			Separator
