@@ -1,4 +1,10 @@
 2ГИС: 481627348
+Adobe Acrobat Reader: 469337564
+Adobe Express: 1051937863
+Adobe Lightroom: 878783582
+Adobe Photoshop Express: 331975235
+Adobe Scan: 1199564834
+Adobe Sign: 481082197
 AdGuard: 1047223162
 AmneziaVPN: 1600529900
 AmneziaWG: 6478942365
@@ -26,6 +32,7 @@ Google Authenticator: 388497605
 Google Chrome: 535886823
 Google Drive: 507874739
 Google Gemini: 6477489729
+Google Meet: 1096918571
 Google Документы: 842842640
 Google Карты: 585027354
 Google Переводчик: 414706506
@@ -45,11 +52,25 @@ Karing: 6472431552
 Lamoda: 777645417
 Lovit (Интернет-провайдер): 1349402658 (Октябрь 2025)
 Mail.ru: 511310430
+Microsoft Authenticator: 983156458
 Microsoft Copilot: 6472538445
+Microsoft Clipchamp: 1503463881
+Microsoft Edge: 1288723196
+Microsoft Excel: 586683407
+Microsoft OneDrive: 477537958
+Microsoft OneNote: 410395246
+Microsoft Outlook: 951937596
+Microsoft PowerBi: 929738808
+Microsoft PowerPoint: 586449534
+Microsoft SharePoint: 1091505266
+Microsoft Teams: 1113153706
+Microsoft To Do: 1212616790
+Microsoft Word: 586447913
 Netcraze: 6738113127
 Okko: 448868000 (Март 2026)
 Ozon: 407804998
 Perplexity: 1668000334
+PicsArt: 587366035
 Ping: 576773404
 Pinterest: 429047995
 Premier - Сериалы, фильмы, шоу: 1334187043 (Июнь 2022)
@@ -66,7 +87,6 @@ S7 Airlines (Учебник Путешествий): 6746844981 (Август 20
 S7 Airlines (Узнай Сибирь): 6755426632 (Январь 2026)
 Shazam: 284993459
 Snapchat: 447188370
-Sora by OpenAI: 6744034028
 Spark Mail: 997102246
 Streisand: 6450534064
 T2: 1010648429
@@ -85,12 +105,15 @@ WhatsApp: 310633997
 WhatsApp Business: 1386412985
 Whoosh: 1418412616
 Wildberries: 597880187
+Windows App Mobile: 714464092
 Wink: 1294366633
 X: 333903271
+XBox: 736179781
 Yota: 871741640 (Сентябрь 2023)
 YouTube: 544007664
 YouTube Music: 1017492454
 YouTube Детям: 936971630
+Zoom Workplace: 546505307
 Аверс Бизнес: 1553926438 (Ноябрь 2025)
 Аверс Онлайн 2.0: 1523861947 (Ноябрь 2025)
 Авито: 417281773 (Май 2025)
