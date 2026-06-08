@@ -39,7 +39,7 @@ Instead of installing the full iTunes package, you can perform a custom installa
 • Enter the App ID  
 • The script will ask for the number of versions you want to display  
 • The script will show a list of available application versions (from newest to oldest)  
-• To download, enter the versions' index numbers  
+• To download, enter the versions' index numbers (multiple versions input is supported, eg: 1, 2, 3-5)  
 
 **Important Note:**  
 If an app is unavailable in your region, it will still appear if an update is available in the App Store, but attempting to update it directly will result in an error.  
@@ -48,15 +48,15 @@ To update such apps, you must delete the old version from your device, download 
 #### 4. Show list of App IDs and download the latest version
 • The script will prompt you to select a list to download (either from the GitHub repository or a list of previously downloaded applications)  
 • The selected list of applications will be displayed  
-• To download, enter the apps' index numbers  
+• To download, enter the apps' index numbers (multiple apps input is supported, eg: 1, 2, 3-5)  
 
 #### 5. Show list of App IDs and download (with version selection)
 • The script will prompt you to select a list to download (either from the GitHub repository or a list of previously downloaded applications)  
 • The selected list of applications will be displayed  
-• Enter the apps' index numbers  
+• Enter the apps' index numbers (multiple apps input is supported, eg: 1, 2, 3-5)  
 • The script will ask for the number of versions you want to display  
 • The script will show a list of available application versions (from newest to oldest)  
-• To download, enter the versions' index numbers  
+• To download, enter the versions' index numbers (multiple versions input is supported, eg: 1, 2, 3-5)  
 
 **Important Note:**  
 If an app is unavailable in your region, it will still appear if an update is available in the App Store, but attempting to update it directly will result in an error.  
@@ -65,7 +65,7 @@ To update such apps, you must delete the old version from your device, download 
 #### 6. Show list of App IDs and purchase
 • The script will prompt you to select a list to download (either from the GitHub repository or a list of previously downloaded applications)  
 • The selected list of applications will be displayed  
-• To purchase, enter the apps' index numbers  
+• To purchase, enter the apps' index numbers (multiple apps input is supported, eg: 1, 2, 3-5)  
 
 #### 7. Show minimum iOS version for ipa files in Apps folder
 • The script will display the minimum iOS version required for installation for all `.ipa` files currently located in the `Apps` folder  
