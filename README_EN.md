@@ -73,7 +73,7 @@ To update such apps, you must delete the old version from your device, download 
 #### 8. Install apps downloaded to the Apps folder
 • Make sure you have iTunes installed from the official Apple website, or the `AppleMobileDeviceSupport` driver package (bundled with iTunes)  
 • Connect your device to the PC via USB and trust the computer  
-• The script will automatically install all applications found in the `Apps` folder  
+• To install, enter the apps' index numbers (multiple apps input is supported, eg: 1, 2, 3-5)  
 
 #### 9. Clear data
 • The script will clean up the following data (with an option to choose):  
