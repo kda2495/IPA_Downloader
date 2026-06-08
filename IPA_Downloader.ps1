@@ -37,7 +37,7 @@ Add-Type -AssemblyName System.IO.Compression.FileSystem
 chcp 65001 > $null
 
 # Версия скрипта:
-Write-Host "IPA_Downloader 3.8.4" -ForegroundColor Black -BackgroundColor Yellow
+Write-Host "IPA_Downloader 3.8.5" -ForegroundColor Black -BackgroundColor Yellow
 
 # Файл языка скрипта:
 $LangConfigFile = ".\MainApp\Lang_Config.txt"
@@ -822,12 +822,49 @@ $(Get-Lang 'Menu12')`n
 		
 		# 8. Установка приложений, загруженных в папку Apps:
 		"8" {
-			if (Test-Path ".\Apps\*.ipa") {
-				Get-ChildItem ".\Apps\*.ipa" | ForEach-Object {
+			# Получаем список всех .ipa файлов:
+			$IpaFiles = @(Get-ChildItem -Path ".\Apps\*.ipa" -ErrorAction SilentlyContinue)
+			
+			if ($IpaFiles.Count -gt 0) {
+				Separator
+				Write-Host ("{0,-3} {1}" -f "№", (Get-Lang "HeaderFileName"))
+				
+				# Выводим пронумерованный список файлов:
+				$Counter = 1
+				foreach ($File in $IpaFiles) {
+					Write-Host ("{0,-3} {1}" -f $Counter, $File.Name)
+					$Counter++
+				}
+				Separator
+				
+				# Запрашиваем номера для установки:
+				$Selection = Read-Host "$(Get-Lang 'AskAppNum') (1-$($IpaFiles.Count)) $(Get-Lang 'CancelStep')`n"
+				
+				if ($Selection -eq '0') { continue }
+				
+				if ([string]::IsNullOrWhiteSpace($Selection)) {
 					Separator
-					Write-Host (Get-Lang "InstallApp") "$($_.Name)"
+					Write-Host (Get-Lang "ErrorInvalidInput") -ForegroundColor DarkRed
+					continue
+				}
+
+				# Обрабатываем ввод пользователя через существующую функцию:
+				$SelectedIndices = Parse-NumberSelection -Selection $Selection -MaxCount $IpaFiles.Count
+				
+				if ($null -eq $SelectedIndices) {
+					Separator
+					Write-Host (Get-Lang "ErrorInvalidInput") -ForegroundColor DarkRed
+					continue
+				}
+
+				# Устанавливаем выбранные приложения:
+				foreach ($Idx in $SelectedIndices) {
+					$SelectedFile = $IpaFiles[$Idx - 1]
+					Separator
+					Write-Host "$(Get-Lang 'InstallApp') $($SelectedFile.Name)"
+					
 					$TempFile = "$env:TEMP\Temp.ipa"
-					Copy-Item -Path $_.FullName -Destination $TempFile -Force
+					Copy-Item -Path $SelectedFile.FullName -Destination $TempFile -Force
 					.\MainApp\ideviceinstaller.exe install $TempFile
 					Remove-Item -Path $TempFile -Force -ErrorAction SilentlyContinue
 				}
