@@ -77,7 +77,8 @@ To update such apps, you must delete the old version from your device, download 
 
 #### 9. Clear data
 • The script will clean up the following data (with an option to choose):  
-• The list of previously downloaded applications  
+• The list of previously downloaded apps  
+• The list of previously purchased apps  
 • The `Apps` folder, deleting all downloaded applications  
 
 #### 10. Log out of Apple ID account
