@@ -117,7 +117,7 @@ $LangStrings = @{
 		"PurchasedListCleared" = "Готово. Список приобретенных приложений очищен."
 		"PurchasedListMenu1" = "1. Полный список приложений (GitHub)"
 		"PurchasedListMenu2" = "2. Список ранее приобретенных приложений"
-		"PurchasedListMenu3" = "3. Список не приобретенных приложений"
+		"PurchasedListMenu3" = "3. Список ранее не приобретенных приложений"
 		"SelectedApp" = "Выбрано приложение:"
 		"SelectedVer" = "Выбрана версия:"
 	}
@@ -180,7 +180,7 @@ $LangStrings = @{
 		"PurchasedListCleared" = "Done. List of purchased apps cleared."
 		"PurchasedListMenu1" = "1. Full application list (GitHub)"
 		"PurchasedListMenu2" = "2. List of previously purchased apps"
-		"PurchasedListMenu3" = "3. List of not purchased apps"
+		"PurchasedListMenu3" = "3. List of previously not purchased apps"
 		"SelectedApp" = "Selected app:"
 		"SelectedVer" = "Selected version:"
 	}
