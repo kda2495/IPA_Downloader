@@ -37,7 +37,7 @@ Add-Type -AssemblyName System.IO.Compression.FileSystem
 chcp 65001 > $null
 
 # Версия скрипта:
-Write-Host "IPA_Downloader 3.8.5" -ForegroundColor Black -BackgroundColor Yellow
+Write-Host "IPA_Downloader 3.8.6" -ForegroundColor Black -BackgroundColor Yellow
 
 # Файл языка скрипта:
 $LangConfigFile = ".\MainApp\Lang_Config.txt"
@@ -59,7 +59,8 @@ if (Test-Path $LangConfigFile) {
 # Перевод текста:
 $LangStrings = @{
 	"RU" = @{
-		"AddedToList" = "Добавлено в список: {0} - {1}"
+		"AddedToDownloadedList" = "Добавлено в список: {0} - {1}"
+		"AddedToPurchasedList" = "Добавлено в список покупок: {0} - {1}"
 		"AlreadyInList" = "Уже есть в списке: {0} - {1}"
 		"AppsCleared" = "Готово. Файлы в папке Apps удалены."
 		"AskAppNum" = "Введите номера приложений"
@@ -72,13 +73,19 @@ $LangStrings = @{
 		"AuthSuccess" = "Вход в аккаунт Apple ID выполнен.`nДанные аккаунта Apple ID:"
 		"CancelStep" = "(0: Отмена/Возврат в главное меню)"
 		"ClearMenu1" = "1. Очистка списка ранее загруженных приложений"
-		"ClearMenu2" = "2. Очистка папки Apps"
+		"ClearMenu2" = "2. Очистка списка ранее приобретенных приложений"
+		"ClearMenu3" = "3. Очистка папки Apps"
 		"ClearMenuTitle" = "Выберите данные для очистки:"
+		"DownloadedListCleared" = "Готово. Список загруженных приложений очищен."
+		"DownloadedListMenu1" = "1. Полный список приложений (GitHub)"
+		"DownloadedListMenu2" = "2. Список ранее загруженных приложений"
+		"DownloadedListMenu3" = "3. Список ранее не загруженных приложений"
 		"ErrorHistoryEmpty" = "Ошибка: История загрузок пуста."
 		"ErrorInvalidInput" = "Ошибка: Неверный ввод."
 		"ErrorListLoadError" = "Ошибка загрузки списка приложений."
 		"ErrorMissingFiles" = "Ошибка: Следующие файлы не найдены в папке MainApp:"
 		"ErrorNoApps" = "Ошибка: В папке Apps отсутствуют приложения."
+		"ErrorPurchasedEmpty" = "Ошибка: История покупок пуста."
 		"FileName" = "Название файла:"
 		"FileSaved" = "Готово. Файл сохранен в папку Apps."
 		"HeaderAppName" = "Название приложения"
@@ -89,9 +96,6 @@ $LangStrings = @{
 		"HeaderVersion" = "Версия"
 		"InstallApp" = "Установка:"
 		"LangChanged" = "Язык успешно изменен на Русский."
-		"ListCleared" = "Готово. Список загруженных приложений очищен."
-		"ListMenu1" = "1. Полный список приложений (GitHub)"
-		"ListMenu2" = "2. Список ранее загруженных приложений"
 		"ListMenuTitle" = "Выберите список для отображения:"
 		"LoggedOut" = "Выполнен выход из аккаунта Apple ID."
 		"Menu1" = "1. Поиск приложения и загрузка последней версии"
@@ -110,11 +114,16 @@ $LangStrings = @{
 		"MinIOS" = "Минимальная версия iOS:"
 		"NoAppsFound" = "Приложения не найдены."
 		"PressEnter" = "Нажмите Enter для выхода"
+		"PurchasedListCleared" = "Готово. Список приобретенных приложений очищен."
+		"PurchasedListMenu1" = "1. Полный список приложений (GitHub)"
+		"PurchasedListMenu2" = "2. Список ранее приобретенных приложений"
+		"PurchasedListMenu3" = "3. Список не приобретенных приложений"
 		"SelectedApp" = "Выбрано приложение:"
 		"SelectedVer" = "Выбрана версия:"
 	}
 	"EN" = @{
-		"AddedToList" = "Added to the list: {0} - {1}"
+		"AddedToDownloadedList" = "Added to the list: {0} - {1}"
+		"AddedToPurchasedList" = "Added to purchased list: {0} - {1}"
 		"AlreadyInList" = "Already in the list: {0} - {1}"
 		"AppsCleared" = "Done. Apps folder has been cleared."
 		"AskAppNum" = "Enter index numbers of apps"
@@ -127,13 +136,19 @@ $LangStrings = @{
 		"AuthSuccess" = "Apple ID account login successful.`nApple ID account details:"
 		"CancelStep" = "(0: Cancel/Return to main menu)"
 		"ClearMenu1" = "1. Clear list of previously downloaded apps"
-		"ClearMenu2" = "2. Clear Apps folder"
+		"ClearMenu2" = "2. Clear list of previously purchased apps"
+		"ClearMenu3" = "3. Clear Apps folder"
 		"ClearMenuTitle" = "Select data to clear:"
+		"DownloadedListCleared" = "Done. List of downloaded apps cleared."
+		"DownloadedListMenu1" = "1. Full application list (GitHub)"
+		"DownloadedListMenu2" = "2. List of previously downloaded apps"
+		"DownloadedListMenu3" = "3. List of previously not downloaded apps"
 		"ErrorHistoryEmpty" = "Error: Download history is empty."
 		"ErrorInvalidInput" = "Error: Invalid input."
 		"ErrorListLoadError" = "Failed to load the application list."
 		"ErrorMissingFiles" = "Error: The following files were not found in the MainApp folder:"
 		"ErrorNoApps" = "Error: No applications found in the Apps folder."
+		"ErrorPurchasedEmpty" = "Error: Purchase history is empty."
 		"FileName" = "File name:"
 		"FileSaved" = "Done. File saved to the Apps folder."
 		"HeaderAppName" = "App Name"
@@ -144,9 +159,6 @@ $LangStrings = @{
 		"HeaderVersion" = "Version"
 		"InstallApp" = "Installing:"
 		"LangChanged" = "Language successfully changed to English."
-		"ListCleared" = "Done. List of downloaded apps cleared."
-		"ListMenu1" = "1. Full application list (GitHub)"
-		"ListMenu2" = "2. List of previously downloaded apps"
 		"ListMenuTitle" = "Select list source:"
 		"LoggedOut" = "Successfully logged out of the Apple ID account."
 		"Menu1" = "1. Search for an app and download the latest version"
@@ -165,6 +177,10 @@ $LangStrings = @{
 		"MinIOS" = "Minimum iOS version:"
 		"NoAppsFound" = "No applications found."
 		"PressEnter" = "Press Enter to exit"
+		"PurchasedListCleared" = "Done. List of purchased apps cleared."
+		"PurchasedListMenu1" = "1. Full application list (GitHub)"
+		"PurchasedListMenu2" = "2. List of previously purchased apps"
+		"PurchasedListMenu3" = "3. List of not purchased apps"
 		"SelectedApp" = "Selected app:"
 		"SelectedVer" = "Selected version:"
 	}
@@ -328,7 +344,49 @@ function Save-App-To-History {
 
 	$Data | ConvertTo-Json -Depth 5 | Set-Content $HistoryFile -Encoding UTF8
 
-	Write-Host ((Get-Lang "AddedToList") -f $AppNameOnly, $AppId)
+	Write-Host ((Get-Lang "AddedToDownloadedList") -f $AppNameOnly, $AppId)
+}
+
+# Функция сохранения информации о приобретенных приложениях:
+function Save-App-To-Purchased {
+	param (
+		[string]$AppId,
+		[string]$AppNameOnly
+	)
+
+	$HistoryFile = ".\Lists\Purchased_IDs.json"
+	
+	if (!(Test-Path $HistoryFile)) {
+		$null = New-Item -Path $HistoryFile -ItemType "File" -Value ''
+	}
+	
+	$JsonRaw = Get-Content $HistoryFile -Raw -Encoding UTF8
+
+	if ([string]::IsNullOrWhiteSpace($JsonRaw)) {
+		$Data = @()
+	} else {
+		$Data = $JsonRaw | ConvertFrom-Json
+	}
+
+	if (!$Data) { $Data = @() }
+	if ($Data -isnot [System.Collections.IEnumerable]) { $Data = @($Data) }
+
+	foreach ($Item in $Data) {
+		if ($Item.appid -eq $AppId) {
+			return
+		}
+	}
+
+	$NewItem = [PSCustomObject]@{
+		name = $AppNameOnly
+		appid = $AppId
+	}
+
+	$Data = @($Data) + $NewItem
+	$Data = $Data | Sort-Object -Property name
+	$Data | ConvertTo-Json -Depth 5 | Set-Content $HistoryFile -Encoding UTF8
+
+	Write-Host ((Get-Lang "AddedToPurchasedList") -f $AppNameOnly, $AppId)
 }
 
 # Функция поиска имени приложения по ID в списке GitHub:
@@ -544,12 +602,24 @@ function IPA-Download-With-Version {
 	}
 }
 
-# Функция получения списка выбранных приложений (поддерживает диапазоны и перечисления):
+# Функция получения списка выбранных приложений (поддерживает диапазоны, перечисления и разные списки):
 function Get-Apps-From-List {
+	param (
+		[string]$ListMode = "Download"
+	)
+	
+	$MenuTitle = Get-Lang 'ListMenuTitle'
+	$Menu1 = if ($ListMode -eq "Purchase") { Get-Lang 'PurchasedListMenu1' } else { Get-Lang 'DownloadedListMenu1' }
+	$Menu2 = if ($ListMode -eq "Purchase") { Get-Lang 'PurchasedListMenu2' } else { Get-Lang 'DownloadedListMenu2' }
+	$Menu3 = if ($ListMode -eq "Purchase") { Get-Lang 'PurchasedListMenu3' } else { Get-Lang 'DownloadedListMenu3' }
+	$TargetFile = if ($ListMode -eq "Purchase") { ".\Lists\Purchased_IDs.json" } else { ".\Lists\Downloaded_IDs.json" }
+	$EmptyError = if ($ListMode -eq "Purchase") { Get-Lang 'ErrorPurchasedEmpty' } else { Get-Lang 'ErrorHistoryEmpty' }
+
 	$List_Menu = @"
-$(Get-Lang 'ListMenuTitle') $(Get-Lang 'CancelStep')
-$(Get-Lang 'ListMenu1')
-$(Get-Lang 'ListMenu2')`n
+$MenuTitle $(Get-Lang 'CancelStep')
+$Menu1
+$Menu2
+$Menu3`n
 "@
 	$ListChoice = Read-Host $List_Menu
 
@@ -570,24 +640,22 @@ $(Get-Lang 'ListMenu2')`n
 			}
 		}
 		"2" {
-			$HistoryFile = ".\Lists\Downloaded_IDs.json"
-			
-			if (!(Test-Path $HistoryFile)) {
+			if (!(Test-Path $TargetFile)) {
 				Separator
-				Write-Host (Get-Lang "ErrorHistoryEmpty") -ForegroundColor DarkRed
+				Write-Host $EmptyError -ForegroundColor DarkRed
 				return $null
 			}
 			
-			$JsonRaw = Get-Content $HistoryFile -Raw -Encoding UTF8
+			$JsonRaw = Get-Content $TargetFile -Raw -Encoding UTF8
 			if ([string]::IsNullOrWhiteSpace($JsonRaw)) {
 				Separator
-				Write-Host (Get-Lang "ErrorHistoryEmpty") -ForegroundColor DarkRed
+				Write-Host $EmptyError -ForegroundColor DarkRed
 				return $null
 			}
 			$HistoryData = $JsonRaw | ConvertFrom-Json
 			if ($null -eq $HistoryData) {
 				Separator
-				Write-Host (Get-Lang "ErrorHistoryEmpty") -ForegroundColor DarkRed
+				Write-Host $EmptyError -ForegroundColor DarkRed
 				return $null
 			}
 			if ($HistoryData -isnot [System.Collections.IEnumerable]) {
@@ -595,6 +663,38 @@ $(Get-Lang 'ListMenu2')`n
 			}
 			foreach ($Item in $HistoryData) {
 				$Lines += "{0}: {1}" -f $Item.name, $Item.appid
+			}
+		}
+		"3" {
+			try {
+				if ($null -eq $Global:GitHubRawList) {
+					$Global:GitHubRawList = Invoke-RestMethod -Uri "https://raw.githubusercontent.com/kda2495/IPA_Downloader/refs/heads/main/Apps_ID_List.txt" -ErrorAction Stop
+				}
+				$AllLines = $Global:GitHubRawList -split "`n" | Where-Object { $_.Trim() -ne "" }
+			} catch {
+				Write-Host (Get-Lang "ErrorListLoadError") -ForegroundColor DarkRed
+				return $null
+			}
+
+			$SavedIds = @()
+			if (Test-Path $TargetFile) {
+				$JsonRaw = Get-Content $TargetFile -Raw -Encoding UTF8
+				if (-not [string]::IsNullOrWhiteSpace($JsonRaw)) {
+					$HistoryData = $JsonRaw | ConvertFrom-Json
+					if ($null -ne $HistoryData) {
+						if ($HistoryData -isnot [System.Collections.IEnumerable]) {
+							$HistoryData = @($HistoryData)
+						}
+						$SavedIds = $HistoryData.appid
+					}
+				}
+			}
+
+			foreach ($Line in $AllLines) {
+				$AppId = [System.Text.RegularExpressions.Regex]::Match($Line, '\b\d{6,}\b').Value
+				if ($AppId -and $SavedIds -notcontains $AppId) {
+					$Lines += $Line
+				}
 			}
 		}
 		default {
@@ -606,7 +706,7 @@ $(Get-Lang 'ListMenu2')`n
 
 	if ($Lines.Count -eq 0) {
 		Separator
-		Write-Host (Get-Lang "ErrorInvalidInput") -ForegroundColor DarkRed
+		Write-Host (Get-Lang "NoAppsFound") -ForegroundColor DarkRed
 		return $null
 	}
 
@@ -625,7 +725,6 @@ $(Get-Lang 'ListMenu2')`n
 		return $null
 	}
 
-	# Используем универсальную функцию:
 	$SelectedIndices = Parse-NumberSelection -Selection $Selection -MaxCount $Lines.Count
 
 	if ($null -eq $SelectedIndices) {
@@ -801,16 +900,17 @@ $(Get-Lang 'Menu12')`n
 				}
 			}
 		}
+		
 		# 6. Вывод списка ID приложений и покупка:
 		"6" {
 			Separator
-			$SelectedApps = Get-Apps-From-List
+			$SelectedApps = Get-Apps-From-List -ListMode "Purchase"
 			if ($null -ne $SelectedApps) {
 				foreach ($App in $SelectedApps) {
 					Separator
 					Write-Host "$(Get-Lang 'SelectedApp') $($App.Name)"
 					.\MainApp\ipatool.exe purchase -i $App.Id
-					Start-Sleep -Seconds (Get-Random -Minimum 3.0 -Maximum 6.0)
+					Save-App-To-Purchased -AppId $App.Id -AppNameOnly $App.Name
 				}
 			}
 		}
@@ -822,33 +922,34 @@ $(Get-Lang 'Menu12')`n
 		
 		# 8. Установка приложений, загруженных в папку Apps:
 		"8" {
-			# Получаем список всех .ipa файлов:
 			$IpaFiles = @(Get-ChildItem -Path ".\Apps\*.ipa" -ErrorAction SilentlyContinue)
 			
 			if ($IpaFiles.Count -gt 0) {
 				Separator
-				Write-Host ("{0,-3} {1}" -f "№", (Get-Lang "HeaderFileName"))
+				Write-Host ("{0,-3} {1,-30} {2}" -f "№", (Get-Lang "HeaderFileName"), (Get-Lang "HeaderMinIOS"))
 				
-				# Выводим пронумерованный список файлов:
+				# Выводим пронумерованный список файлов с версией iOS:
 				$Counter = 1
 				foreach ($File in $IpaFiles) {
-					Write-Host ("{0,-3} {1}" -f $Counter, $File.Name)
+					$Meta = Get-IPA-Metadata -IpaPath $File.FullName
+					$MinOs = if ($Meta) { "$($Meta.MinIOS)+" } else { "Error" }
+					$PrintName = if ($File.Name.Length -gt 30) { $File.Name.Substring(0,27) + "..." } else { $File.Name }
+					Write-Host ("{0,-3} {1,-30} {2}" -f $Counter, $PrintName, $MinOs)
 					$Counter++
 				}
 				Separator
 				
-				# Запрашиваем номера для установки:
+				# Запрашиваем номера для установки с возможностью отмены:
 				$Selection = Read-Host "$(Get-Lang 'AskAppNum') (1-$($IpaFiles.Count)) $(Get-Lang 'CancelStep')`n"
 				
 				if ($Selection -eq '0') { continue }
-				
 				if ([string]::IsNullOrWhiteSpace($Selection)) {
 					Separator
 					Write-Host (Get-Lang "ErrorInvalidInput") -ForegroundColor DarkRed
 					continue
 				}
 
-				# Обрабатываем ввод пользователя через существующую функцию:
+				# Обрабатываем ввод пользователя через функцию:
 				$SelectedIndices = Parse-NumberSelection -Selection $Selection -MaxCount $IpaFiles.Count
 				
 				if ($null -eq $SelectedIndices) {
@@ -861,7 +962,12 @@ $(Get-Lang 'Menu12')`n
 				foreach ($Idx in $SelectedIndices) {
 					$SelectedFile = $IpaFiles[$Idx - 1]
 					Separator
-					Write-Host "$(Get-Lang 'InstallApp') $($SelectedFile.Name)"
+					
+					# Дополнительно подтягиваем Мин. iOS для вывода в строку прогресса:
+					$Meta = Get-IPA-Metadata -IpaPath $SelectedFile.FullName
+					$MinOsSuffix = if ($Meta) { " [iOS $($Meta.MinIOS)+]" } else { "" }
+					
+					Write-Host "$(Get-Lang 'InstallApp') $($SelectedFile.Name)$MinOsSuffix"
 					
 					$TempFile = "$env:TEMP\Temp.ipa"
 					Copy-Item -Path $SelectedFile.FullName -Destination $TempFile -Force
@@ -880,7 +986,8 @@ $(Get-Lang 'Menu12')`n
 			$Clear_Menu = @"
 $(Get-Lang 'ClearMenuTitle') $(Get-Lang 'CancelStep')
 $(Get-Lang 'ClearMenu1')
-$(Get-Lang 'ClearMenu2')`n
+$(Get-Lang 'ClearMenu2')
+$(Get-Lang 'ClearMenu3')`n
 "@
 			$ClearChoice = Read-Host ($Clear_Menu)
 			
@@ -890,9 +997,14 @@ $(Get-Lang 'ClearMenu2')`n
 				"1" {
 					Remove-Item ".\Lists\Downloaded_IDs.json" -Force -ErrorAction SilentlyContinue
 					Separator
-					Write-Host (Get-Lang "ListCleared")
+					Write-Host (Get-Lang "DownloadedListCleared")
 				}
 				"2" {
+					Remove-Item ".\Lists\Purchased_IDs.json" -Force -ErrorAction SilentlyContinue
+					Separator
+					Write-Host (Get-Lang "PurchasedListCleared")
+				}
+				"3" {
 					if (Test-Path ".\Apps\*.ipa") {
 						Remove-Item ".\Apps\*.ipa" -Force -ErrorAction SilentlyContinue
 						Separator
