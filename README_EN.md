@@ -46,12 +46,12 @@ If an app is unavailable in your region, it will still appear if an update is av
 To update such apps, you must delete the old version from your device, download the new version via IPA_Downloader, and then reinstall it.  
 
 #### 4. Show list of App IDs and download the latest version
-• The script will prompt you to select a list to download (either from the GitHub repository or a list of previously downloaded applications)  
+• The script will prompt you to select a list to show  
 • The selected list of applications will be displayed  
 • To download, enter the apps' index numbers (multiple apps input is supported, eg: 1, 2, 3-5)  
 
 #### 5. Show list of App IDs and download (with version selection)
-• The script will prompt you to select a list to download (either from the GitHub repository or a list of previously downloaded applications)  
+• The script will prompt you to select a list to show  
 • The selected list of applications will be displayed  
 • Enter the apps' index numbers (multiple apps input is supported, eg: 1, 2, 3-5)  
 • The script will ask for the number of versions you want to display  
@@ -63,7 +63,7 @@ If an app is unavailable in your region, it will still appear if an update is av
 To update such apps, you must delete the old version from your device, download the new version via IPA_Downloader, and then reinstall it.  
 
 #### 6. Show list of App IDs and purchase
-• The script will prompt you to select a list to download (either from the GitHub repository or a list of previously downloaded applications)  
+• The script will prompt you to select a list to show  
 • The selected list of applications will be displayed  
 • To purchase, enter the apps' index numbers (multiple apps input is supported, eg: 1, 2, 3-5)  
 
