@@ -64,8 +64,8 @@ PowerShell-скрипт для загрузки ранее приобретен�
 [Сайт AppBank](https://pwa.appbank.pw/)  
 [Telegram-канал AppBank](https://t.me/appbankRu)  
 
-### Как найти ID приложения:
-Для поиска ID приложения находим его ссылку в AppStore и из ссылки копируем числовой идентификатор после `id`.  
+### Поиск ID приложения:
+Находим ссылку на приложение в AppStore и из ссылки копируем числовой идентификатор после `id`.  
 <details>
  <summary>Скриншот (нажмите для просмотра)</summary>
 <img width="389" height="36" alt="AppStore_Link" src="https://github.com/user-attachments/assets/e73fd860-ed11-4293-8600-aef61fe3dc7f" />
