@@ -1,144 +1,78 @@
 [![GitHub release](https://img.shields.io/github/v/release/kda2495/IPA_Downloader.svg?label=Release)](https://github.com/kda2495/IPA_Downloader/releases)
 [![License](https://img.shields.io/github/license/kda2495/IPA_Downloader.svg?label=License&color=blue)](https://github.com/kda2495/IPA_Downloader/blob/main/LICENSE)
 [![Downloads](https://img.shields.io/github/downloads/kda2495/IPA_Downloader/total?label=Downloads&color=blue)](https://github.com/kda2495/IPA_Downloader/releases)
+[![Downloads](https://img.shields.io/github/downloads/kda2495/IPA_Downloader/latest/total?label=Downloads%20(latest)&color=blue)](https://github.com/kda2495/IPA_Downloader/releases)
 
 # IPA_Downloader
 [![Russian README](https://img.shields.io/badge/README-Russian-blue.svg)](README.md)  
-A PowerShell-script for downloading previously purchased apps from the App Store and installing them on Apple devices (powered by [ipatool-cpp](https://github.com/Sorvigolova/ipatool)).
+A PowerShell script to download previously purchased applications from the App Store and install them on Apple devices (powered by [ipatool-cpp](https://github.com/Sorvigolova/ipatool)).
 
 ## Requirements:
-• Windows 7-11 x64  
-• Installed AppleMobileDeviceSupport driver (included with iTunes):  
+• Windows 7–11 (x64)  
+• AppleMobileDeviceSupport driver installed (included with iTunes):  
 [iTunes Download Link](https://www.apple.com/itunes/download/win64)  
-Instead of installing the full iTunes package, you can perform a custom installation of `AppleMobileDeviceSupport64.msi` by extracting the iTunes installer using any archive manager.  
-• Active Internet connection  
-• An Apple ID account with previously downloaded/purchased applications  
+Instead of a full iTunes installation, you can perform a selective installation of `AppleMobileDeviceSupport64.msi` by extracting the iTunes installer with any file archiver.  
+• Internet connection  
+• Apple ID with previously purchased/downloaded applications  
+
+## Features:
+• Search for an app and purchase it  
+• Search for an app and download the latest version  
+• Search for an app and download (with version selection)  
+• Input app IDs and purchase  
+• Input app IDs and download the latest version  
+• Input app IDs and download (with version selection)  
+• List app IDs and purchase  
+• List app IDs and download the latest version  
+• List app IDs and download (with version selection)  
+• Display the minimum iOS version for IPA files in the "Apps" folder  
+• Install applications  
+
+#### Note:  
+For commands requiring IDs, you can enter multiple IDs in the format `1, 2, 3`.  
+For version selection commands, you can enter multiple versions in the format `1, 2, 3-5`.  
+For commands listing IDs, you can enter multiple apps in the format `1, 2, 3-5`.  
 
 ## How to use:
-**1\. Double-click the `Start_IPA_Downloader.bat` file.**  
-**2\. On the first launch, you will need to log into your Apple ID:**  
-• Enter Apple ID (Enter email)  
-• Enter password  
-• Enter 2FA code (Two-Factor Authentication)  
+1. Double-click the `Start_IPA_Downloader.bat` file.  
+2. Upon the first launch, you will need to log in to your Apple ID:  
+• Enter your Apple ID (email)  
+• Enter your password  
+• Enter your two-factor authentication (2FA) code  
+3. Follow the on-screen prompts to enter the desired command.  
 
-**Please note:**  
-• All actions in the script are confirmed by pressing the Enter key.  
-• All downloaded applications are saved to the `IPA_Downloader/Apps` folder.  
-• The downloaded file name contains the application ID and its version.  
-
-## Script Commands Overview:
-#### 1. Search for an app and download the latest version
-• Enter the name of the application you want to find  
-• The script will display the search results  
-• To download, enter the App ID  
-
-#### 2. Enter App ID and download the latest version
-• To download, directly enter the App ID  
-
-#### 3. Enter App ID and download (with version selection)
-• Enter the App ID  
-• The script will ask for the number of versions you want to display  
-• The script will show a list of available application versions (from newest to oldest)  
-• To download, enter the versions' index numbers (multiple versions input is supported, eg: 1, 2, 3-5)  
-
-**Important Note:**  
-If an app is unavailable in your region, it will still appear if an update is available in the App Store, but attempting to update it directly will result in an error.  
-To update such apps, you must delete the old version from your device, download the new version via IPA_Downloader, and then reinstall it.  
-
-#### 4. Show list of App IDs and download the latest version
-• The script will prompt you to select a list to show  
-• The selected list of applications will be displayed  
-• To download, enter the apps' index numbers (multiple apps input is supported, eg: 1, 2, 3-5)  
-
-#### 5. Show list of App IDs and download (with version selection)
-• The script will prompt you to select a list to show  
-• The selected list of applications will be displayed  
-• Enter the apps' index numbers (multiple apps input is supported, eg: 1, 2, 3-5)  
-• The script will ask for the number of versions you want to display  
-• The script will show a list of available application versions (from newest to oldest)  
-• To download, enter the versions' index numbers (multiple versions input is supported, eg: 1, 2, 3-5)  
-
-**Important Note:**  
-If an app is unavailable in your region, it will still appear if an update is available in the App Store, but attempting to update it directly will result in an error.  
-To update such apps, you must delete the old version from your device, download the new version via IPA_Downloader, and then reinstall it.  
-
-#### 6. Show list of App IDs and purchase
-• The script will prompt you to select a list to show  
-• The selected list of applications will be displayed  
-• To purchase, enter the apps' index numbers (multiple apps input is supported, eg: 1, 2, 3-5)  
-
-#### 7. Show minimum iOS version for ipa files in Apps folder
-• The script will display the minimum iOS version required for installation for all `.ipa` files currently located in the `Apps` folder  
-
-#### 8. Install apps downloaded to the Apps folder
-• Make sure you have iTunes installed from the official Apple website, or the `AppleMobileDeviceSupport` driver package (bundled with iTunes)  
-• Connect your device to the PC via USB and trust the computer  
-• To install, enter the apps' index numbers (multiple apps input is supported, eg: 1, 2, 3-5)  
-
-#### 9. Clear data
-• The script will clean up the following data (with an option to choose):  
-• The list of previously downloaded apps  
-• The list of previously purchased apps  
-• The `Apps` folder, deleting all downloaded applications  
-
-#### 10. Log out of Apple ID account
-• The script will securely log out of your Apple ID account  
-
-#### 11. GitHub project page
-• The script will open the official project page on GitHub in your default browser  
-
-#### 12. Change Language (Сменить язык)
-• Toggles the script interface language  
-
-## How to find an App ID:
-To find an App ID, you need to know its AppStore URL link (for example, search for the app via a search engine, open its AppStore link, and copy the numeric identifier that comes right after `id`).  
+## Additional Information:
+### Windows 7 Support:
+1\. Update system certificates via UpdRootsCert:  
+[UpdRootsCert Download Link](https://disk.yandex.ru/d/SdHMgwJ55MTQRg)
 <details>
- <summary>Screenshot (click to expand)</summary>
-<img width="389" height="36" alt="AppStore_Link" src="https://github.com/user-attachments/assets/e73fd860-ed11-4293-8600-aef61fe3dc7f" />
-</details>
-
-You can also find application IDs using the [appmagic.rocks](https://appmagic.rocks/top-charts/apps) website (type the app or publisher name in the search field at the top right), then go to the app page and copy the ID number from the URL.  
-
-You can also display a list of actual app IDs using commands 4 and 5.  
-
-## Track New App Releases:
-[Telegram Channel AppBank](https://t.me/appbankRu)  
-[AppBank Website](https://appbank.pw/)  
-
-## Windows 7 Support:
-**1\. Update system certificates via UpdRootsCert:**  
-[Download Link for UpdRootsCert](https://disk.yandex.ru/d/SdHMgwJ55MTQRg)
-<details>
- <summary>Screenshot (click to expand)</summary>
+ <summary>Screenshot (click to view)</summary>
 <img width="521" height="407" alt="UpdRootsCert" src="https://github.com/user-attachments/assets/437390c2-f820-4caa-b679-30377b388c72" />
 </details>
 
-**2\. Install .NET Framework 4.8:**  
-[Download Link for .NET Framework 4.8](https://go.microsoft.com/fwlink/?linkid=2088631)
+2\. Install .NET Framework 4.8:  
+[.NET Framework 4.8 Download Link](https://go.microsoft.com/fwlink/?linkid=2088631)
 
-**3\. Install update KB3191566 (to add PowerShell 5.1 support):**  
-[Download Link for KB3191566](https://www.microsoft.com/en-us/download/details.aspx?id=54616)
+3\. Install update KB3191566 (to add PowerShell 5.1 support):  
+[KB3191566 Download Link](https://www.microsoft.com/en-us/download/details.aspx?id=54616)
 <details>
- <summary>Screenshot (click to expand)</summary>
+ <summary>Screenshot (click to view)</summary>
 <img width="973" height="616" alt="KB3191566" src="https://github.com/user-attachments/assets/940968fc-359f-4ed6-a6d4-2ca834fc989b" />
 </details>
 
-## Updating libimobiledevice libraries for App Installation:
-**1\. Download msys2-x86_64-latest.exe using the following link:**  
-[Download Link for MSYS2](https://github.com/msys2/msys2-installer/releases/tag/nightly-x86_64)  
-**2\. Launch MSYS2 MINGW64 and type:**  
+### Keeping track of new apps:
+[AppBank Website](https://pwa.appbank.pw/)  
+[AppBank Telegram Channel](https://t.me/appbankRu)  
 
-```
-pacman -S \
-mingw-w64-x86_64-libimobiledevice \
-mingw-w64-x86_64-libplist \
-mingw-w64-x86_64-libusbmuxd \
-mingw-w64-x86_64-ideviceinstaller
-```
-**3\. Once downloaded, the updated libimobiledevice libraries will be located in the `C:\msys64\mingw64\bin` folder.**  
+### How to find an App ID:
+To find an app's ID, locate it in the App Store, copy the URL, and take the numeric identifier that follows `id`.  
+<details>
+ <summary>Screenshot (click to view)</summary>
+<img width="389" height="36" alt="AppStore_Link" src="https://github.com/user-attachments/assets/e73fd860-ed11-4293-8600-aef61fe3dc7f" />
+</details>
 
-## Support the Project:
-IPA_Downloader is completely free. However, if you wish to support the project voluntarily, you can do so using the following details:  
+## Project Support:
+IPA_Downloader is completely free. However, if you would like to support the project, you can do so here:  
 [Support via CloudTips](https://pay.cloudtips.ru/p/93c0b094)  
 
 <img width="320" height="320" alt="qrCode" src="https://github.com/user-attachments/assets/1013fdce-2f18-4b5e-bd73-9237f691f51a" />
