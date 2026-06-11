@@ -5,7 +5,7 @@
 
 # IPA_Downloader
 [![Russian README](https://img.shields.io/badge/README-Russian-blue.svg)](README.md)  
-A PowerShell script to download previously purchased applications from the App Store and install them on Apple devices (powered by [ipatool-cpp](https://github.com/Sorvigolova/ipatool)).
+A PowerShell script to download previously purchased apps from the App Store and install them on Apple devices (powered by [ipatool-cpp](https://github.com/Sorvigolova/ipatool)).
 
 ## Requirements:
 • Windows 7–11 (x64)  
@@ -13,20 +13,20 @@ A PowerShell script to download previously purchased applications from the App S
 [iTunes Download Link](https://www.apple.com/itunes/download/win64)  
 Instead of a full iTunes installation, you can perform a selective installation of `AppleMobileDeviceSupport64.msi` by extracting the iTunes installer with any file archiver.  
 • Internet connection  
-• Apple ID with previously purchased/downloaded applications  
+• Apple ID with previously purchased/downloaded apps
 
 ## Features:
-• Search for an app and purchase it  
-• Search for an app and download the latest version  
-• Search for an app and download (with version selection)  
-• Input app IDs and purchase  
-• Input app IDs and download the latest version  
-• Input app IDs and download (with version selection)  
-• List app IDs and purchase  
-• List app IDs and download the latest version  
-• List app IDs and download (with version selection)  
-• Display the minimum iOS version for IPA files in the "Apps" folder  
-• Install applications  
+• Search for an app and purchase
+• Search for an app and download the latest version
+• Search for an app and download (with version selection)
+• Enter App IDs and purchase
+• Enter App IDs and download the latest version
+• Enter App IDs and download (with version selection)
+• Show list of App IDs and purchase
+• Show list of App IDs and download the latest version
+• Show list of App IDs and download (with version selection)
+• Show minimum iOS version for ipa files in Apps folder
+• Install apps
 
 #### Note:  
 For commands requiring IDs, you can enter multiple IDs in the format `1, 2, 3`.  
