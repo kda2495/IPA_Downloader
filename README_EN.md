@@ -64,8 +64,8 @@ For commands listing IDs, you can enter multiple apps in the format `1, 2, 3-5`.
 [AppBank Website](https://pwa.appbank.pw/)  
 [AppBank Telegram Channel](https://t.me/appbankRu)  
 
-### How to find an App ID:
-To find an app's ID, locate it in the App Store, copy the URL, and take the numeric identifier that follows `id`.  
+### Search for an App ID:
+Locate app in the App Store, copy the URL, and take the numeric identifier that follows `id`.  
 <details>
  <summary>Screenshot (click to view)</summary>
 <img width="389" height="36" alt="AppStore_Link" src="https://github.com/user-attachments/assets/e73fd860-ed11-4293-8600-aef61fe3dc7f" />
