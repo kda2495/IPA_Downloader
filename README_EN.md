@@ -34,12 +34,12 @@ For version selection commands, you can enter multiple versions in the format `1
 For commands listing IDs, you can enter multiple apps in the format `1, 2, 3-5`.  
 
 ## How to use:
-1. Double-click the `Start_IPA_Downloader.bat` file.  
-2. Upon the first launch, you will need to log in to your Apple ID:  
+1\. Double-click the `Start_IPA_Downloader.bat` file.  
+2\. Upon the first launch, you will need to log in to your Apple ID:  
 • Enter your Apple ID (email)  
 • Enter your password  
 • Enter your two-factor authentication (2FA) code  
-3. Follow the on-screen prompts to enter the desired command.  
+3\. Follow the on-screen prompts to enter the desired command.  
 
 ## Additional Information:
 ### Windows 7 Support:
