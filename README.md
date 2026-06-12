@@ -41,6 +41,12 @@ PowerShell скрипт для загрузки ранее приобретен�
 • Код двухфакторной аутентификации (Enter 2FA code)  
 3\. Введите необходимую команду
 
+## Возможные ошибки:
+• Download error: HTTP request failed: Timeout was reached - Не удалось подключиться к серверам Apple, проверьте интернет-соединение  
+• Error: license is required - Приложение не было приобретено на этом Apple ID ранее  
+• Purchase error: item is temporarily unavailable - Приложение не было приобретено на этом Apple ID ранее, покупка не удалась, так как приложение удалено из App Store  
+• No device found - Устройство не найдено. Убедитесь, что драйвер `AppleMobileDeviceSupport64` из пакета [iTunes](https://www.apple.com/itunes/download/win64) установлен  
+
 ## Прочая информация:
 ### Поддержка Windows 7:
 1\. Обновить системные сертификаты через UpdRootsCert:  
