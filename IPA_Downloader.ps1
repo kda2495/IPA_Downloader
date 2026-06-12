@@ -975,11 +975,7 @@ $(Get-Lang 'Menu15')`n
 				foreach ($Idx in $SelectedIndices) {
 					$SelectedFile = $IpaFiles[$Idx - 1]
 					Separator
-					
-					$Meta = Get-IPA-Metadata -IpaPath $SelectedFile.FullName
-					
 					Write-Host "$(Get-Lang 'InstallApp') $($SelectedFile.Name)"
-					
 					$TempFile = "$env:TEMP\Temp.ipa"
 					Copy-Item -Path $SelectedFile.FullName -Destination $TempFile -Force
 					.\MainApp\ideviceinstaller.exe install $TempFile
