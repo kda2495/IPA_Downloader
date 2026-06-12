@@ -37,7 +37,7 @@ Add-Type -AssemblyName System.IO.Compression.FileSystem
 chcp 65001 > $null
 
 # Версия скрипта:
-Write-Host "IPA_Downloader 3.8.8" -ForegroundColor Black -BackgroundColor Yellow
+Write-Host "IPA_Downloader 3.8.9" -ForegroundColor Black -BackgroundColor Yellow
 
 # Файл языка скрипта:
 $LangConfigFile = ".\MainApp\Lang_Config.txt"
@@ -201,7 +201,7 @@ function Get-Lang($Key) {
 
 # Функция разделителя:
 function Separator {
-	Write-Host "====================================================================" -ForegroundColor Green
+	Write-Host "================================================" -ForegroundColor Green
 }
 
 # Проверка на наличие базовых папок:
