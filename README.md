@@ -5,7 +5,7 @@
 
 # IPA_Downloader
 [![English README](https://img.shields.io/badge/README-English-blue.svg)](README_EN.md)  
-PowerShell-скрипт для загрузки ранее приобретенных приложений из App Store и их установки на устройства Apple (работает на базе [ipatool-cpp](https://github.com/Sorvigolova/ipatool)).
+PowerShell скрипт для загрузки ранее приобретенных приложений из App Store и их установки на устройства Apple (работает на базе [ipatool-cpp](https://github.com/Sorvigolova/ipatool)).
 
 ## Требования:
 • Windows 7-11 x64  
