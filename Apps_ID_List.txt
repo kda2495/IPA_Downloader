@@ -123,6 +123,7 @@ Wildberries: 597880187
 Windows App Mobile: 714464092
 Wink: 1294366633
 Wink Музыка: 6472437731
+Wireguard: 1441195209
 X: 333903271
 XBox: 736179781
 Yota: 871741640
