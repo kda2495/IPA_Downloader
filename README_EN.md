@@ -25,8 +25,8 @@ Instead of a full iTunes installation, you can perform a selective installation 
 • Show list of App IDs and purchase
 • Show list of App IDs and download the latest version
 • Show list of App IDs and download (with version selection)
-• Show minimum iOS version for ipa files in Apps folder
-• Install apps
+• Check minimum iOS version for .ipa files in Apps folder
+• Install .ipa files from Apps folder
 
 #### Note:  
 For commands requiring IDs, you can enter multiple IDs in the format `1, 2, 3`.  
@@ -65,7 +65,7 @@ For commands listing IDs, you can enter multiple apps in the format `1, 2, 3-5`.
 [AppBank Telegram Channel](https://t.me/appbankRu)  
 
 ### Search for an App ID:
-Locate app in the App Store, copy the URL, and take the numeric identifier that follows `id`.  
+Find the app in the App Store and copy the numeric ID (the value after `id` in the URL).  
 <details>
  <summary>Screenshot (click to view)</summary>
 <img width="389" height="36" alt="AppStore_Link" src="https://github.com/user-attachments/assets/e73fd860-ed11-4293-8600-aef61fe3dc7f" />
