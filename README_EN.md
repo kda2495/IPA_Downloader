@@ -41,6 +41,12 @@ For commands listing IDs, you can enter multiple apps in format `1, 2, 3-5`.
 • Enter your two-factor authentication code (Enter 2FA code)  
 3\. Enter desired command  
 
+## Possible errors:
+• Download error: HTTP request failed: Timeout was reached - Failed to connect to Apple servers, check your network connection  
+• Error: license is required - This app has not been previously purchased on this Apple ID  
+• Purchase error: item is temporarily unavailable - This app has not been previously purchased on this Apple ID, and the purchase failed because app has been removed from App Store  
+• No device found - Device not detected. Make sure the `AppleMobileDeviceSupport64` driver (included with [iTunes](https://www.apple.com/itunes/download/win64)) is installed  
+
 ## Additional Information:
 ### Windows 7 Support:
 1\. Update system certificates via UpdRootsCert:  
