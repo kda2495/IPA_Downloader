@@ -37,7 +37,7 @@ Add-Type -AssemblyName System.IO.Compression.FileSystem
 chcp 65001 > $null
 
 # Версия скрипта:
-Write-Host "IPA_Downloader 3.8.7" -ForegroundColor Black -BackgroundColor Yellow
+Write-Host "IPA_Downloader 3.8.8" -ForegroundColor Black -BackgroundColor Yellow
 
 # Файл языка скрипта:
 $LangConfigFile = ".\MainApp\Lang_Config.txt"
@@ -62,25 +62,25 @@ $LangStrings = @{
 		"AddedToDownloadedList" = "Добавлено в список: {0} - {1}"
 		"AddedToPurchasedList" = "Добавлено в список покупок: {0} - {1}"
 		"AlreadyInList" = "Уже есть в списке: {0} - {1}"
-		"AppsCleared" = "Готово. Файлы в папке Apps удалены."
+		"AppsCleared" = "Готово. Приложения в папке Apps удалены."
 		"AskAppNum" = "Введите номера приложений"
 		"AskIdDownload" = "Введите ID приложения для загрузки"
-		"AskIdSearch" = "Введите ID приложения для поиска (можно через запятую)"
+		"AskIdSearch" = "Введите ID приложения для поиска"
 		"AskIdPurchase" = "Введите ID приложения для покупки"
 		"AskSearch" = "Введите название приложения для поиска"
 		"AskVerCount" = "Введите количество версий для отображения"
 		"AskVerNum" = "Введите номера версий для загрузки"
-		"AuthFail" = "Вход в аккаунт Apple ID не выполнен."
-		"AuthSuccess" = "Вход в аккаунт Apple ID выполнен.`nДанные аккаунта Apple ID:"
+		"AuthFail" = "Вход в Apple ID не выполнен."
+		"AuthSuccess" = "Вход в Apple ID выполнен.`nДанные аккаунта:"
 		"CancelStep" = "(0: Отмена/Возврат в главное меню)"
-		"ClearMenu1" = "1. Очистка списка ранее загруженных приложений"
-		"ClearMenu2" = "2. Очистка списка ранее приобретенных приложений"
-		"ClearMenu3" = "3. Очистка папки Apps"
+		"ClearMenu1" = "1. Список загруженных приложений"
+		"ClearMenu2" = "2. Список приобретенных приложений"
+		"ClearMenu3" = "3. Приложения в папке Apps"
 		"ClearMenuTitle" = "Выберите данные для очистки:"
 		"DownloadedListCleared" = "Готово. Список загруженных приложений очищен."
 		"DownloadedListMenu1" = "1. Полный список приложений (GitHub)"
-		"DownloadedListMenu2" = "2. Список ранее загруженных приложений"
-		"DownloadedListMenu3" = "3. Список ранее не загруженных приложений"
+		"DownloadedListMenu2" = "2. Список загруженных приложений"
+		"DownloadedListMenu3" = "3. Список не загруженных приложений"
 		"ErrorHistoryEmpty" = "Ошибка: История загрузок пуста."
 		"ErrorInvalidInput" = "Ошибка: Неверный ввод."
 		"ErrorListLoadError" = "Ошибка загрузки списка приложений."
@@ -88,18 +88,18 @@ $LangStrings = @{
 		"ErrorNoApps" = "Ошибка: В папке Apps отсутствуют приложения."
 		"ErrorNoAppsFound" = "Ошибка: Приложения не найдены."
 		"ErrorPurchasedEmpty" = "Ошибка: История покупок пуста."
-		"FileName" = "Название файла:"
+		"FileName" = "Имя файла:"
 		"FileSaved" = "Готово. Файл сохранен в папку Apps."
 		"HeaderAppName" = "Название приложения"
 		"HeaderAppID" = "ID приложения"
-		"HeaderFileName" = "Название файла"
+		"HeaderFileName" = "Имя файла"
 		"HeaderMinIOS" = "Мин. iOS"
 		"HeaderVerID" = "ID версии"
 		"HeaderVersion" = "Версия"
 		"InstallApp" = "Установка:"
 		"LangChanged" = "Язык успешно изменен на Русский."
 		"ListMenuTitle" = "Выберите список для отображения:"
-		"LoggedOut" = "Выполнен выход из аккаунта Apple ID."
+		"LoggedOut" = "Выполнен выход из Apple ID."
 		"Menu1" = "1. Поиск приложения и покупка"
 		"Menu2" = "2. Поиск приложения и загрузка последней версии"
 		"Menu3" = "3. Поиск приложения и загрузка (с выбором версии)"
@@ -109,10 +109,10 @@ $LangStrings = @{
 		"Menu7" = "7. Вывод списка ID приложений и покупка"
 		"Menu8" = "8. Вывод списка ID приложений и загрузка последней версии"
 		"Menu9" = "9. Вывод списка ID приложений и загрузка (с выбором версии)"
-		"Menu10" = "10. Показать минимальную версию iOS для ipa-файлов в папке Apps"
-		"Menu11" = "11. Установка приложений, загруженных в папку Apps"
+		"Menu10" = "10. Проверка минимальной версии iOS для приложений в папке Apps"
+		"Menu11" = "11. Установка приложений из папки Apps"
 		"Menu12" = "12. Очистка данных"
-		"Menu13" = "13. Выход из аккаунта Apple ID"
+		"Menu13" = "13. Выход из Apple ID"
 		"Menu14" = "14. Страница проекта на GitHub"
 		"Menu15" = "15. Сменить язык (Change Language)"
 		"MenuTitle" = "Введите команду:"
@@ -120,43 +120,43 @@ $LangStrings = @{
 		"PressEnter" = "Нажмите Enter для выхода"
 		"PurchasedListCleared" = "Готово. Список приобретенных приложений очищен."
 		"PurchasedListMenu1" = "1. Полный список приложений (GitHub)"
-		"PurchasedListMenu2" = "2. Список ранее приобретенных приложений"
-		"PurchasedListMenu3" = "3. Список ранее не приобретенных приложений"
+		"PurchasedListMenu2" = "2. Список приобретенных приложений"
+		"PurchasedListMenu3" = "3. Список не приобретенных приложений"
 		"SelectedApp" = "Выбрано приложение:"
 		"SelectedVer" = "Выбрана версия:"
 	}
 	"EN" = @{
-		"AddedToDownloadedList" = "Added to the list: {0} - {1}"
+		"AddedToDownloadedList" = "Added to list: {0} - {1}"
 		"AddedToPurchasedList" = "Added to purchased list: {0} - {1}"
-		"AlreadyInList" = "Already in the list: {0} - {1}"
+		"AlreadyInList" = "Already in list: {0} - {1}"
 		"AppsCleared" = "Done. Apps folder has been cleared."
-		"AskAppNum" = "Enter index numbers of apps"
-		"AskIdDownload" = "Enter the App IDs to download"
-		"AskIdSearch" = "Enter the App IDs to search"
-		"AskIdPurchase" = "Enter the App IDs to purchase"
-		"AskSearch" = "Enter the app name to search"
-		"AskVerCount" = "Enter the number of versions to display"
-		"AskVerNum" = "Enter index number"
+		"AskAppNum" = "Enter app index numbers"
+		"AskIdDownload" = "Enter app IDs to download"
+		"AskIdSearch" = "Enter app IDs to search"
+		"AskIdPurchase" = "Enter app IDs to purchase"
+		"AskSearch" = "Enter app name to search"
+		"AskVerCount" = "Enter number of versions to display"
+		"AskVerNum" = "Enter version numbers to download"
 		"AuthFail" = "Not authenticated with Apple ID."
-		"AuthSuccess" = "Apple ID account login successful.`nApple ID account details:"
+		"AuthSuccess" = "Apple ID login successful.`nAccount details:"
 		"CancelStep" = "(0: Cancel/Return to main menu)"
-		"ClearMenu1" = "1. Clear list of previously downloaded apps"
-		"ClearMenu2" = "2. Clear list of previously purchased apps"
-		"ClearMenu3" = "3. Clear Apps folder"
+		"ClearMenu1" = "1. Downloaded apps list"
+		"ClearMenu2" = "2. Purchased apps list"
+		"ClearMenu3" = "3. Apps in Apps folder"
 		"ClearMenuTitle" = "Select data to clear:"
-		"DownloadedListCleared" = "Done. List of downloaded apps cleared."
+		"DownloadedListCleared" = "Done. Downloaded apps list cleared."
 		"DownloadedListMenu1" = "1. Full apps list (GitHub)"
-		"DownloadedListMenu2" = "2. List of previously downloaded apps"
-		"DownloadedListMenu3" = "3. List of previously not downloaded apps"
+		"DownloadedListMenu2" = "2. Downloaded apps list"
+		"DownloadedListMenu3" = "3. Not downloaded apps list"
 		"ErrorHistoryEmpty" = "Error: Download history is empty."
 		"ErrorInvalidInput" = "Error: Invalid input."
-		"ErrorListLoadError" = "Failed to load the apps list."
-		"ErrorMissingFiles" = "Error: The following files were not found in the MainApp folder:"
-		"ErrorNoApps" = "Error: No apps found in the Apps folder."
+		"ErrorListLoadError" = "Failed to load apps list."
+		"ErrorMissingFiles" = "Error: Following files were not found in MainApp folder:"
+		"ErrorNoApps" = "Error: No apps found in Apps folder."
 		"ErrorNoAppsFound" = "Error: No apps found."
 		"ErrorPurchasedEmpty" = "Error: Purchase history is empty."
 		"FileName" = "File name:"
-		"FileSaved" = "Done. File saved to the Apps folder."
+		"FileSaved" = "Done. File saved to Apps folder."
 		"HeaderAppName" = "App Name"
 		"HeaderAppID" = "App ID"
 		"HeaderFileName" = "File name"
@@ -165,30 +165,30 @@ $LangStrings = @{
 		"HeaderVersion" = "Version"
 		"InstallApp" = "Installing:"
 		"LangChanged" = "Language successfully changed to English."
-		"ListMenuTitle" = "Select list source:"
-		"LoggedOut" = "Successfully logged out of the Apple ID account."
-		"Menu1" = "1. Search for an app and purchase"
-		"Menu2" = "2. Search for an app and download the latest version"
-		"Menu3" = "3. Search for an app and download (with version selection)"
-		"Menu4" = "4. Enter App IDs and purchase"
-		"Menu5" = "5. Enter App IDs and download the latest version"
-		"Menu6" = "6. Enter App IDs and download (with version selection)"
-		"Menu7" = "7. Show list of App IDs and purchase"
-		"Menu8" = "8. Show list of App IDs and download the latest version"
-		"Menu9" = "9. Show list of App IDs and download (with version selection)"
-		"Menu10" = "10. Show minimum iOS version for ipa files in Apps folder"
-		"Menu11" = "11. Install apps downloaded to the Apps folder"
+		"ListMenuTitle" = "Select list to display:"
+		"LoggedOut" = "Successfully logged out of Apple ID."
+		"Menu1" = "1. Search for app and purchase"
+		"Menu2" = "2. Search for app and download latest version"
+		"Menu3" = "3. Search for app and download (with version selection)"
+		"Menu4" = "4. Enter app IDs and purchase"
+		"Menu5" = "5. Enter app IDs and download latest version"
+		"Menu6" = "6. Enter app IDs and download (with version selection)"
+		"Menu7" = "7. Show list of app IDs and purchase"
+		"Menu8" = "8. Show list of app IDs and download latest version"
+		"Menu9" = "9. Show list of app IDs and download (with version selection)"
+		"Menu10" = "10. Check minimum iOS version for apps in Apps folder"
+		"Menu11" = "11. Install apps from Apps folder"
 		"Menu12" = "12. Clear data"
-		"Menu13" = "13. Log out of Apple ID account"
+		"Menu13" = "13. Log out of Apple ID"
 		"Menu14" = "14. GitHub project page"
 		"Menu15" = "15. Change Language (Сменить язык)"
 		"MenuTitle" = "Enter a command:"
 		"MinIOS" = "Minimum iOS version:"
 		"PressEnter" = "Press Enter to exit"
-		"PurchasedListCleared" = "Done. List of purchased apps cleared."
+		"PurchasedListCleared" = "Done. Purchased apps list cleared."
 		"PurchasedListMenu1" = "1. Full apps list (GitHub)"
-		"PurchasedListMenu2" = "2. List of previously purchased apps"
-		"PurchasedListMenu3" = "3. List of previously not purchased apps"
+		"PurchasedListMenu2" = "2. Purchased apps list"
+		"PurchasedListMenu3" = "3. Not purchased apps list"
 		"SelectedApp" = "Selected app:"
 		"SelectedVer" = "Selected version:"
 	}
@@ -201,7 +201,7 @@ function Get-Lang($Key) {
 
 # Функция разделителя:
 function Separator {
-	Write-Host "==================================================================" -ForegroundColor Green
+	Write-Host "====================================================================" -ForegroundColor Green
 }
 
 # Проверка на наличие базовых папок:
@@ -244,7 +244,7 @@ if (Test-Path "$env:USERPROFILE\.ipatool\account") {
 	.\MainApp\ipatool.exe auth info
 }
 
-# Функция входа в аккаунт Apple ID:
+# Функция входа в Apple ID:
 function Connect-AppleID {
 	while (!(Test-Path "$env:USERPROFILE\.ipatool\account")) {
 		Remove-Item "$env:USERPROFILE\.ipatool\cookies" -Force -ErrorAction SilentlyContinue
@@ -461,7 +461,7 @@ function Parse-NumberSelection {
 	return $SelectedIndices
 }
 
-# Функция загрузки ipa-файлов:
+# Функция загрузки приложений:
 function IPA-Download {
 	param (
 		[string]$AppId,
@@ -473,7 +473,7 @@ function IPA-Download {
 	Move-IPA-Files -AppId $AppId -AppName $AppName
 }
 
-# Функция загрузки ipa-файлов с выбором версии:
+# Функция загрузки приложений с выбором версии:
 function IPA-Download-With-Version {
 	param (
 		[string]$AppId,
@@ -946,12 +946,12 @@ $(Get-Lang 'Menu15')`n
 			}
 		}
 		
-		# 10. Показать минимальную версию iOS для ipa-файлов в папке Apps:
+		# 10. Проверка минимальной версии iOS для приложений в папке Apps:
 		"10" {
 			$null = Get-iOS-MinVersion
 		}
 		
-		# 11. Установка приложений, загруженных в папку Apps:
+		# 11. Установка приложений из папки Apps:
 		"11" {
 			$IpaFiles = Get-iOS-MinVersion
 			if ($null -ne $IpaFiles) {
@@ -977,9 +977,8 @@ $(Get-Lang 'Menu15')`n
 					Separator
 					
 					$Meta = Get-IPA-Metadata -IpaPath $SelectedFile.FullName
-					$MinOsSuffix = if ($Meta) { " [iOS $($Meta.MinIOS)+]" } else { "" }
 					
-					Write-Host "$(Get-Lang 'InstallApp') $($SelectedFile.Name)$MinOsSuffix"
+					Write-Host "$(Get-Lang 'InstallApp') $($SelectedFile.Name)"
 					
 					$TempFile = "$env:TEMP\Temp.ipa"
 					Copy-Item -Path $SelectedFile.FullName -Destination $TempFile -Force
@@ -1033,7 +1032,7 @@ $(Get-Lang 'ClearMenu3')`n
 			}
 		}
 		
-		# 13. Выход из аккаунта Apple ID:
+		# 13. Выход из Apple ID:
 		"13" {
 			Separator
 			Write-Host (Get-Lang "LoggedOut")
