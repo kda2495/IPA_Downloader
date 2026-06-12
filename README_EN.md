@@ -5,41 +5,41 @@
 
 # IPA_Downloader
 [![Russian README](https://img.shields.io/badge/README-Russian-blue.svg)](README.md)  
-A PowerShell script to download previously purchased apps from the App Store and install them on Apple devices (powered by [ipatool-cpp](https://github.com/Sorvigolova/ipatool)).
+A PowerShell script to download previously purchased apps from App Store and install them on Apple devices (powered by [ipatool-cpp](https://github.com/Sorvigolova/ipatool)).
 
 ## Requirements:
 • Windows 7–11 (x64)  
 • AppleMobileDeviceSupport driver installed (included with iTunes):  
 [iTunes Download Link](https://www.apple.com/itunes/download/win64)  
-Instead of a full iTunes installation, you can perform a selective installation of `AppleMobileDeviceSupport64.msi` by extracting the iTunes installer with any file archiver.  
+Instead of a full iTunes installation, you can perform a selective installation of `AppleMobileDeviceSupport64.msi` by extracting iTunes installer with any file archiver.  
 • Internet connection  
 • Apple ID with previously purchased/downloaded apps
 
 ## Features:
-• Search for an app and purchase
-• Search for an app and download the latest version
-• Search for an app and download (with version selection)
-• Enter App IDs and purchase
-• Enter App IDs and download the latest version
-• Enter App IDs and download (with version selection)
-• Show list of App IDs and purchase
-• Show list of App IDs and download the latest version
-• Show list of App IDs and download (with version selection)
-• Check minimum iOS version for .ipa files in Apps folder
-• Install .ipa files from Apps folder
+• Search for app and purchase  
+• Search for app and download latest version  
+• Search for app and download (with version selection)  
+• Enter app IDs and purchase  
+• Enter app IDs and download latest version  
+• Enter app IDs and download (with version selection)  
+• Show list of app IDs and purchase  
+• Show list of app IDs and download latest version  
+• Show list of app IDs and download (with version selection)  
+• Check minimum iOS version for apps in Apps folder  
+• Install apps from Apps folder  
 
 #### Note:  
-For commands requiring IDs, you can enter multiple IDs in the format `1, 2, 3`.  
-For version selection commands, you can enter multiple versions in the format `1, 2, 3-5`.  
-For commands listing IDs, you can enter multiple apps in the format `1, 2, 3-5`.  
+For commands requiring IDs, you can enter multiple IDs in format `1, 2, 3`.  
+For version selection commands, you can enter multiple versions in format `1, 2, 3-5`.  
+For commands listing IDs, you can enter multiple apps in format `1, 2, 3-5`.  
 
 ## How to use:
-1\. Double-click the `Start_IPA_Downloader.bat` file.  
-2\. Upon the first launch, you will need to log in to your Apple ID:  
-• Enter your Apple ID (email)  
-• Enter your password  
-• Enter your two-factor authentication (2FA) code  
-3\. Follow the on-screen prompts to enter the desired command.  
+1\. Double-click `Start_IPA_Downloader.bat` file.  
+2\. Upon first launch, you will need to log in to your Apple ID:  
+• Enter your Apple ID (Enter email)  
+• Enter your password (Enter password)  
+• Enter your two-factor authentication code (Enter 2FA code)  
+3\. Enter desired command  
 
 ## Additional Information:
 ### Windows 7 Support:
@@ -64,15 +64,15 @@ For commands listing IDs, you can enter multiple apps in the format `1, 2, 3-5`.
 [AppBank Website](https://pwa.appbank.pw/)  
 [AppBank Telegram Channel](https://t.me/appbankRu)  
 
-### Search for an App ID:
-Find the app in the App Store and copy the numeric ID (the value after `id` in the URL).  
+### Search for App ID:
+Find app in App Store and copy numeric ID (value after `id` in URL).  
 <details>
  <summary>Screenshot (click to view)</summary>
 <img width="389" height="36" alt="AppStore_Link" src="https://github.com/user-attachments/assets/e73fd860-ed11-4293-8600-aef61fe3dc7f" />
 </details>
 
 ## Project Support:
-IPA_Downloader is completely free. However, if you would like to support the project, you can do so here:  
+IPA_Downloader is completely free. However, if you would like to support project, you can do so here:  
 [Support via CloudTips](https://pay.cloudtips.ru/p/93c0b094)  
 
 <img width="320" height="320" alt="qrCode" src="https://github.com/user-attachments/assets/1013fdce-2f18-4b5e-bd73-9237f691f51a" />
