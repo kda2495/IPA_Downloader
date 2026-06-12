@@ -5,7 +5,7 @@
 
 # IPA_Downloader
 [![Russian README](https://img.shields.io/badge/README-Russian-blue.svg)](README.md)  
-A PowerShell script to download previously purchased apps from App Store and install them on Apple devices (powered by [ipatool-cpp](https://github.com/Sorvigolova/ipatool)).
+PowerShell script to download previously purchased apps from App Store and install them on Apple devices (powered by [ipatool-cpp](https://github.com/Sorvigolova/ipatool)).
 
 ## Requirements:
 • Windows 7–11 (x64)  
