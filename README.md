@@ -44,6 +44,7 @@ PowerShell скрипт для загрузки ранее приобретен�
 ## Возможные ошибки:
 • Download error: HTTP request failed: Timeout was reached - Не удалось подключиться к серверам Apple, проверьте интернет-соединение  
 • Error: license is required - Приложение не было приобретено на этом Apple ID ранее  
+• Purchase error: app not found - Покупка приложения не удалась, так как приложение удалено из App Store  
 • Purchase error: item is temporarily unavailable - Приложение не было приобретено на этом Apple ID ранее, покупка не удалась, так как приложение удалено из App Store  
 • No device found - Устройство не найдено. Убедитесь, что драйвер `AppleMobileDeviceSupport64` из пакета [iTunes](https://www.apple.com/itunes/download/win64) установлен  
 
