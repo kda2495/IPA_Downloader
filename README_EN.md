@@ -44,6 +44,7 @@ For commands listing IDs, you can enter multiple apps in format `1, 2, 3-5`.
 ## Possible errors:
 • Download error: HTTP request failed: Timeout was reached - Failed to connect to Apple servers, check your network connection  
 • Error: license is required - This app has not been previously purchased on this Apple ID  
+• Purchase error: app not found - Purchase failed because app has been removed from App Store  
 • Purchase error: item is temporarily unavailable - This app has not been previously purchased on this Apple ID, and the purchase failed because app has been removed from App Store  
 • No device found - Device not detected. Make sure the `AppleMobileDeviceSupport64` driver (included with [iTunes](https://www.apple.com/itunes/download/win64)) is installed  
 
