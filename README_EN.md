@@ -16,13 +16,13 @@ Instead of a full iTunes installation, you can perform a selective installation 
 • Apple ID with previously purchased/downloaded apps
 
 ## Features:
-• Search for app and purchase  
+• Search for app and purchase (without downloading)  
 • Search for app and download latest version  
 • Search for app and download (with version selection)  
-• Enter app IDs and purchase  
+• Enter app IDs and purchase (without downloading)  
 • Enter app IDs and download latest version  
 • Enter app IDs and download (with version selection)  
-• Show list of app IDs and purchase  
+• Show list of app IDs and purchase (without downloading)  
 • Show list of app IDs and download latest version  
 • Show list of app IDs and download (with version selection)  
 • Check minimum iOS version for apps in Apps folder  
