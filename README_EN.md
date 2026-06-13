@@ -34,12 +34,13 @@ For version selection commands, you can enter multiple versions in format `1, 2,
 For commands listing IDs, you can enter multiple apps in format `1, 2, 3-5`.  
 
 ## How to use:
-1\. Double-click `Start_IPA_Downloader.bat` file.  
-2\. Upon first launch, you will need to log in to your Apple ID:  
+1\. Unpack archive using any archiver  
+2\. Double-click `Start_IPA_Downloader.bat` file  
+3\. Upon first launch, you will need to log in to your Apple ID:  
 • Enter your Apple ID (Enter email)  
 • Enter your password (Enter password)  
 • Enter your two-factor authentication code (Enter 2FA code)  
-3\. Enter desired command  
+4\. Enter desired command  
 
 ## Possible errors:
 • Download error: HTTP request failed: Timeout was reached - Failed to connect to Apple servers, check your network connection  
