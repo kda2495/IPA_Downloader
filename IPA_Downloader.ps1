@@ -37,7 +37,7 @@ Add-Type -AssemblyName System.IO.Compression.FileSystem
 chcp 65001 > $null
 
 # Версия скрипта:
-Write-Host "IPA_Downloader 3.8.9" -ForegroundColor Black -BackgroundColor Yellow
+Write-Host "IPA_Downloader 3.8.9.1" -ForegroundColor Black -BackgroundColor Yellow
 
 # Файл языка скрипта:
 $LangConfigFile = ".\MainApp\Lang_Config.txt"
@@ -100,13 +100,13 @@ $LangStrings = @{
 		"LangChanged" = "Язык успешно изменен на Русский."
 		"ListMenuTitle" = "Выберите список для отображения:"
 		"LoggedOut" = "Выполнен выход из Apple ID."
-		"Menu1" = "1. Поиск приложения и покупка"
+		"Menu1" = "1. Поиск приложения и покупка (без загрузки)"
 		"Menu2" = "2. Поиск приложения и загрузка последней версии"
 		"Menu3" = "3. Поиск приложения и загрузка (с выбором версии)"
-		"Menu4" = "4. Ввод ID приложений и покупка"
+		"Menu4" = "4. Ввод ID приложений и покупка (без загрузки)"
 		"Menu5" = "5. Ввод ID приложений и загрузка последней версии"
 		"Menu6" = "6. Ввод ID приложений и загрузка (с выбором версии)"
-		"Menu7" = "7. Вывод списка ID приложений и покупка"
+		"Menu7" = "7. Вывод списка ID приложений и покупка (без загрузки)"
 		"Menu8" = "8. Вывод списка ID приложений и загрузка последней версии"
 		"Menu9" = "9. Вывод списка ID приложений и загрузка (с выбором версии)"
 		"Menu10" = "10. Проверка минимальной версии iOS для приложений в папке Apps"
@@ -167,13 +167,13 @@ $LangStrings = @{
 		"LangChanged" = "Language successfully changed to English."
 		"ListMenuTitle" = "Select list to display:"
 		"LoggedOut" = "Successfully logged out of Apple ID."
-		"Menu1" = "1. Search for app and purchase"
+		"Menu1" = "1. Search for app and purchase (without downloading)"
 		"Menu2" = "2. Search for app and download latest version"
 		"Menu3" = "3. Search for app and download (with version selection)"
-		"Menu4" = "4. Enter app IDs and purchase"
+		"Menu4" = "4. Enter app IDs and purchase (without downloading)"
 		"Menu5" = "5. Enter app IDs and download latest version"
 		"Menu6" = "6. Enter app IDs and download (with version selection)"
-		"Menu7" = "7. Show list of app IDs and purchase"
+		"Menu7" = "7. Show list of app IDs and purchase (without downloading)"
 		"Menu8" = "8. Show list of app IDs and download latest version"
 		"Menu9" = "9. Show list of app IDs and download (with version selection)"
 		"Menu10" = "10. Check minimum iOS version for apps in Apps folder"
