@@ -88,6 +88,7 @@ Microsoft Outlook: 951937596
 Microsoft PowerBi: 929738808
 Microsoft PowerPoint: 586449534
 Microsoft SharePoint: 1091505266
+Microsoft SwiftKey: 911813648
 Microsoft Teams: 1113153706
 Microsoft To Do: 1212616790
 Microsoft Word: 586447913
