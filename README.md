@@ -193,7 +193,7 @@ PowerShell-скрипт для загрузки ранее приобретен�
 * Error: license is required - Приложение не было приобретено на этом Apple ID ранее;  
 * Purchase error: app not found - Покупка приложения не удалась, так как приложение удалено из App Store;  
 * Purchase error: item is temporarily unavailable - Приложение не было приобретено на этом Apple ID ранее, покупка не удалась, так как приложение удалено из App Store;  
-* No device found - Устройство не найдено. Убедитесь, что драйвер AppleMobileDeviceSupport64 установлен (актуально для Windows);  
+* No device found - Устройство не найдено. Убедитесь, что драйвер AppleMobileDeviceSupport64 установлен (актуально для Windows).  
 
 ## Решение проблем:
 #### Сообщить следующую информацию:
