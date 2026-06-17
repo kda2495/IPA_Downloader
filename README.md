@@ -5,7 +5,7 @@
 
 # IPA_Downloader
 [![English README](https://img.shields.io/badge/README-English-blue.svg)](README_EN.md)  
-PowerShell-скрипт для загрузки ранее приобретенных приложений из App Store и их установки на устройства Apple (работает на базе [ipatool-cpp](https://github.com/Sorvigolova/ipatool)).
+PowerShell скрипт для загрузки ранее приобретенных приложений из App Store и их установки на устройства Apple (работает на базе [ipatool-cpp](https://github.com/Sorvigolova/ipatool)).
 
 ## Возможности:
 * Поиск приложения и покупка (без загрузки);  
@@ -103,7 +103,7 @@ PowerShell-скрипт для загрузки ранее приобретен�
 ## Как использовать (macOS):
 #### 1. **Распаковываем архив IPA_Downloader.zip любым архиватором;**
 #### 2. **В терминале вводим:**
-* `chmod +x ` (с пробелом) и перетаскиваем файл Start_IPA_Downloader.command на Терминал;  
+* `chmod +x ` (с пробелом после x) и перетаскиваем файл Start_IPA_Downloader.command на Терминал;  
 * Дважды кликаем по файлу Start_IPA_Downloader.command;  
 * В первый раз macOS заблокирует запуск Start_IPA_Downloader.command;  
 * Нажмите на файл Start_IPA_Downloader.command правой кнопкой мыши;  
