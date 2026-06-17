@@ -1,4 +1,40 @@
-﻿Add-Type -TypeDefinition @"
+# Переключение рабочей директории в папку со скриптом:
+Set-Location -Path $PSScriptRoot
+
+# Определение основных папок и переменных:
+$IsWin = [System.Runtime.InteropServices.RuntimeInformation]::IsOSPlatform([System.Runtime.InteropServices.OSPlatform]::Windows)
+
+if ($IsWin) {
+	$ArchSubFolder = "windows_amd64"
+} else {
+	# Кроссплатформенный способ получения архитектуры:
+	$Arch = [System.Runtime.InteropServices.RuntimeInformation]::OSArchitecture.ToString().ToLower()
+	if ($Arch -eq "arm64") {
+		$ArchSubFolder = "macos_arm64"
+	} else {
+		$ArchSubFolder = "macos_amd64"
+	}
+}
+$OSVersion = $WindowsVersion = [System.Environment]::OSVersion
+$WindowsVersion = [System.Environment]::OSVersion.Version
+$MainAppFolderPath = Join-Path -Path $PSScriptRoot -ChildPath "MainApp"
+$BinaryFolderPath = Join-Path -Path $MainAppFolderPath -ChildPath $ArchSubFolder
+$LangConfigFilePath = Join-Path -Path $MainAppFolderPath -ChildPath "Lang_Config.txt"
+$ListsFolderPath = Join-Path -Path $PSScriptRoot -ChildPath "Lists"
+$DownloadedIDsFilePath = Join-Path -Path $ListsFolderPath -ChildPath "Downloaded_IDs.json"
+$PurchasedIDsFilePath = Join-Path -Path $ListsFolderPath -ChildPath "Purchased_IDs.json"
+$AppsFolderPath = Join-Path -Path $PSScriptRoot -ChildPath "Apps"
+$ipatoolHomePath = Join-Path -Path $HOME -ChildPath ".ipatool"
+$AccountFilePath = Join-Path -Path $ipatoolHomePath -ChildPath "account"
+$CookiesFilePath = Join-Path -Path $ipatoolHomePath -ChildPath "cookies"
+$TempFolderPath = [System.IO.Path]::GetTempPath()
+$TempIpaFilePath = Join-Path -Path $TempFolderPath -ChildPath "Temp.ipa"
+$AppsIDListPath = Join-Path -Path $ListsFolderPath -ChildPath "Apps_ID_List.txt"
+$AppsIDTempListPath = Join-Path -Path $MainAppFolderPath -ChildPath "Apps_ID_List_tmp.txt"
+
+# Настройка консоли:
+if ($IsWin) {
+Add-Type -TypeDefinition @"
 using System;
 using System.Runtime.InteropServices;
 public class ConsoleFont {
@@ -28,19 +64,38 @@ public class ConsoleFont {
 }
 "@
 
+[ConsoleFont]::SetFont("Consolas", 16)
+[Console]::InputEncoding = [System.Text.Encoding]::UTF8
+[Console]::OutputEncoding = [System.Text.Encoding]::UTF8
+$OutputEncoding = [System.Text.Encoding]::UTF8
+chcp 65001 > $null
+}
+
 # Подключение системных сборок для работы с Zip-архивами:
 Add-Type -AssemblyName System.IO.Compression.FileSystem
 
-# Устанавливаем шрифт Consolas и кодировку UTF8:
-[ConsoleFont]::SetFont("Consolas", 16)
-[Console]::OutputEncoding = [System.Text.Encoding]::UTF8
-chcp 65001 > $null
+# Функция разделителя:
+function Separator {
+	Write-Host "================================================" -ForegroundColor Green
+}
 
 # Версия скрипта:
-Write-Host "IPA_Downloader 3.8.9.1" -ForegroundColor Black -BackgroundColor Yellow
+Separator
+Write-Host "IPA_Downloader 3.9.0 (ipatool_$ArchSubFolder)"
+
+# Операционная система:
+Separator
+Write-Host "$OSVersion"
+
+# Проверка на наличие базовых папок:
+foreach ($Dir in @("$AppsFolderPath", "$ListsFolderPath", "$MainAppFolderPath", "$ipatoolHomePath")) {
+	if (!(Test-Path $Dir)) {
+		$null = New-Item -Path $Dir -ItemType "Directory"
+	}
+}
 
 # Файл языка скрипта:
-$LangConfigFile = ".\MainApp\Lang_Config.txt"
+$LangConfigFile = "$LangConfigFilePath"
 $Global:CurrentLang = "RU"
 
 # Глобальная переменная для кэширования структурированного списка с GitHub:
@@ -84,12 +139,13 @@ $LangStrings = @{
 		"ErrorHistoryEmpty" = "Ошибка: История загрузок пуста."
 		"ErrorInvalidInput" = "Ошибка: Неверный ввод."
 		"ErrorListLoadError" = "Ошибка загрузки списка приложений."
-		"ErrorMissingFiles" = "Ошибка: Следующие файлы не найдены в папке MainApp:"
+		"ErrorMacIdeviceinstallerNotFound" = "Ошибка: ideviceinstaller не найден. Установка приложений через скрипт невозможна."
+		"ErrorMissingFiles" = "Ошибка. Следующие файлы не найдены:"
 		"ErrorNoApps" = "Ошибка: В папке Apps отсутствуют приложения."
 		"ErrorNoAppsFound" = "Ошибка: Приложения не найдены."
 		"ErrorPurchasedEmpty" = "Ошибка: История покупок пуста."
 		"FileName" = "Имя файла:"
-		"FileSaved" = "Готово. Файл сохранен в папку Apps."
+		"FileSaved" = "Готово. Файл сохранен в папку IPA_Downloader/Apps."
 		"HeaderAppName" = "Название приложения"
 		"HeaderAppID" = "ID приложения"
 		"HeaderFileName" = "Имя файла"
@@ -106,9 +162,9 @@ $LangStrings = @{
 		"Menu4" = "4. Ввод ID приложений и покупка (без загрузки)"
 		"Menu5" = "5. Ввод ID приложений и загрузка последней версии"
 		"Menu6" = "6. Ввод ID приложений и загрузка (с выбором версии)"
-		"Menu7" = "7. Вывод списка ID приложений и покупка (без загрузки)"
-		"Menu8" = "8. Вывод списка ID приложений и загрузка последней версии"
-		"Menu9" = "9. Вывод списка ID приложений и загрузка (с выбором версии)"
+		"Menu7" = "7. Вывод списка приложений и покупка (без загрузки)"
+		"Menu8" = "8. Вывод списка приложений и загрузка последней версии"
+		"Menu9" = "9. Вывод списка приложений и загрузка (с выбором версии)"
 		"Menu10" = "10. Проверка минимальной версии iOS для приложений в папке Apps"
 		"Menu11" = "11. Установка приложений из папки Apps"
 		"Menu12" = "12. Очистка данных"
@@ -117,7 +173,6 @@ $LangStrings = @{
 		"Menu15" = "15. Сменить язык (Change Language)"
 		"MenuTitle" = "Введите команду:"
 		"MinIOS" = "Минимальная версия iOS:"
-		"PressEnter" = "Нажмите Enter для выхода"
 		"PurchasedListCleared" = "Готово. Список приобретенных приложений очищен."
 		"PurchasedListMenu1" = "1. Полный список приложений (GitHub)"
 		"PurchasedListMenu2" = "2. Список приобретенных приложений"
@@ -151,12 +206,13 @@ $LangStrings = @{
 		"ErrorHistoryEmpty" = "Error: Download history is empty."
 		"ErrorInvalidInput" = "Error: Invalid input."
 		"ErrorListLoadError" = "Failed to load apps list."
-		"ErrorMissingFiles" = "Error: Following files were not found in MainApp folder:"
+		"ErrorMissingFiles" = "Error. Following files were not found:"
+		"ErrorMacIdeviceinstallerNotFound" = "Error: ideviceinstaller not found. Apps installation via script is impossible."
 		"ErrorNoApps" = "Error: No apps found in Apps folder."
 		"ErrorNoAppsFound" = "Error: No apps found."
 		"ErrorPurchasedEmpty" = "Error: Purchase history is empty."
 		"FileName" = "File name:"
-		"FileSaved" = "Done. File saved to Apps folder."
+		"FileSaved" = "Done. File saved to IPA_Downloader/Apps folder."
 		"HeaderAppName" = "App Name"
 		"HeaderAppID" = "App ID"
 		"HeaderFileName" = "File name"
@@ -173,9 +229,9 @@ $LangStrings = @{
 		"Menu4" = "4. Enter app IDs and purchase (without downloading)"
 		"Menu5" = "5. Enter app IDs and download latest version"
 		"Menu6" = "6. Enter app IDs and download (with version selection)"
-		"Menu7" = "7. Show list of app IDs and purchase (without downloading)"
-		"Menu8" = "8. Show list of app IDs and download latest version"
-		"Menu9" = "9. Show list of app IDs and download (with version selection)"
+		"Menu7" = "7. Show list of apps and purchase (without downloading)"
+		"Menu8" = "8. Show list of apps and download latest version"
+		"Menu9" = "9. Show list of apps and download (with version selection)"
 		"Menu10" = "10. Check minimum iOS version for apps in Apps folder"
 		"Menu11" = "11. Install apps from Apps folder"
 		"Menu12" = "12. Clear data"
@@ -184,7 +240,6 @@ $LangStrings = @{
 		"Menu15" = "15. Change Language (Сменить язык)"
 		"MenuTitle" = "Enter a command:"
 		"MinIOS" = "Minimum iOS version:"
-		"PressEnter" = "Press Enter to exit"
 		"PurchasedListCleared" = "Done. Purchased apps list cleared."
 		"PurchasedListMenu1" = "1. Full apps list (GitHub)"
 		"PurchasedListMenu2" = "2. Purchased apps list"
@@ -199,58 +254,109 @@ function Get-Lang($Key) {
 	return $LangStrings[$Global:CurrentLang][$Key]
 }
 
-# Функция разделителя:
-function Separator {
-	Write-Host "================================================" -ForegroundColor Green
-}
-
-# Проверка на наличие базовых папок:
-foreach ($Dir in @(".\Apps", ".\Lists", "$env:USERPROFILE\.ipatool")) {
-	if (!(Test-Path $Dir)) {
-		$null = New-Item -Path $Dir -ItemType "Directory"
+# Проверка и установка зависимостей:
+if ($IsWin) {
+	# Windows: ищем ideviceinstaller.exe и ipatool.exe в локальной папке:
+	$RequiredFiles = @("ideviceinstaller.exe", "ipatool.exe")
+	$ExistingFiles = @()
+	
+	if (Test-Path -Path $BinaryFolderPath) {
+		$ExistingFiles = Get-ChildItem -Path $BinaryFolderPath -ErrorAction SilentlyContinue | Select-Object -ExpandProperty Name
 	}
-}
-
-# Проверка на наличие всех необходимых файлов для работы:
-$CheckMainAppFiles = @("ipatool.exe", "ideviceinstaller.exe")
-$MissingMainAppFiles = @()
-foreach ($File in $CheckMainAppFiles) {
-	if (!(Test-Path ".\MainApp\$File")) {
-		$MissingMainAppFiles += $File
+	
+	$MissingMainAppFiles = foreach ($File in $RequiredFiles) {
+		if ($File -notin $ExistingFiles) {
+			Join-Path -Path $BinaryFolderPath -ChildPath $File
+		}
 	}
-}
-if ($MissingMainAppFiles.Count -gt 0) {
-	Separator
-	Write-Host (Get-Lang "ErrorMissingFiles") -ForegroundColor DarkRed
-	$MissingMainAppFiles | ForEach-Object { Write-Host "$_" -ForegroundColor DarkRed }
-	Separator
-	Read-Host (Get-Lang "PressEnter")
-	exit
+
+	if ($MissingMainAppFiles) {
+		Separator
+		Write-Host (Get-Lang "ErrorMissingFiles") -ForegroundColor DarkRed
+		$MissingMainAppFiles | ForEach-Object { Write-Host "$_" -ForegroundColor DarkRed }
+		Separator
+		exit
+	}
+	
+	$ipatoolFilePath = Join-Path -Path $BinaryFolderPath -ChildPath "ipatool.exe"
+	$ideviceinstallerFilePath = Join-Path -Path $BinaryFolderPath -ChildPath "ideviceinstaller.exe"
+	
+} else {
+	# macOS: ищем ipatool в локальной папке:
+	$ipatoolFilePath = Join-Path -Path $BinaryFolderPath -ChildPath "ipatool"
+	
+	# Ищем ideviceinstaller:
+	$ideviceinstallerFilePath = (Get-Command ideviceinstaller -ErrorAction SilentlyContinue).Source
+	if (-not $ideviceinstallerFilePath) {
+		Write-Host (Get-Lang "ErrorMacIdeviceinstallerNotFound") -ForegroundColor DarkRed
+	}
+	
+	$MissingMacFiles = @()
+	
+	if (-not (Test-Path $ipatoolFilePath)) {
+		$MissingMacFiles += $ipatoolFilePath
+	}
+	
+	# Финальная проверка файлов:
+	if ($MissingMacFiles) {
+		Separator
+		Write-Host (Get-Lang "ErrorMissingFiles") -ForegroundColor DarkRed
+		$MissingMacFiles | ForEach-Object { Write-Host "$_" -ForegroundColor DarkRed }
+		Separator
+		exit
+	}
+	
+	# Права доступа на macOS:
+	xattr -cr "$MainAppFolderPath" 2>$null
+	chmod +x "$ipatoolFilePath" 2>$null
 }
 
-# Удаление файлов .ipa.tmp при запуске:
-Remove-Item ".\*.ipa.tmp" -Force -ErrorAction SilentlyContinue
+# Удаление временных файлов при запуске:
+Get-ChildItem -Path $PSScriptRoot -Filter "*.ipa.tmp" | Remove-Item -Force -ErrorAction SilentlyContinue
+if (Test-Path $AppsIDTempListPath) { Remove-Item $AppsIDTempListPath -Force -ErrorAction SilentlyContinue }
 
 # Проверка на Windows 7 и включение TLS 1.2:
-$OsVersion = [System.Environment]::OSVersion.Version
-if ($OsVersion.Major -eq 6 -and $OsVersion.Minor -eq 1) {
+if ($WindowsVersion.Major -eq 6 -and $WindowsVersion.Minor -eq 1) {
 	[Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
 }
 
+# Асинхронное фоновое обновление списка приложений с GitHub:
+$AppsIDListDownload = {
+	param($Url, $FinalPath, $TempPath)
+	try {
+		if ([System.Environment]::OSVersion.Version.Major -eq 6 -and [System.Environment]::OSVersion.Version.Minor -eq 1) {
+			[Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
+		}
+		
+		# Скачиваем список приложений во временный файл в папку MainApp:
+		Invoke-RestMethod -Uri $Url -OutFile $TempPath -ErrorAction SilentlyContinue
+		
+		if (Test-Path $TempPath) {
+			# Проверка на то, что файл загрузился:
+			if ((Get-Item $TempPath).Length -gt 10) {
+				Move-Item -Path $TempPath -Destination $FinalPath -Force
+			} else {
+				Remove-Item $TempPath -Force
+			}
+		}
+	} catch {}
+}
+$null = Start-Job -ScriptBlock $AppsIDListDownload -ArgumentList "https://raw.githubusercontent.com/kda2495/IPA_Downloader/refs/heads/main/Apps_ID_List.txt", $AppsIDListPath, $AppsIDTempListPath
+
 # Проверка наличия файла account:
-if (Test-Path "$env:USERPROFILE\.ipatool\account") {
+if (Test-Path "$AccountFilePath") {
 	Separator
 	Write-Host (Get-Lang "AuthSuccess")
-	.\MainApp\ipatool.exe auth info
+	& "$ipatoolFilePath" auth info
 }
 
 # Функция входа в Apple ID:
 function Connect-AppleID {
-	while (!(Test-Path "$env:USERPROFILE\.ipatool\account")) {
-		Remove-Item "$env:USERPROFILE\.ipatool\cookies" -Force -ErrorAction SilentlyContinue
+	while (!(Test-Path "$AccountFilePath")) {
+		Remove-Item "$CookiesFilePath" -Force -ErrorAction SilentlyContinue
 		Separator
 		Write-Host (Get-Lang "AuthFail")
-		.\MainApp\ipatool.exe auth login
+		& "$ipatoolFilePath" auth login
 	}
 }
 
@@ -311,7 +417,7 @@ function Save-App-To-List {
 		return
 	}
 	
-	$HistoryFile = if ($Type -eq "Purchased") { ".\Lists\Purchased_IDs.json" } else { ".\Lists\Downloaded_IDs.json" }
+	$HistoryFile = if ($Type -eq "Purchased") { "$PurchasedIDsFilePath" } else { "$DownloadedIDsFilePath" }
 	
 	if (!(Test-Path $HistoryFile)) {
 		$null = New-Item -Path $HistoryFile -ItemType "File" -Value ''
@@ -325,7 +431,7 @@ function Save-App-To-List {
 
 	foreach ($Item in $Data) {
 		if ($Item.appid -eq $AppId) {
-			if ($Type -eq "Downloaded") { Write-Host ((Get-Lang "AlreadyInList") -f $Item.name, $AppId) }
+			Write-Host ((Get-Lang "AlreadyInList") -f $Item.name, $AppId)
 			return
 		}
 	}
@@ -343,7 +449,19 @@ function Save-App-To-List {
 function Initialize-GitHub-List {
 	if ($null -ne $Global:GitHubParsedList) { return }
 	try {
-		$Raw = Invoke-RestMethod -Uri "https://raw.githubusercontent.com/kda2495/IPA_Downloader/refs/heads/main/Apps_ID_List.txt" -ErrorAction SilentlyContinue
+		# Если файла нет, скачиваем синхронно:
+		if (!(Test-Path "$AppsIDListPath")) {
+			Invoke-RestMethod -Uri "https://raw.githubusercontent.com/kda2495/IPA_Downloader/refs/heads/main/Apps_ID_List.txt" -OutFile "$AppsIDListPath" -ErrorAction SilentlyContinue
+		}
+		
+		# Защита от сбоя сети при первом запуске:
+		if (!(Test-Path "$AppsIDListPath")) {
+			$Global:GitHubParsedList = @()
+			return
+		}
+		
+		# Чтение данных из локального файла:
+		$Raw = Get-Content -Path "$AppsIDListPath" -Raw -Encoding UTF8 -ErrorAction SilentlyContinue
 		if ([string]::IsNullOrWhiteSpace($Raw)) { 
 			$Global:GitHubParsedList = @()
 			return 
@@ -352,7 +470,7 @@ function Initialize-GitHub-List {
 		$Global:GitHubParsedList = $Raw -split "`n" | Where-Object { $_ -match '^(.+?):\s*(\d+)' } | ForEach-Object {
 			[PSCustomObject]@{
 				Name = $Matches[1].Trim()
-				Id   = $Matches[2].Trim()
+				Id = $Matches[2].Trim()
 			}
 		}
 	} catch {
@@ -374,10 +492,10 @@ function Move-IPA-Files {
 		[string]$AppId,
 		[string]$AppName
 	)
-	$IpaFiles = Get-ChildItem -Filter "*.ipa"
+	$IpaFiles = Get-ChildItem -Path "$PSScriptRoot" -Filter "*.ipa"
 	if ($IpaFiles) {
 		foreach ($File in $IpaFiles) {
-			$DestPath = Join-Path (Get-Location) ".\Apps\$($File.Name)"
+			$DestPath = Join-Path -Path $AppsFolderPath -ChildPath $File.Name
 			Move-Item -Path $File.FullName -Destination $DestPath -Force
 			Separator
 			Write-Host (Get-Lang "FileSaved")
@@ -401,7 +519,7 @@ function Move-IPA-Files {
 				
 				# Формируем имя файла и заменяем все пробелы на "_":
 				$NewName = "$($FinalAppName)_$($Meta.Version)_iOS_$($Meta.MinIOS)+.ipa" -replace '\s+', '_'
-				$TargetFile = Join-Path (Get-Location) ".\Apps\$NewName"
+				$TargetFile = Join-Path -Path $AppsFolderPath -ChildPath $NewName
 				
 				if (Test-Path $TargetFile) {
 					Remove-Item $TargetFile -Force -ErrorAction SilentlyContinue
@@ -469,7 +587,7 @@ function IPA-Download {
 	)
 	if (!(Test-NumericInput -InputValue $AppId)) { return }
 	Separator
-	.\MainApp\ipatool.exe download -i $AppId --purchase
+	& "$ipatoolFilePath" download -i $AppId --purchase
 	Move-IPA-Files -AppId $AppId -AppName $AppName
 }
 
@@ -482,7 +600,7 @@ function IPA-Download-With-Version {
 	if (!(Test-NumericInput -InputValue $AppId)) { return }
 	
 	Separator
-	$RawOutput = .\MainApp\ipatool.exe list-versions -i $AppId 2>&1
+	$RawOutput = & "$ipatoolFilePath" list-versions -i $AppId 2>&1
 
 	if ($RawOutput -match "Error:") {
 		Write-Host $RawOutput -ForegroundColor DarkRed
@@ -512,7 +630,7 @@ function IPA-Download-With-Version {
 	Separator
 	Write-Host ("{0,-3} {1,-12} {2}" -f "№", (Get-Lang "HeaderVerID"), (Get-Lang "HeaderVersion"))
 	foreach ($VersionId in $RecentVersions) {
-		$Meta = .\MainApp\ipatool.exe get-version-metadata -i $AppId --external-version-id $VersionId 2>$null
+		$Meta = & "$ipatoolFilePath" get-version-metadata -i $AppId --external-version-id $VersionId 2>$null
 		$DisplayVersion = if ($Meta -match 'displayVersion=([^\s,]+)') { $Matches[1] } else { "NA" }
 		Write-Host ("{0,-3} {1,-12} {2}" -f $Counter, $VersionId, $DisplayVersion)
 		$VersionMapping += [PSCustomObject]@{ Index = $Counter; ID = $VersionId; Version = $DisplayVersion }
@@ -547,12 +665,12 @@ function IPA-Download-With-Version {
 		Write-Host "$(Get-Lang 'SelectedVer') $($SelectedObject.Version)"
 		Separator
 		$FinalId = $SelectedObject.ID
-		.\MainApp\ipatool.exe download -i $AppId --external-version-id $FinalId
+		& "$ipatoolFilePath" download -i $AppId --external-version-id $FinalId
 		Move-IPA-Files -AppId $AppId -AppName $AppName
 	}
 }
 
-# Функция поиска приложений (возврат в меню при пустом вводе или отсутствии результатов):
+# Функция поиска приложений:
 function Search-Apps-Menu {
 	Separator
 	$AppName = Read-Host "$(Get-Lang 'AskSearch') $(Get-Lang 'CancelStep')`n"
@@ -565,7 +683,7 @@ function Search-Apps-Menu {
 		return $null
 	}
 
-	$SearchOutput = .\MainApp\ipatool.exe search $AppName --limit 20 *>&1 | Out-String
+	$SearchOutput = & "$ipatoolFilePath" search $AppName --limit 10 *>&1 | Out-String
 	if ($SearchOutput -match 'apps=(\[.*?\])') {
 		$JsonString = $Matches[1]
 		if ($JsonString -eq '[]') {
@@ -650,7 +768,7 @@ function Get-Apps-From-List {
 	$Menu1 = if ($ListMode -eq "Purchase") { Get-Lang 'PurchasedListMenu1' } else { Get-Lang 'DownloadedListMenu1' }
 	$Menu2 = if ($ListMode -eq "Purchase") { Get-Lang 'PurchasedListMenu2' } else { Get-Lang 'DownloadedListMenu2' }
 	$Menu3 = if ($ListMode -eq "Purchase") { Get-Lang 'PurchasedListMenu3' } else { Get-Lang 'DownloadedListMenu3' }
-	$TargetFile = if ($ListMode -eq "Purchase") { ".\Lists\Purchased_IDs.json" } else { ".\Lists\Downloaded_IDs.json" }
+	$TargetFile = if ($ListMode -eq "Purchase") { "$PurchasedIDsFilePath" } else { "$DownloadedIDsFilePath" }
 	$EmptyError = if ($ListMode -eq "Purchase") { Get-Lang 'ErrorPurchasedEmpty' } else { Get-Lang 'ErrorHistoryEmpty' }
 
 	$List_Menu = @"
@@ -677,6 +795,7 @@ $Menu3`n
 				$Lines += "{0}: {1}" -f $App.Name, $App.Id
 			}
 		}
+		
 		"2" {
 			if (!(Test-Path $TargetFile)) {
 				Separator
@@ -690,19 +809,24 @@ $Menu3`n
 				Write-Host $EmptyError -ForegroundColor DarkRed
 				return $null
 			}
+			
 			$HistoryData = $JsonRaw | ConvertFrom-Json
+			
 			if ($null -eq $HistoryData) {
 				Separator
 				Write-Host $EmptyError -ForegroundColor DarkRed
 				return $null
 			}
+			
 			if ($HistoryData -isnot [System.Collections.IEnumerable]) {
 				$HistoryData = @($HistoryData)
 			}
+			
 			foreach ($Item in $HistoryData) {
 				$Lines += "{0}: {1}" -f $Item.name, $Item.appid
 			}
 		}
+		
 		"3" {
 			Initialize-GitHub-List
 			if ($Global:GitHubParsedList.Count -eq 0) {
@@ -729,6 +853,7 @@ $Menu3`n
 				}
 			}
 		}
+		
 		default {
 			Separator
 			Write-Host (Get-Lang "ErrorInvalidInput") -ForegroundColor DarkRed
@@ -747,10 +872,12 @@ $Menu3`n
 		$Index = $I + 1
 		Write-Host ("{0}. {1}" -f $Index, $Lines[$I])
 	}
+	
 	Separator
 	$Selection = Read-Host "$(Get-Lang 'AskAppNum') (1-$($Lines.Count)) $(Get-Lang 'CancelStep')`n"
 	
 	if ($Selection -eq '0') { return $null }
+	
 	if ([string]::IsNullOrWhiteSpace($Selection)) {
 		Separator
 		Write-Host (Get-Lang "ErrorInvalidInput") -ForegroundColor DarkRed
@@ -766,6 +893,7 @@ $Menu3`n
 	}
 
 	$SelectedApps = @()
+	
 	foreach ($Idx in $SelectedIndices) {
 		$SelectedLine = $Lines[$Idx - 1]
 		$AppId = [System.Text.RegularExpressions.Regex]::Match($SelectedLine, '\b\d{6,}\b').Value
@@ -787,15 +915,18 @@ $Menu3`n
 
 # Функция проверки минимальной версии iOS и возврата файлов:
 function Get-iOS-MinVersion {
-	$FilesToProcess = Get-ChildItem -Path ".\Apps\*.ipa" -ErrorAction SilentlyContinue
+	$FilesToProcess = Get-ChildItem -Path "$AppsFolderPath" -Filter "*.ipa" -ErrorAction SilentlyContinue
+	
 	if (-not $FilesToProcess) {
 		Separator
 		Write-Host (Get-Lang "ErrorNoApps") -ForegroundColor DarkRed
 		return $null
 	}
+	
 	Separator
 	Write-Host ("{0,-3} {1,-30} {2}" -f "№", (Get-Lang "HeaderFileName"), (Get-Lang "HeaderMinIOS"))
 	$Counter = 1
+	
 	foreach ($File in $FilesToProcess) {
 		$Meta = Get-IPA-Metadata -IpaPath $File.FullName
 		$MinOs = if ($Meta) { "$($Meta.MinIOS)+" } else { "Error" }
@@ -810,7 +941,7 @@ function Get-iOS-MinVersion {
 Connect-AppleID
 
 # Основной цикл:
-while (Test-Path "$env:USERPROFILE\.ipatool\account") {
+while (Test-Path "$AccountFilePath") {
 	Separator
 	$MainMenu = @"
 $(Get-Lang 'MenuTitle')
@@ -834,14 +965,14 @@ $(Get-Lang 'Menu15')`n
 	$SwitchValue = Read-Host $MainMenu
 	switch ($SwitchValue) {
 		
-		# 1. Поиск приложения и покупка:
+		# 1. Поиск приложения и покупка (без загрузки):
 		"1" {
 			$AppsToProcess = Search-Apps-Menu
 			if ($null -ne $AppsToProcess) {
 				foreach ($App in $AppsToProcess) {
 					Separator
 					Write-Host "$(Get-Lang 'SelectedApp') $($App.name)"
-					.\MainApp\ipatool.exe purchase -i $App.id
+					& "$ipatoolFilePath" purchase -i $App.id
 					Save-App-To-List -AppId $App.id -AppNameOnly $App.name -Type "Purchased"
 				}
 			}
@@ -871,42 +1002,53 @@ $(Get-Lang 'Menu15')`n
 			}
 		}
 
-		# 4. Ввод ID приложения и покупка:
+		# 4. Ввод ID приложений и покупка (без загрузки):
 		"4" {
 			$AppIds = Get-Multiple-AppIds -PromptKey 'AskIdPurchase'
 			if ($null -ne $AppIds) {
 				foreach ($Id in $AppIds) {
 					Separator
-					Write-Host "$(Get-Lang 'SelectedApp') $Id"
-					.\MainApp\ipatool.exe purchase -i $Id
 					$GitHubName = Get-GitHub-AppName -AppId $Id
+					$DisplayName = if ([string]::IsNullOrWhiteSpace($GitHubName)) { $Id } else { $GitHubName }
+					Write-Host "$(Get-Lang 'SelectedApp') $DisplayName"
+					& "$ipatoolFilePath" purchase -i $Id
 					$FinalName = if ([string]::IsNullOrWhiteSpace($GitHubName)) { "Unknown" } else { $GitHubName }
 					Save-App-To-List -AppId $Id -AppNameOnly $FinalName -Type "Purchased"
 				}
 			}
 		}
 
-		# 5. Ввод ID приложения и загрузка последней версии:
+		# 5. Ввод ID приложений и загрузка последней версии:
 		"5" {
 			$AppIds = Get-Multiple-AppIds -PromptKey 'AskIdDownload'
 			if ($null -ne $AppIds) {
 				foreach ($Id in $AppIds) {
-					IPA-Download -AppId $Id
+					Separator
+					$GitHubName = Get-GitHub-AppName -AppId $Id
+					$DisplayName = if ([string]::IsNullOrWhiteSpace($GitHubName)) { $Id } else { $GitHubName }
+					Write-Host "$(Get-Lang 'SelectedApp') $DisplayName"
+					$FinalName = if ([string]::IsNullOrWhiteSpace($GitHubName)) { "Unknown" } else { $GitHubName }
+					IPA-Download -AppId $Id -AppName $FinalName
 				}
 			}
 		}
 		
-		# 6. Ввод ID приложения и загрузка (с выбором версии):
+		# 6. Ввод ID приложений и загрузка (с выбором версии):
 		"6" {
 			$AppIds = Get-Multiple-AppIds -PromptKey 'AskIdSearch'
 			if ($null -ne $AppIds) {
 				foreach ($Id in $AppIds) {
-					IPA-Download-With-Version -AppId $Id
+					Separator
+					$GitHubName = Get-GitHub-AppName -AppId $Id
+					$DisplayName = if ([string]::IsNullOrWhiteSpace($GitHubName)) { $Id } else { $GitHubName }
+					Write-Host "$(Get-Lang 'SelectedApp') $DisplayName"
+					$FinalName = if ([string]::IsNullOrWhiteSpace($GitHubName)) { "Unknown" } else { $GitHubName }
+					IPA-Download-With-Version -AppId $Id -AppName $FinalName
 				}
 			}
 		}
 		
-		# 7. Вывод списка ID приложений и покупка:
+		# 7. Вывод списка ID приложений и покупка (без загрузки):
 		"7" {
 			Separator
 			$SelectedApps = Get-Apps-From-List -ListMode "Purchase"
@@ -914,7 +1056,7 @@ $(Get-Lang 'Menu15')`n
 				foreach ($App in $SelectedApps) {
 					Separator
 					Write-Host "$(Get-Lang 'SelectedApp') $($App.Name)"
-					.\MainApp\ipatool.exe purchase -i $App.Id
+					& "$ipatoolFilePath" purchase -i $App.Id
 					Save-App-To-List -AppId $App.Id -AppNameOnly $App.Name -Type "Purchased"
 				}
 			}
@@ -976,9 +1118,9 @@ $(Get-Lang 'Menu15')`n
 					$SelectedFile = $IpaFiles[$Idx - 1]
 					Separator
 					Write-Host "$(Get-Lang 'InstallApp') $($SelectedFile.Name)"
-					$TempFile = "$env:TEMP\Temp.ipa"
+					$TempFile = "$TempIpaFilePath"
 					Copy-Item -Path $SelectedFile.FullName -Destination $TempFile -Force
-					.\MainApp\ideviceinstaller.exe install $TempFile
+					& "$ideviceinstallerFilePath" install $TempFile
 					Remove-Item -Path $TempFile -Force -ErrorAction SilentlyContinue
 				}
 			}
@@ -999,20 +1141,21 @@ $(Get-Lang 'ClearMenu3')`n
 			
 			switch ($ClearChoice) {
 				"1" {
-					Remove-Item ".\Lists\Downloaded_IDs.json" -Force -ErrorAction SilentlyContinue
+					Remove-Item "$DownloadedIDsFilePath" -Force -ErrorAction SilentlyContinue
 					Separator
 					Write-Host (Get-Lang "DownloadedListCleared")
 				}
 				
 				"2" {
-					Remove-Item ".\Lists\Purchased_IDs.json" -Force -ErrorAction SilentlyContinue
+					Remove-Item "$PurchasedIDsFilePath" -Force -ErrorAction SilentlyContinue
 					Separator
 					Write-Host (Get-Lang "PurchasedListCleared")
 				}
 				
 				"3" {
-					if (Test-Path ".\Apps\*.ipa") {
-						Remove-Item ".\Apps\*.ipa" -Force -ErrorAction SilentlyContinue
+					$ipaFilesToRemove = Get-ChildItem -Path $AppsFolderPath -Filter "*.ipa" -ErrorAction SilentlyContinue
+					if ($ipaFilesToRemove) {
+						$ipaFilesToRemove | Remove-Item -Force -ErrorAction SilentlyContinue
 						Separator
 						Write-Host (Get-Lang "AppsCleared")
 					} else {
@@ -1032,7 +1175,7 @@ $(Get-Lang 'ClearMenu3')`n
 		"13" {
 			Separator
 			Write-Host (Get-Lang "LoggedOut")
-			.\MainApp\ipatool.exe auth revoke
+			& "$ipatoolFilePath" auth revoke
 			Connect-AppleID
 		}
 		
