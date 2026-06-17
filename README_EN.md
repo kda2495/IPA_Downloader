@@ -193,7 +193,7 @@ If the script does not start, enter the following commands in the Terminal:
 * Error: license is required - The app was not previously purchased on this Apple ID;
 * Purchase error: app not found - App purchase failed because the app has been removed from the App Store;
 * Purchase error: item is temporarily unavailable - The app was not previously purchased on this Apple ID, the purchase failed because the app has been removed from the App Store;
-* No device found - Device not found. Make sure the AppleMobileDeviceSupport64 driver is installed (relevant for Windows);
+* No device found - Device not found. Make sure the AppleMobileDeviceSupport64 driver is installed (relevant for Windows).
 
 ## Troubleshooting:
 #### Provide the following information:
