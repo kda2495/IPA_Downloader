@@ -1,4 +1,4 @@
-# Переключение рабочей директории в папку со скриптом:
+﻿# Переключение рабочей директории в папку со скриптом:
 Set-Location -Path $PSScriptRoot
 
 # Определение основных папок и переменных:
@@ -81,7 +81,7 @@ function Separator {
 
 # Версия скрипта:
 Separator
-Write-Host "IPA_Downloader 3.9.0 (ipatool_$ArchSubFolder)"
+Write-Host "IPA_Downloader 3.9.1 (ipatool_$ArchSubFolder)"
 
 # Операционная система:
 Separator
