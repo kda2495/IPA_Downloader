@@ -21,7 +21,7 @@ A script for purchasing/downloading any available App Store apps, as well as res
 * Install apps from Apps folder.
 
 #### The script CANNOT:
-* Download apps that have NOT been previously purchased from the App Store;
+* Download apps that have **NOT** been previously purchased from the App Store;
 * Copy apps directly from the device.
 
 #### Note:
@@ -102,7 +102,7 @@ A complete set of the above programs/updates for Windows 7/8.1 is available at t
 
 ## How to use (macOS):
 #### 1. **Extract the IPA_Downloader.zip archive using any archiver;**
-#### 2. **In the terminal, enter:**
+#### 2. **In the Terminal, enter:**
 * `chmod +x ` (including the trailing space after x) and drag and drop the Start_IPA_Downloader.command file into the Terminal;
 * Double-click the Start_IPA_Downloader.command file;
 * The first time, macOS will block Start_IPA_Downloader.command from running;
