@@ -85,7 +85,7 @@ A complete set of the above programs/updates for Windows 7/8.1 is available at t
 #### 1. **Install PowerShell:**
 * Follow the link to download PowerShell:  
 [Link to download PowerShell](https://github.com/PowerShell/PowerShell/releases)  
-* Find the latest PowerShell release (currently 7.6.3);
+* Find the latest PowerShell release (currently 7.6.3, on older versions of macOS this version of PowerShell may not be supported);
 * Click Show all assets;
 * Download the files: powershell-7.6.3-osx-arm64.pkg (for Mac on Apple Silicon) or powershell-7.6.3-osx-x64.pkg (for Mac on Intel);
 * Install powershell-7.6.3-osx-arm64.pkg (for Mac on Apple Silicon) or powershell-7.6.3-osx-x64.pkg (for Mac on Intel).
