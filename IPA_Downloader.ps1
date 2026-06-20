@@ -1,13 +1,13 @@
 ﻿# Переключение рабочей директории в папку со скриптом:
 Set-Location -Path $PSScriptRoot
 
-# Определение основных папок и переменных:
+# Проверка запуска на Windows:
 $IsWin = [System.Runtime.InteropServices.RuntimeInformation]::IsOSPlatform([System.Runtime.InteropServices.OSPlatform]::Windows)
 
 if ($IsWin) {
 	$ArchSubFolder = "windows_amd64"
 } else {
-	# Кроссплатформенный способ получения архитектуры:
+	# Получение архитектуры macOS:
 	$Arch = [System.Runtime.InteropServices.RuntimeInformation]::OSArchitecture.ToString().ToLower()
 	if ($Arch -eq "arm64") {
 		$ArchSubFolder = "macos_arm64"
@@ -16,6 +16,7 @@ if ($IsWin) {
 	}
 }
 
+# Определение основных папок и переменных:
 $OSVersion = [System.Environment]::OSVersion
 $WindowsVersion = [System.Environment]::OSVersion.Version
 $MainAppFolderPath = Join-Path -Path $PSScriptRoot -ChildPath "MainApp"
@@ -394,7 +395,7 @@ function Initialize-GitHub-List {
 	}
 }
 
-# Быстрый поиск имени приложения по кэшу:
+# Функция поиска имени приложения по кэшу:
 function Get-GitHub-AppName {
 	param ([string]$AppId)
 	Initialize-GitHub-List
@@ -495,7 +496,7 @@ function Parse-NumberSelection {
 	return $SelectedIndices
 }
 
-# Функция запроса номеров позиций у пользователя с проверкой отмены и валидацией (объединяет повторяющийся ранее код):
+# Функция запроса номеров позиций у пользователя с проверкой отмены и валидацией:
 function Read-NumberSelection {
 	param (
 		[string]$PromptKey,
@@ -941,7 +942,7 @@ $AppsIDListDownload = {
 
 $BackgroundJob = Start-Job -ScriptBlock $AppsIDListDownload -ArgumentList "https://raw.githubusercontent.com/kda2495/IPA_Downloader/refs/heads/main/Apps_ID_List.txt", $AppsIDListPath, $AppsIDTempListPath
 
-# Проверка наличия файла account:
+# Проверка осуществленного входа с Apple ID:
 if (Test-Path "$AccountFilePath") {
 	Separator
 	Write-Host (Get-Lang "AuthSuccess")
@@ -953,7 +954,7 @@ Connect-AppleID
 
 # Основной цикл:
 while (Test-Path "$AccountFilePath") {
-    # Удаление завершенных фоновых задач для предотвращения утечки памяти:
+    # Удаление завершенных фоновых задач:
     Get-Job | Where-Object { $_.State -eq 'Completed' } | Remove-Job -Force
 
 	Separator
