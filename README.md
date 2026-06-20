@@ -85,7 +85,7 @@
 #### 1. **Устанавливаем PowerShell:**
 * Переходим по ссылке для загрузки PowerShell:  
 [Ссылка для загрузки PowerShell](https://github.com/PowerShell/PowerShell/releases)  
-* Находим последний релиз PowerShell (на данный момент это 7.6.3);  
+* Находим последнюю версию PowerShell (на данный момент это 7.6.3, на более старых версиях macOS эта версия PowerShell может не поддерживаться);  
 * Нажимаем Show all assets;  
 * Загружаем файлы: powershell-7.6.3-osx-arm64.pkg (для Mac на Apple Silicon) или powershell-7.6.3-osx-x64.pkg (для Mac на Intel);  
 * Производим установку powershell-7.6.3-osx-arm64.pkg (для Mac на Apple Silicon) или powershell-7.6.3-osx-x64.pkg (для Mac на Intel).  
