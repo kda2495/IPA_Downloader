@@ -45,7 +45,7 @@ A script for purchasing/downloading any available App Store apps, as well as res
 
 ## To run on Windows 7 and 8.1:
 #### All steps must be performed strictly in the following order:
-#### 1. **Update system certificates via UpdRootsCert:**
+#### 1. Update system certificates via UpdRootsCert:
 * Follow the link to download UpdRootsCert:  
 [Link to download UpdRootsCert](https://disk.yandex.ru/d/SdHMgwJ55MTQRg)  
 * Download the UpdRootsCert.exe file;
@@ -53,14 +53,14 @@ A script for purchasing/downloading any available App Store apps, as well as res
 * Check the boxes: System Root Certificates, Russian Ministry of Digital Development Certificates, Add a monthly task to the Task Scheduler;
 * Click the Install button.
 
-#### 2. **Install .NET Framework 4.8:**
+#### 2. Install .NET Framework 4.8:
 * Follow the link to download .NET Framework 4.8:  
 [Link to download .NET Framework 4.8](https://go.microsoft.com/fwlink/?linkid=2088631)  
 * Download the NDP48-x86-x64-AllOS-ENU.exe file;
 * Run the NDP48-x86-x64-AllOS-ENU.exe file;
 * Install .NET Framework 4.8 following the installation wizard instructions.
 
-#### 3. **Install the KB3191566 update (to add PowerShell 5.1 support):**
+#### 3. Install the KB3191566 update (to add PowerShell 5.1 support):
 * Follow the link to download KB3191566:  
 [Link to download KB3191566](https://www.microsoft.com/en-us/download/details.aspx?id=54616)  
 * Click the Download button;
@@ -75,16 +75,16 @@ A complete set of the above programs/updates for Windows 7/8.1 is available at t
 [Link for the complete set of programs/updates](https://disk.yandex.ru/d/Fft0whzAz-C7Jg)  
 
 ## How to use (Windows):
-#### 1. **Extract the IPA_Downloader.zip archive using any archiver;**
-#### 2. **Double-click the Start_IPA_Downloader.bat file;**
-#### 3. **On the first run, initial configuration is required:**
+#### 1. Extract the IPA_Downloader.zip archive using any archiver;
+#### 2. Double-click the Start_IPA_Downloader.bat file;
+#### 3. On the first run, initial configuration is required:
 * Select language;
-* Press Enter;
-* Select one of the available modes:
+* Press Enter.
+#### 4. Select one of the available modes:
 * IPA_Downloader (full version, works after logging in with Apple ID);
 * IPA_Installer (limited version with minimum iOS version check and app installation, works without logging in with Apple ID);
 * Press Enter.
-#### 4. If IPA_Downloader mode is selected, then:
+#### 5. If IPA_Downloader mode is selected, then:
 * Enter Apple ID (Enter email:);
 * Press Enter;
 * Enter password (Enter password:);
@@ -93,50 +93,62 @@ A complete set of the above programs/updates for Windows 7/8.1 is available at t
 * Press Enter;
 * Enter the required command;
 * Press Enter.
-#### 5. If IPA_Installer mode is selected, then:
+#### 5.1. If IPA_Installer mode is selected, then:
 * Enter the required command;
 * Press Enter.
 
 ## To run on macOS:
 #### All steps must be performed strictly in the following order:
-#### 1. **Install PowerShell:**
+#### 1. Install PowerShell:
 * Follow the link to download PowerShell:  
-[Link to download PowerShell](https://github.com/PowerShell/PowerShell/releases)  
+[Link to download PowerShell](https://github.com/PowerShell/PowerShell/releases)
 * Find the latest PowerShell release (currently 7.6.3, on older versions of macOS this version of PowerShell may not be supported);
 * Click Show all assets;
 * Download the files: powershell-7.6.3-osx-arm64.pkg (for Mac on Apple Silicon) or powershell-7.6.3-osx-x64.pkg (for Mac on Intel);
 * Install powershell-7.6.3-osx-arm64.pkg (for Mac on Apple Silicon) or powershell-7.6.3-osx-x64.pkg (for Mac on Intel).
-#### 2. **Install the Homebrew package manager:**
+#### 2. Install the Homebrew package manager:
 * Open Terminal (Command + Space, then type Terminal in the Spotlight search field);
-* In the Terminal, enter: `/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"`
+* Type in Terminal: `/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"`
 * Press Enter;
 * During the Homebrew installation, you may be prompted to enter your password;
-* After Homebrew is installed, the text ==> Next steps will appear at the bottom of the Terminal;
-* You need to enter 3 commands one by one (2 of them start with echo and one with eval);
-* After entering each command, press Enter.
-#### 3. **Install the minizip and ideviceinstaller packages:**
-* In the Terminal, enter: `brew install minizip ideviceinstaller`
+* After Homebrew is installed, the text ==> Next steps will appear at the bottom of the Terminal.
+#### 3. When installing on a Mac with Intel processors:
+* Type in Terminal: `echo >> ~/.zprofile`
+* Press Enter;
+* Type in Terminal: `echo 'eval "$(/usr/local/bin/brew shellenv zsh)"' >> ~/.zprofile`
+* Press Enter;
+* Type in Terminal: `eval "$(/usr/local/bin/brew shellenv zsh)"`
+* Press Enter.
+#### 3.1. When installing on a Mac with Apple Silicon processors:
+* Type in Terminal: `echo >> ~/.zprofile`
+* Press Enter;
+* Type in Terminal: `echo 'eval "$(/opt/homebrew/bin/brew shellenv zsh)"' >> ~/.zprofile`
+* Press Enter;
+* Type in Terminal: `eval "$(/opt/homebrew/bin/brew shellenv zsh)"`
+* Press Enter.
+#### 4. Install the minizip and ideviceinstaller packages:
+* Type in Terminal: `brew install minizip ideviceinstaller`
 * Press Enter.
 
 ## How to use (macOS):
-#### 1. **Extract the IPA_Downloader.zip archive using any archiver;**
-* In the Terminal, enter: `chmod +x ` (including the trailing space after x) and drag and drop the Start_IPA_Downloader.command file into the Terminal;
-* Press Enter;
-* Double-click the Start_IPA_Downloader.command file;
+#### 1. Extract the IPA_Downloader.zip archive using any archiver;
+* Type in Terminal: `chmod +x ` (including the trailing space after x) and drag and drop the Start_IPA_Downloader.command file into Terminal;
+* Press Enter.
+#### 2. Double-click the Start_IPA_Downloader.command file;
 * The first time, macOS will block Start_IPA_Downloader.command from running;
-* Right-click the Start_IPA_Downloader.command file while holding the Control key;
+* Right-click the Start_IPA_Downloader.command file;
 * Select Open from the context menu;
 * The same warning will appear, but a new Open button will be available;
 * Click the Open button;
 * macOS will remember your choice, and in the future, the script will launch with a regular double-click.
-#### 2. **On the first run, initial configuration is required:**
+#### 3. On the first run, initial configuration is required:
 * Select language;
-* Press Enter;
-* Select one of the available modes:
+* Press Enter.
+#### 4. Select one of the available modes:
 * IPA_Downloader (full version, works after logging in with Apple ID);
 * IPA_Installer (limited version with minimum iOS version check and app installation, works without logging in with Apple ID);
 * Press Enter.
-#### 3. If IPA_Downloader mode is selected, then:
+#### 5. If IPA_Downloader mode is selected, then:
 * Enter Apple ID (Enter email:);
 * Press Enter;
 * Enter password (Enter password:);
@@ -145,30 +157,30 @@ A complete set of the above programs/updates for Windows 7/8.1 is available at t
 * Press Enter;
 * Enter the required command;
 * Press Enter.
-#### 4. If IPA_Installer mode is selected, then:
+#### 5.1. If IPA_Installer mode is selected, then:
 * Enter the required command;
 * Press Enter.
 
 #### Note:
-* If the script doesn't start, enter in the Terminal: `brew reinstall minizip ideviceinstaller`
+* If the script doesn't start, type in Terminal: `brew reinstall minizip ideviceinstaller`
 * Press Enter.
 
 ## IPA_Downloader commands description:
-#### 1. **Search for app and purchase (without downloading):**
+#### 1. Search for app and purchase (without downloading):
 * Enter the app name to search;
 * Press Enter;
 * A list of found apps will be displayed;
 * Enter the index numbers of the apps to purchase (in the format 1, 2, 3-5);
 * Press Enter;
 * The script will purchase the selected apps.
-#### 2. **Search for app and download latest version:**
+#### 2. Search for app and download latest version:
 * Enter the app name to search;
 * Press Enter;
 * A list of found apps will be displayed;
 * Enter the index numbers of the apps to download (in the format 1, 2, 3-5);
 * Press Enter;
 * The script will download the selected apps.
-#### 3. **Search for app and download (with version selection):**
+#### 3. Search for app and download (with version selection):
 * Enter the app name to search;
 * Press Enter;
 * A list of found apps will be displayed;
@@ -180,15 +192,15 @@ A complete set of the above programs/updates for Windows 7/8.1 is available at t
 * Enter the index numbers of the app versions to download (in the format 1, 2, 3-5);
 * Press Enter;
 * The script will download the selected app versions.
-#### 4. **Enter app IDs and purchase (without downloading):**
+#### 4. Enter app IDs and purchase (without downloading):
 * Enter the app IDs to purchase (in the format 1, 2, 3);
 * Press Enter;
 * The script will purchase the selected apps.
-#### 5. **Enter app IDs and download latest version:**
+#### 5. Enter app IDs and download latest version:
 * Enter the app IDs to download (in the format 1, 2, 3);
 * Press Enter;
 * The script will download the selected apps.
-#### 6. **Enter app IDs and download (with version selection):**
+#### 6. Enter app IDs and download (with version selection):
 * Enter the app IDs to download (in the format 1, 2, 3);
 * Press Enter;
 * Enter the number of app versions to display;
@@ -197,21 +209,21 @@ A complete set of the above programs/updates for Windows 7/8.1 is available at t
 * Enter the index numbers of the app versions to download (in the format 1, 2, 3-5);
 * Press Enter;
 * The script will download the selected app versions.
-#### 7. **Show list of apps and purchase (without downloading):**
+#### 7. Show list of apps and purchase (without downloading):
 * Enter the list of apps to display (ready-made apps list, purchased apps list, not purchased apps list);
 * Press Enter;
 * The selected list will be displayed;
 * Enter the index numbers of the apps to purchase (in the format 1, 2, 3-5);
 * Press Enter;
 * The script will purchase the selected apps.
-#### 8. **Show list of app IDs and download latest version:**
+#### 8. Show list of apps and download latest version:
 * Enter the list of apps to display (ready-made apps list, purchased apps list, not purchased apps list);
 * Press Enter;
 * The selected list will be displayed;
 * Enter the index numbers of the apps to download (in the format 1, 2, 3-5);
 * Press Enter;
 * The script will download the selected apps.
-#### 9. **Show list of app IDs and download (with version selection):**
+#### 9. Show list of apps and download (with version selection):
 * Enter the list of apps to display (ready-made apps list, purchased apps list, not purchased apps list);
 * Press Enter;
 * Enter the index numbers of the apps to download (in the format 1, 2, 3-5);
@@ -222,41 +234,41 @@ A complete set of the above programs/updates for Windows 7/8.1 is available at t
 * Enter the index numbers of the app versions to download (in the format 1, 2, 3-5);
 * Press Enter;
 * The script will download the selected app versions.
-#### 10. **Check minimum iOS version for apps in Apps folder:**
+#### 10. Check minimum iOS version for apps in Apps folder:
 * Apps must be located in the IPA_Downloader/Apps path;
 * The script will check the minimum iOS version required for the app to work.
-#### 11. **Install apps from Apps folder:**
+#### 11. Install apps from Apps folder:
 * Connect the device using a cable;
 * Apps must be located in the IPA_Downloader/Apps path;
 * Enter the index numbers of the apps to install on the device (in the format 1, 2, 3-5);
 * Press Enter;
 * The script will install the selected apps on the device.
-#### 12. **Clear data:**
+#### 12. Clear data:
 * Enter the data list to clear (downloaded apps list, purchased apps list, apps in Apps folder);
 * Press Enter;
 * The script will clear the selected data type.
-#### 13. **Reset settings:**
+#### 13. Reset settings:
 * The script will log out of the Apple ID and reset all settings.
-#### 14. **GitHub project page:**
+#### 14. GitHub project page:
 * The script will navigate to the project page on GitHub.
-#### 15. **Change Language:**
+#### 15. Change Language:
 * The script will change its interface language.
 
 ## IPA_Installer commands description:
-#### 1. **Check minimum iOS version for apps in Apps folder:**
+#### 1. Check minimum iOS version for apps in Apps folder:
 * Apps must be located in the IPA_Downloader/Apps path;
 * The script will check the minimum iOS version required for the app to work.
-#### 2. **Install apps from Apps folder:**
+#### 2. Install apps from Apps folder:
 * Connect the device using a cable;
 * Apps must be located in the IPA_Downloader/Apps path;
 * Enter the index numbers of the apps to install on the device (in the format 1, 2, 3-5);
 * Press Enter;
 * The script will install the selected apps on the device.
-#### 3. **GitHub project page:**
+#### 3. GitHub project page:
 * The script will navigate to the project page on GitHub.
-#### 4. **Change Language:**
+#### 4. Change Language:
 * The script will change its interface language.
-#### 5. **Switch to IPA_Downloader:**
+#### 5. Switch to IPA_Downloader:
 * The script will switch the mode to IPA_Downloader.
 
 ## Troubleshooting errors:
