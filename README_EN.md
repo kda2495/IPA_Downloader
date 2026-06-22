@@ -5,9 +5,9 @@
 
 # IPA_Downloader
 [![Russian README](https://img.shields.io/badge/README-Russian-blue.svg)](README.md)  
-A script for purchasing/downloading any available App Store apps, as well as restoring removed ones - provided they were previously purchased via your Apple ID (powered by [ipatool-cpp](https://github.com/Sorvigolova/ipatool)).
+A script for purchasing/downloading any available App Store apps, as well as restoring removed ones - provided they were previously purchased via your Apple ID account (powered by [ipatool-cpp](https://github.com/Sorvigolova/ipatool)).
 
-## Features:
+## IPA_Downloader Features:
 * Search for app and purchase (without downloading);
 * Search for app and download latest version;
 * Search for app and download (with version selection);
@@ -25,13 +25,16 @@ A script for purchasing/downloading any available App Store apps, as well as res
 * Copy apps directly from the device.
 
 #### Note:
-* All actions are confirmed by pressing the Enter key after entering commands;
 * To purchase or download apps, they must be previously acquired in the App Store;
 * Apps are downloaded directly from the App Store.
 
+## IPA_Installer Features:
+* Check minimum iOS version for apps in Apps folder;
+* Install apps from Apps folder.
+
 ## General requirements for use:
 * Windows 7, 8.1, 10, 11 (x64);
-* macOS (both Apple Silicon and Intel are supported);
+* macOS starting from 10.15 Catalina (both Apple Silicon and Intel are supported);
 * Stable internet connection;
 * An Apple ID account with previously downloaded apps.
 
@@ -69,16 +72,30 @@ A script for purchasing/downloading any available App Store apps, as well as res
 * Install the KB3191566 update following the installation wizard instructions.
 
 A complete set of the above programs/updates for Windows 7/8.1 is available at the link:  
-[Link for the complete set of programs/updates](https://disk.yandex.ru/d/Fft0whzAz-C7Jg)
+[Link for the complete set of programs/updates](https://disk.yandex.ru/d/Fft0whzAz-C7Jg)  
 
 ## How to use (Windows):
 #### 1. **Extract the IPA_Downloader.zip archive using any archiver;**
 #### 2. **Double-click the Start_IPA_Downloader.bat file;**
-#### 3. **On the first run, you will need to log in to your Apple ID:**
-* Enter Apple ID (Enter email);
-* Enter password (Enter password);
-* Enter the two-factor authentication code (Enter 2FA code).
-#### 4. **Enter the required command.**
+#### 3. **On the first run, initial configuration is required:**
+* Select language;
+* Press Enter;
+* Select one of the available modes:
+* IPA_Downloader (full version, works after logging in with Apple ID);
+* IPA_Installer (limited version with minimum iOS version check and app installation, works without logging in with Apple ID);
+* Press Enter.
+#### 4. If IPA_Downloader mode is selected, then:
+* Enter Apple ID (Enter email:);
+* Press Enter;
+* Enter password (Enter password:);
+* Press Enter;
+* Enter the two-factor authentication code (Enter 2FA code:);
+* Press Enter;
+* Enter the required command;
+* Press Enter.
+#### 5. If IPA_Installer mode is selected, then:
+* Enter the required command;
+* Press Enter.
 
 ## To run on macOS:
 #### All steps must be performed strictly in the following order:
@@ -92,83 +109,118 @@ A complete set of the above programs/updates for Windows 7/8.1 is available at t
 #### 2. **Install the Homebrew package manager:**
 * Open Terminal (Command + Space, then type Terminal in the Spotlight search field);
 * In the Terminal, enter: `/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"`
+* Press Enter;
 * During the Homebrew installation, you may be prompted to enter your password;
 * After Homebrew is installed, the text ==> Next steps will appear at the bottom of the Terminal;
-* You need to enter 3 commands one by one (2 of them start with echo and one with eval).
-#### 3. **Install the minizip package:**
-* In the Terminal, enter: `brew install minizip`
-#### 4. **Install the ideviceinstaller package:**
-* In the Terminal, enter: `brew install ideviceinstaller`
+* You need to enter 3 commands one by one (2 of them start with echo and one with eval);
+* After entering each command, press Enter.
+#### 3. **Install the minizip and ideviceinstaller packages:**
+* In the Terminal, enter: `brew install minizip ideviceinstaller`
+* Press Enter.
 
 ## How to use (macOS):
 #### 1. **Extract the IPA_Downloader.zip archive using any archiver;**
-#### 2. **In the Terminal, enter:**
-* `chmod +x ` (including the trailing space after x) and drag and drop the Start_IPA_Downloader.command file into the Terminal;
+* In the Terminal, enter: `chmod +x ` (including the trailing space after x) and drag and drop the Start_IPA_Downloader.command file into the Terminal;
+* Press Enter;
 * Double-click the Start_IPA_Downloader.command file;
 * The first time, macOS will block Start_IPA_Downloader.command from running;
-* Right-click the Start_IPA_Downloader.command file;
+* Right-click the Start_IPA_Downloader.command file while holding the Control key;
 * Select Open from the context menu;
 * The same warning will appear, but a new Open button will be available;
 * Click the Open button;
 * macOS will remember your choice, and in the future, the script will launch with a regular double-click.
-#### 3. **On the first run, you will need to log in to your Apple ID:**
-* Enter Apple ID (Enter email);
-* Enter password (Enter password);
-* Enter the two-factor authentication code (Enter 2FA code).
-#### 4. **Enter the required command.**
+#### 2. **On the first run, initial configuration is required:**
+* Select language;
+* Press Enter;
+* Select one of the available modes:
+* IPA_Downloader (full version, works after logging in with Apple ID);
+* IPA_Installer (limited version with minimum iOS version check and app installation, works without logging in with Apple ID);
+* Press Enter.
+#### 3. If IPA_Downloader mode is selected, then:
+* Enter Apple ID (Enter email:);
+* Press Enter;
+* Enter password (Enter password:);
+* Press Enter;
+* Enter the two-factor authentication code (Enter 2FA code:);
+* Press Enter;
+* Enter the required command;
+* Press Enter.
+#### 4. If IPA_Installer mode is selected, then:
+* Enter the required command;
+* Press Enter.
 
 #### Note:
-If the script does not start, enter the following commands in the Terminal:  
-`brew reinstall minizip`  
-`brew reinstall ideviceinstaller`
+* If the script doesn't start, enter in the Terminal: `brew reinstall minizip ideviceinstaller`
+* Press Enter.
 
-## Script commands description:
+## IPA_Downloader commands description:
 #### 1. **Search for app and purchase (without downloading):**
 * Enter the app name to search;
+* Press Enter;
 * A list of found apps will be displayed;
 * Enter the index numbers of the apps to purchase (in the format 1, 2, 3-5);
+* Press Enter;
 * The script will purchase the selected apps.
 #### 2. **Search for app and download latest version:**
 * Enter the app name to search;
+* Press Enter;
 * A list of found apps will be displayed;
 * Enter the index numbers of the apps to download (in the format 1, 2, 3-5);
+* Press Enter;
 * The script will download the selected apps.
 #### 3. **Search for app and download (with version selection):**
 * Enter the app name to search;
+* Press Enter;
 * A list of found apps will be displayed;
 * Enter the index numbers of the apps to display versions (in the format 1, 2, 3-5);
+* Press Enter;
 * Enter the number of app versions to display;
+* Press Enter;
 * A list of app versions will be displayed;
 * Enter the index numbers of the app versions to download (in the format 1, 2, 3-5);
+* Press Enter;
 * The script will download the selected app versions.
 #### 4. **Enter app IDs and purchase (without downloading):**
 * Enter the app IDs to purchase (in the format 1, 2, 3);
+* Press Enter;
 * The script will purchase the selected apps.
 #### 5. **Enter app IDs and download latest version:**
 * Enter the app IDs to download (in the format 1, 2, 3);
+* Press Enter;
 * The script will download the selected apps.
 #### 6. **Enter app IDs and download (with version selection):**
 * Enter the app IDs to download (in the format 1, 2, 3);
+* Press Enter;
 * Enter the number of app versions to display;
+* Press Enter;
 * A list of app versions will be displayed;
 * Enter the index numbers of the app versions to download (in the format 1, 2, 3-5);
+* Press Enter;
 * The script will download the selected app versions.
 #### 7. **Show list of apps and purchase (without downloading):**
-* Select the list of apps to display (full apps list, purchased apps list, not purchased apps list);
+* Enter the list of apps to display (ready-made apps list, purchased apps list, not purchased apps list);
+* Press Enter;
 * The selected list will be displayed;
 * Enter the index numbers of the apps to purchase (in the format 1, 2, 3-5);
+* Press Enter;
 * The script will purchase the selected apps.
-#### 8. **Show list of apps and download latest version:**
-* Select the list of apps to display (full apps list, purchased apps list, not purchased apps list);
+#### 8. **Show list of app IDs and download latest version:**
+* Enter the list of apps to display (ready-made apps list, purchased apps list, not purchased apps list);
+* Press Enter;
 * The selected list will be displayed;
 * Enter the index numbers of the apps to download (in the format 1, 2, 3-5);
+* Press Enter;
 * The script will download the selected apps.
-#### 9. **Show list of apps and download (with version selection):**
-* Select the list of apps to display (full apps list, purchased apps list, not purchased apps list);
+#### 9. **Show list of app IDs and download (with version selection):**
+* Enter the list of apps to display (ready-made apps list, purchased apps list, not purchased apps list);
+* Press Enter;
 * Enter the index numbers of the apps to download (in the format 1, 2, 3-5);
+* Press Enter;
 * Enter the number of app versions to display;
+* Press Enter;
 * A list of app versions will be displayed;
 * Enter the index numbers of the app versions to download (in the format 1, 2, 3-5);
+* Press Enter;
 * The script will download the selected app versions.
 #### 10. **Check minimum iOS version for apps in Apps folder:**
 * Apps must be located in the IPA_Downloader/Apps path;
@@ -177,23 +229,43 @@ If the script does not start, enter the following commands in the Terminal:
 * Connect the device using a cable;
 * Apps must be located in the IPA_Downloader/Apps path;
 * Enter the index numbers of the apps to install on the device (in the format 1, 2, 3-5);
+* Press Enter;
 * The script will install the selected apps on the device.
 #### 12. **Clear data:**
-* Select the data list to clear (downloaded apps list, purchased apps list, apps in Apps folder);
+* Enter the data list to clear (downloaded apps list, purchased apps list, apps in Apps folder);
+* Press Enter;
 * The script will clear the selected data type.
-#### 13. **Log out of Apple ID:**
-* The script will log out of the Apple ID.
+#### 13. **Reset settings:**
+* The script will log out of the Apple ID and reset all settings.
 #### 14. **GitHub project page:**
 * The script will navigate to the project page on GitHub.
-#### 15. **Change Language (Сменить язык):**
+#### 15. **Change Language:**
 * The script will change its interface language.
+
+## IPA_Installer commands description:
+#### 1. **Check minimum iOS version for apps in Apps folder:**
+* Apps must be located in the IPA_Downloader/Apps path;
+* The script will check the minimum iOS version required for the app to work.
+#### 2. **Install apps from Apps folder:**
+* Connect the device using a cable;
+* Apps must be located in the IPA_Downloader/Apps path;
+* Enter the index numbers of the apps to install on the device (in the format 1, 2, 3-5);
+* Press Enter;
+* The script will install the selected apps on the device.
+#### 3. **GitHub project page:**
+* The script will navigate to the project page on GitHub.
+#### 4. **Change Language:**
+* The script will change its interface language.
+#### 5. **Switch to IPA_Downloader:**
+* The script will switch the mode to IPA_Downloader.
 
 ## Troubleshooting errors:
 * Download error: HTTP request failed: Timeout was reached - Failed to connect to Apple servers, check your internet connection;
 * Error: license is required - The app was not previously purchased on this Apple ID;
 * Purchase error: app not found - App purchase failed because the app has been removed from the App Store;
 * Purchase error: item is temporarily unavailable - The app was not previously purchased on this Apple ID, the purchase failed because the app has been removed from the App Store;
-* No device found - Device not found. Make sure the AppleMobileDeviceSupport64 driver is installed (relevant for Windows).
+* No device found - Device not found. Make sure the AppleMobileDeviceSupport64 driver is installed (relevant for Windows);
+* WARNING: could not locate Payload/App.app/SC_Info/App.sinf in archive! - Application signature not found in the installed ipa file.
 
 ## Troubleshooting:
 #### Provide the following information:
