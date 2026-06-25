@@ -2,7 +2,7 @@
 Set-Location -Path $PSScriptRoot
 
 # Версия скрипта:
-$ScriptVersion = "3.9.1"
+$ScriptVersion = "3.9.2"
 
 # Определение запуска на Windows:
 $IsWin = [System.Runtime.InteropServices.RuntimeInformation]::IsOSPlatform([System.Runtime.InteropServices.OSPlatform]::Windows)
@@ -1026,23 +1026,23 @@ function Set-IpatoolVersion {
 
 # Функция запроса версии ipatool с проверкой наличия файлов:
 function Invoke-IpatoolVersionPrompt {
-	#$V2Label = "ipatool_$(Get-ArchSubFolder -Version 'v2')"
-	#$V3Label = "ipatool_$(Get-ArchSubFolder -Version 'v3')"
+	$V2Label = "ipatool_$(Get-ArchSubFolder -Version 'v2')"
+	$V3Label = "ipatool_$(Get-ArchSubFolder -Version 'v3')"
 	
-	#while ($true) {
-		#Separator
-		#$Version_Menu = @"
-#$(Get-Lang 'IpatoolVersionMenuTitle')
-#1. $V2Label
-#2. $V3Label`n
-#"@
-		#$VersionChoice = Read-MenuChoice -MenuText $Version_Menu -OptionsCount 2
-		#$SelectedVersion = if ($VersionChoice -eq '2') { 'v3' } else { 'v2' }
+	while ($true) {
+		Separator
+		$Version_Menu = @"
+$(Get-Lang 'IpatoolVersionMenuTitle')
+1. $V2Label
+2. $V3Label`n
+"@
+		$VersionChoice = Read-MenuChoice -MenuText $Version_Menu -OptionsCount 2
+		$SelectedVersion = if ($VersionChoice -eq '2') { 'v3' } else { 'v2' }
 		
-		#if (Set-IpatoolVersion -Version $SelectedVersion) {
-			#return
-		#}
-	#}
+		if (Set-IpatoolVersion -Version $SelectedVersion) {
+			return
+		}
+	}
 }
 
 # Функция установки приложений из папки Apps:
