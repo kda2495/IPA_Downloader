@@ -38,37 +38,38 @@ A script for purchasing/downloading any available App Store apps, as well as res
 * Stable internet connection;
 * An Apple ID account with previously downloaded apps.
 
-## To support app installation (Windows):
-* AppleMobileDeviceSupport driver (included with iTunes):  
+## To run on Windows:
+* iTunes from the Apple website:  
 [Link to download iTunes from the Apple website](https://www.apple.com/itunes/download/win64)  
-* Instead of a full iTunes installation, you can perform a custom installation of AppleMobileDeviceSupport64.msi by extracting the iTunes installer with an archiver.
+* iCloud from the Apple website:  
+[Link to download iCloud from the Apple website](https://updates.cdn-apple.com/2020/windows/001-39935-20200911-1A70AA56-F448-11EA-8CC0-99D41950005E/iCloudSetup.exe)
 
 ## To run on Windows 7 and 8.1:
 #### All steps must be performed strictly in the following order:
 #### 1. Update system certificates via UpdRootsCert:
 * Follow the link to download UpdRootsCert:  
 [Link to download UpdRootsCert](https://disk.yandex.ru/d/SdHMgwJ55MTQRg)  
-* Download the UpdRootsCert.exe file;
-* Run the UpdRootsCert.exe file;
-* Check the boxes: System Root Certificates, Russian Ministry of Digital Development Certificates, Add a monthly task to the Task Scheduler;
+* Download the UpdRootsCert.exe file;  
+* Run the UpdRootsCert.exe file;  
+* Check the boxes: System Root Certificates, Russian Ministry of Digital Development Certificates, Add a monthly task to the Task Scheduler;  
 * Click the Install button.
 
 #### 2. Install .NET Framework 4.8:
 * Follow the link to download .NET Framework 4.8:  
 [Link to download .NET Framework 4.8](https://go.microsoft.com/fwlink/?linkid=2088631)  
-* Download the NDP48-x86-x64-AllOS-ENU.exe file;
-* Run the NDP48-x86-x64-AllOS-ENU.exe file;
+* Download the NDP48-x86-x64-AllOS-ENU.exe file;  
+* Run the NDP48-x86-x64-AllOS-ENU.exe file;  
 * Install .NET Framework 4.8 following the installation wizard instructions.
 
 #### 3. Install the KB3191566 update (to add PowerShell 5.1 support):
 * Follow the link to download KB3191566:  
 [Link to download KB3191566](https://www.microsoft.com/en-us/download/details.aspx?id=54616)  
-* Click the Download button;
-* Check the boxes: Win7AndW2K8R2-KB3191566-x64.zip (for Windows 7) or Win8.1AndW2K12R2-KB3191564-x64.msu (for Windows 8.1);
-* Click the Download button;
-* Download the files: Win7AndW2K8R2-KB3191566-x64.zip (for Windows 7) or Win8.1AndW2K12R2-KB3191564-x64.msu (for Windows 8.1);
-* Extract the Win7AndW2K8R2-KB3191566-x64.zip archive (for Windows 7);
-* Run the files: Win7AndW2K8R2-KB3191566-x64.msu (for Windows 7) or Win8.1AndW2K12R2-KB3191564-x64.msu (for Windows 8.1);
+* Click the Download button;  
+* Check the boxes: Win7AndW2K8R2-KB3191566-x64.zip (for Windows 7) or Win8.1AndW2K12R2-KB3191564-x64.msu (for Windows 8.1);  
+* Click the Download button;  
+* Download the files: Win7AndW2K8R2-KB3191566-x64.zip (for Windows 7) or Win8.1AndW2K12R2-KB3191564-x64.msu (for Windows 8.1);  
+* Extract the Win7AndW2K8R2-KB3191566-x64.zip archive (for Windows 7);  
+* Run the files: Win7AndW2K8R2-KB3191566-x64.msu (for Windows 7) or Win8.1AndW2K12R2-KB3191564-x64.msu (for Windows 8.1);  
 * Install the KB3191566 update following the installation wizard instructions.
 
 A complete set of the above programs/updates for Windows 7/8.1 is available at the link:  
@@ -85,10 +86,12 @@ A complete set of the above programs/updates for Windows 7/8.1 is available at t
 * IPA_Installer (limited version with minimum iOS version check and app installation, works without logging in with Apple ID);
 * Press Enter.
 #### 5. If IPA_Downloader mode is selected, then:
+* Select ipatool version (v3 is recommended);
 * Enter Apple ID (Enter email:);
 * Press Enter;
 * Enter password (Enter password:);
 * Press Enter;
+* Tap Allow on your device and remember the two-factor authentication code;
 * Enter the two-factor authentication code (Enter 2FA code:);
 * Press Enter;
 * Enter the required command;
@@ -136,11 +139,14 @@ A complete set of the above programs/updates for Windows 7/8.1 is available at t
 * Press Enter.
 #### 2. Double-click the Start_IPA_Downloader.command file;
 * The first time, macOS will block Start_IPA_Downloader.command from running;
-* Right-click the Start_IPA_Downloader.command file;
-* Select Open from the context menu;
-* The same warning will appear, but a new Open button will be available;
-* Click the Open button;
-* macOS will remember your choice, and in the future, the script will launch with a regular double-click.
+* Click "Done" in the prompt that appears;
+* Click the Apple menu () in the top-left corner of the screen and select "System Settings...";
+* In the left sidebar, scroll down and select "Privacy & Security";
+* Scroll down the right side of the screen to the "Security" section;
+* Next to "Start_IPA_Downloader.command was blocked from use because it is not from an identified developer", click "Open Anyway";
+* In the pop-up window, click "Open Anyway";
+* Enter your Mac password or use Touch ID;
+* If necessary, double-click the Start_IPA_Downloader.command file again.
 #### 3. On the first run, initial configuration is required:
 * Select language;
 * Press Enter.
@@ -149,10 +155,12 @@ A complete set of the above programs/updates for Windows 7/8.1 is available at t
 * IPA_Installer (limited version with minimum iOS version check and app installation, works without logging in with Apple ID);
 * Press Enter.
 #### 5. If IPA_Downloader mode is selected, then:
+* Select ipatool version (v3 is recommended);
 * Enter Apple ID (Enter email:);
 * Press Enter;
 * Enter password (Enter password:);
 * Press Enter;
+* Get a two-factor authentication code (turn on Airplane Mode on your device, go to Settings -> [Your Account] -> Sign-In & Security -> Get Verification Code);
 * Enter the two-factor authentication code (Enter 2FA code:);
 * Press Enter;
 * Enter the required command;
@@ -164,6 +172,7 @@ A complete set of the above programs/updates for Windows 7/8.1 is available at t
 #### Note:
 * If the script doesn't start, type in Terminal: `brew reinstall minizip ideviceinstaller`
 * Press Enter.
+* There is a bug in ipatool v3 for macOS: an unknown MacBook Pro is added to your account's device list (due to how anisette works). If necessary, you can remove it from the device list, but you will have to obtain a two-factor authentication code again.
 
 ## IPA_Downloader commands description:
 #### 1. Search for app and purchase (without downloading):
@@ -277,7 +286,7 @@ A complete set of the above programs/updates for Windows 7/8.1 is available at t
 * Purchase error: app not found - App purchase failed because the app has been removed from the App Store;
 * Purchase error: item is temporarily unavailable - The app was not previously purchased on this Apple ID, the purchase failed because the app has been removed from the App Store;
 * No device found - Device not found. Make sure the AppleMobileDeviceSupport64 driver is installed (relevant for Windows);
-* WARNING: could not locate Payload/App.app/SC_Info/App.sinf in archive! - Application signature not found in the installed ipa file.
+* WARNING: could not locate Payload/App.app/SC_Info/App.sinf in archive! - App signature not found in the installed ipa file.
 
 ## Troubleshooting:
 #### Provide the following information:
