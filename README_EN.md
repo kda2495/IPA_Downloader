@@ -173,6 +173,7 @@ A complete set of the above programs/updates for Windows 7/8.1 is available at t
 * If the script doesn't start, type in Terminal: `brew reinstall minizip ideviceinstaller`
 * Press Enter.
 * There is a bug in ipatool v3 for macOS: an unknown MacBook Pro is added to your account's device list (due to how anisette works). If necessary, you can remove it from the device list, but you will have to obtain a two-factor authentication code again.
+* You can use AirDrop to install the app: simply transfer file to your iPhone, and the app will be installed automatically.
 
 ## IPA_Downloader commands description:
 #### 1. Search for app and purchase (without downloading):
