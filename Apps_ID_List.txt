@@ -1,13 +1,13 @@
 1Password: 1511601750
 24ТВ: 1200838800
 2ГИС: 481627348
+AdGuard: 1047223162
 Adobe Acrobat Reader: 469337564
 Adobe Express: 1051937863
 Adobe Lightroom: 878783582
 Adobe Photoshop Express: 331975235
 Adobe Scan: 1199564834
 Adobe Sign: 481082197
-AdGuard: 1047223162
 AliExpress: 1516453498
 Amediateka: 695094274
 AmneziaVPN: 1600529900
