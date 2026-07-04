@@ -2,12 +2,12 @@
 Set-Location -Path $PSScriptRoot
 
 # Версия скрипта:
-$ScriptVersion = "3.9.2"
+$ScriptVersion = "3.9.3"
 
 # Определение запуска на Windows:
 $IsWin = [System.Runtime.InteropServices.RuntimeInformation]::IsOSPlatform([System.Runtime.InteropServices.OSPlatform]::Windows)
 
-# Папка MainApp и единый файл настроек (язык, режим работы, версия ipatool):
+# Папка MainApp и единый файл настроек (язык, режим работы):
 $MainAppFolderPath = Join-Path -Path $PSScriptRoot -ChildPath "MainApp"
 $SettingsFilePath = Join-Path -Path $MainAppFolderPath -ChildPath "Settings.txt"
 
@@ -33,32 +33,29 @@ function Set-Setting {
 	Set-Content -Path $SettingsFilePath -Value $Lines -Force
 }
 
-# Загрузка сохраненных настроек (язык, режим работы, версия ipatool) или значений по умолчанию:
+# Загрузка сохраненных настроек (язык, режим работы) или значений по умолчанию:
 $SavedSettings = Get-Settings
 $Global:CurrentLang = if ($SavedSettings['Language'] -match '^(RU|EN)$') { $SavedSettings['Language'] } else { "RU" }
 $Global:WorkMode = if ($SavedSettings['Mode'] -in @('Downloader', 'Installer')) { $SavedSettings['Mode'] } else { $null }
-$IpatoolVersion = if ($SavedSettings['IpatoolVersion'] -eq 'v3') { 'v3' } else { 'v2' }
 
 # Определение архитектуры macOS:
 if (-not $IsWin) {
 	$Arch = [System.Runtime.InteropServices.RuntimeInformation]::OSArchitecture.ToString().ToLower()
 }
 
-# Функция вычисления имени папки с ipatool для конкретной версии (v2/v3) под текущую систему/архитектуру:
+# Функция вычисления имени папки с ipatool под текущую систему/архитектуру:
 function Get-ArchSubFolder {
-	param ([ValidateSet("v2", "v3")][string]$Version)
-	
 	if ($IsWin) {
-		if ($Version -eq "v3") { return "windows_amd64_v3" } else { return "windows_amd64_v2" }
+		return "windows_amd64_v3"
 	} elseif ($Arch -eq "arm64") {
-		if ($Version -eq "v3") { return "macOS_arm64_v3" } else { return "macOS_arm64_v2" }
+		return "macOS_arm64_v3"
 	} else {
-		if ($Version -eq "v3") { return "macOS_amd64_v3" } else { return "macOS_amd64_v2" }
+		return "macOS_amd64_v3"
 	}
 }
 
 # Определение системы и архитектуры:
-$ArchSubFolder = Get-ArchSubFolder -Version $IpatoolVersion
+$ArchSubFolder = Get-ArchSubFolder
 
 # Определение основных папок и переменных:
 $OSVersion = [System.Environment]::OSVersion
@@ -124,6 +121,7 @@ $Global:GitHubParsedList = $null
 # Перевод текста:
 $LangStrings = @{
 	"RU" = @{
+		"AccountClearedMsg" = "Готово. Данные аккаунта {0} удалены."
 		"AddedToDownloadedList" = "Добавлено в список: {0} - {1}"
 		"AddedToPurchasedList" = "Добавлено в список покупок: {0} - {1}"
 		"AlreadyInList" = "Уже есть в списке: {0} - {1}"
@@ -138,15 +136,17 @@ $LangStrings = @{
 		"AuthFail" = "Вход в Apple ID не выполнен."
 		"AuthSuccess" = "Вход в Apple ID выполнен.`nДанные аккаунта:"
 		"CancelStep" = "(0: Отмена/Возврат в главное меню)"
-		"ClearMenu1" = "1. Список загруженных приложений"
-		"ClearMenu2" = "2. Список приобретенных приложений"
+		"ClearAccountMenuTitle" = "Выберите аккаунты для очистки:"
+		"ClearAllAccounts" = "Все аккаунты"
+		"ClearMenu1" = "1. Список приобретенных приложений"
+		"ClearMenu2" = "2. Список загруженных приложений"
 		"ClearMenu3" = "3. Приложения в папке Apps"
 		"ClearMenuTitle" = "Выберите данные для очистки:"
 		"DownloadedListCleared" = "Готово. Список загруженных приложений очищен."
 		"DownloadedListMenu1" = "1. Полный список приложений (GitHub)"
 		"DownloadedListMenu2" = "2. Список загруженных приложений"
 		"DownloadedListMenu3" = "3. Список не загруженных приложений"
-		"ErrorHistoryEmpty" = "Ошибка: История загрузок пуста."
+		"ErrorDownloadedEmpty" = "Ошибка: История загрузок пуста."
 		"ErrorInvalidInput" = "Ошибка: Неверный ввод."
 		"ErrorListLoadError" = "Ошибка загрузки списка приложений."
 		"ErrorMacIdeviceinstallerNotFound" = "Ошибка: ideviceinstaller не найден. Установка приложений через скрипт невозможна."
@@ -168,7 +168,6 @@ $LangStrings = @{
 		"InstallerMenu3" = "3. Страница проекта на GitHub"
 		"InstallerMenu4" = "4. Сменить язык (Change Language)"
 		"InstallerMenu5" = "5. Перейти в IPA_Downloader"
-		"IpatoolVersionMenuTitle" = "Выберите версию ipatool:"
 		"LangChanged" = "Язык успешно изменен на Русский."
 		"LanguageMenu1" = "1. Русский"
 		"LanguageMenu2" = "2. English"
@@ -203,6 +202,7 @@ $LangStrings = @{
 		"SelectedVer" = "Выбрана версия:"
 	}
 	"EN" = @{
+		"AccountClearedMsg" = "Done. Account {0} data cleared."
 		"AddedToDownloadedList" = "Added to list: {0} - {1}"
 		"AddedToPurchasedList" = "Added to purchased list: {0} - {1}"
 		"AlreadyInList" = "Already in list: {0} - {1}"
@@ -217,15 +217,17 @@ $LangStrings = @{
 		"AuthFail" = "Not authenticated with Apple ID."
 		"AuthSuccess" = "Apple ID login successful.`nAccount details:"
 		"CancelStep" = "(0: Cancel/Return to main menu)"
-		"ClearMenu1" = "1. Downloaded apps list"
-		"ClearMenu2" = "2. Purchased apps list"
+		"ClearAccountMenuTitle" = "Select accounts to clear:"
+		"ClearAllAccounts" = "All accounts"
+		"ClearMenu1" = "1. Purchased apps list"
+		"ClearMenu2" = "2. Downloaded apps list"
 		"ClearMenu3" = "3. Apps in Apps folder"
 		"ClearMenuTitle" = "Select data to clear:"
 		"DownloadedListCleared" = "Done. Downloaded apps list cleared."
 		"DownloadedListMenu1" = "1. Full apps list (GitHub)"
 		"DownloadedListMenu2" = "2. Downloaded apps list"
 		"DownloadedListMenu3" = "3. Not downloaded apps list"
-		"ErrorHistoryEmpty" = "Error: Download history is empty."
+		"ErrorDownloadedEmpty" = "Error: Download history is empty."
 		"ErrorInvalidInput" = "Error: Invalid input."
 		"ErrorListLoadError" = "Failed to load apps list."
 		"ErrorMissingFiles" = "Error. Following files were not found:"
@@ -247,7 +249,6 @@ $LangStrings = @{
 		"InstallerMenu3" = "3. GitHub project page"
 		"InstallerMenu4" = "4. Change Language (Сменить язык)"
 		"InstallerMenu5" = "5. Switch to IPA_Downloader"
-		"IpatoolVersionMenuTitle" = "Select ipatool version:"
 		"LangChanged" = "Language successfully changed to English."
 		"LanguageMenu1" = "1. Русский"
 		"LanguageMenu2" = "2. English"
@@ -300,6 +301,19 @@ function Show-Error {
 	Write-Host (Get-Lang $Key) -ForegroundColor DarkRed
 }
 
+# Глобальная переменная для хранения текущего Apple ID:
+$Global:CurrentAppleID = "UnknownAccount"
+
+# Функция получения текущего Apple ID:
+function Get-Current-AppleID {
+	$AuthInfo = & "$ipatoolFilePath" auth info 2>&1 | Out-String
+	if ($AuthInfo -match 'email=([^\s]+)') {
+		$Global:CurrentAppleID = $Matches[1].Trim()
+	} else {
+		$Global:CurrentAppleID = "UnknownAccount"
+	}
+}
+
 # Функция запроса пункта меню:
 function Read-MenuChoice {
 	param (
@@ -334,7 +348,7 @@ function Resolve-AppDisplayName {
 	}
 }
 
-# Функция чтения JSON-файла списка приложений:
+# Функция чтения JSON-файла списка приложений с учетом аккаунта:
 function Read-AppList-Json {
 	param ([string]$FilePath, [string]$EmptyError)
 	if (!(Test-Path $FilePath)) {
@@ -342,7 +356,7 @@ function Read-AppList-Json {
 		return $null
 	}
 	$JsonRaw = Get-Content $FilePath -Raw -Encoding UTF8
-	if ([string]::IsNullOrWhiteSpace($JsonRaw)) {
+	if ([string]::IsNullOrWhiteSpace($JsonRaw) -or $JsonRaw -eq '{}') {
 		Show-Error $EmptyError
 		return $null
 	}
@@ -351,8 +365,25 @@ function Read-AppList-Json {
 		Show-Error $EmptyError
 		return $null
 	}
-	if ($Data -isnot [System.Collections.IEnumerable]) { $Data = @($Data) }
-	return $Data
+	
+	# Поддержка старого формата (простой массив без привязки к аккаунту):
+	if ($Data -is [System.Collections.IEnumerable] -and $Data -isnot [System.Management.Automation.PSCustomObject]) {
+		return $Data
+	}
+	
+	# Получение данных конкретного аккаунта:
+	if ($Data.psobject.properties.match($Global:CurrentAppleID).Count -gt 0) {
+		$AccountApps = $Data."$Global:CurrentAppleID"
+		if ($AccountApps -isnot [System.Collections.IEnumerable]) { $AccountApps = @($AccountApps) }
+		if ($AccountApps.Count -eq 0) {
+			Show-Error $EmptyError
+			return $null
+		}
+		return $AccountApps
+	} else {
+		Show-Error $EmptyError
+		return $null
+	}
 }
 
 # Функция входа в Apple ID:
@@ -363,6 +394,7 @@ function Connect-AppleID {
 		Write-Host (Get-Lang "AuthFail")
 		& "$ipatoolFilePath" auth login
 	}
+	Get-Current-AppleID
 }
 
 # Функция извлечения метаданных из ipa:
@@ -410,7 +442,7 @@ function Get-IPA-Metadata {
 	return $Metadata
 }
 
-# Функция сохранения списков:
+# Функция сохранения списков с привязкой к аккаунту и сортировкой:
 function Save-App-To-List {
 	param (
 		[string]$AppId,
@@ -425,24 +457,54 @@ function Save-App-To-List {
 	$HistoryFile = if ($Type -eq "Purchased") { "$PurchasedIDsFilePath" } else { "$DownloadedIDsFilePath" }
 	
 	if (!(Test-Path $HistoryFile)) {
-		$null = New-Item -Path $HistoryFile -ItemType "File" -Value ''
+		$null = New-Item -Path $HistoryFile -ItemType "File" -Value '{}'
 	}
 	
 	$JsonRaw = Get-Content $HistoryFile -Raw -Encoding UTF8
-	$Data = if ([string]::IsNullOrWhiteSpace($JsonRaw)) { @() } else { $JsonRaw | ConvertFrom-Json }
+	if ([string]::IsNullOrWhiteSpace($JsonRaw)) { $JsonRaw = '{}' }
 	
-	if ($Data -isnot [System.Collections.IEnumerable]) { $Data = @($Data) }
+	$Data = $JsonRaw | ConvertFrom-Json
+	if ($null -eq $Data) {
+		$Data = New-Object PSCustomObject
+	}
+	
+	# Если файл в старом формате, конвертируем его:
+	if ($Data -is [System.Collections.IEnumerable] -and $Data -isnot [System.Management.Automation.PSCustomObject]) {
+		$OldArray = $Data
+		$Data = New-Object PSCustomObject
+		$Data | Add-Member -MemberType NoteProperty -Name "UnknownAccount" -Value $OldArray
+	}
+	
+	# Получаем текущий список приложений для текущего аккаунта:
+	$AccountApps = @()
+	if ($Data.psobject.properties.match($Global:CurrentAppleID).Count -gt 0) {
+		$AccountApps = $Data."$Global:CurrentAppleID"
+	} else {
+		$Data | Add-Member -MemberType NoteProperty -Name $Global:CurrentAppleID -Value @()
+	}
+	
+	if ($AccountApps -isnot [System.Collections.IEnumerable]) { $AccountApps = @($AccountApps) }
 
-	foreach ($Item in $Data) {
+	# Проверка на дубликаты в рамках аккаунта:
+	foreach ($Item in $AccountApps) {
 		if ($Item.appid -eq $AppId) {
 			Write-Host ((Get-Lang "AlreadyInList") -f $Item.name, $AppId)
 			return
 		}
 	}
 
+	# Добавление нового приложения:
 	$NewItem = [PSCustomObject]@{ name = $AppNameOnly; appid = $AppId }
-	$Data = @($Data) + $NewItem
-	$Data = $Data | Sort-Object -Property name
+	$AccountApps = @($AccountApps) + $NewItem
+	
+	# Сортировка: Английский (0) -> Русский (1) -> Остальное (2), затем по алфавиту:
+	$AccountApps = $AccountApps | Sort-Object @{Expression={
+		if ($_.name -match '^[A-Za-z]') { 0 }
+		elseif ($_.name -match '^[А-Яа-яЁё]') { 1 }
+		else { 2 }
+	}}, name
+	
+	$Data."$Global:CurrentAppleID" = $AccountApps
 	$Data | ConvertTo-Json -Depth 5 | Set-Content $HistoryFile -Encoding UTF8
 
 	$MsgKey = if ($Type -eq "Purchased") { "AddedToPurchasedList" } else { "AddedToDownloadedList" }
@@ -522,7 +584,7 @@ function Move-IPA-Files {
 				}
 				
 				# Формируем имя файла и заменяем все пробелы на "_":
-				$NewName = "$($FinalAppName)_$($Meta.Version)_iOS_$($Meta.MinIOS)+.ipa" -replace '\s+', '_'
+				$NewName = "$($FinalAppName)_$($Meta.Version)_iOS_$($Meta.MinIOS)+_$($Global:CurrentAppleID).ipa" -replace '\s+', '_'
 				$TargetFile = Join-Path -Path $AppsFolderPath -ChildPath $NewName
 				
 				if (Test-Path $TargetFile) {
@@ -806,7 +868,7 @@ function Get-Apps-From-List {
 	$Menu2 = if ($ListMode -eq "Purchase") { Get-Lang 'PurchasedListMenu2' } else { Get-Lang 'DownloadedListMenu2' }
 	$Menu3 = if ($ListMode -eq "Purchase") { Get-Lang 'PurchasedListMenu3' } else { Get-Lang 'DownloadedListMenu3' }
 	$TargetFile = if ($ListMode -eq "Purchase") { "$PurchasedIDsFilePath" } else { "$DownloadedIDsFilePath" }
-	$EmptyError = if ($ListMode -eq "Purchase") { "ErrorPurchasedEmpty" } else { "ErrorHistoryEmpty" }
+	$EmptyError = if ($ListMode -eq "Purchase") { "ErrorPurchasedEmpty" } else { "ErrorDownloadedEmpty" }
 
 	$List_Menu = @"
 $MenuTitle $(Get-Lang 'CancelStep')
@@ -997,54 +1059,6 @@ function Get-MissingBinaryFiles {
 	}
 }
 
-# Функция установки конкретной версии ipatool:
-function Set-IpatoolVersion {
-	param ([ValidateSet("v2", "v3")][string]$Version)
-	
-	$OldBinaryFolderPath = $script:BinaryFolderPath
-	$NewArchSubFolder = Get-ArchSubFolder -Version $Version
-	$NewBinaryFolderPath = Join-Path -Path $MainAppFolderPath -ChildPath $NewArchSubFolder
-	
-	# Проверка наличия необходимых файлов в папке выбранной версии:
-	$MissingVersionFiles = Get-MissingBinaryFiles -FolderPath $NewBinaryFolderPath
-	if ($MissingVersionFiles) {
-		Separator
-		Write-Host (Get-Lang "ErrorMissingFiles") -ForegroundColor DarkRed
-		$MissingVersionFiles | ForEach-Object { Write-Host "$_" -ForegroundColor DarkRed }
-		return $false
-	}
-	
-	# Применение выбранной версии ipatool:
-	$script:IpatoolVersion = $Version
-	$script:ArchSubFolder = $NewArchSubFolder
-	$script:BinaryFolderPath = $NewBinaryFolderPath
-	
-	Set-IpatoolBinaryPaths -FolderPath $script:BinaryFolderPath -OldFolderPath $OldBinaryFolderPath
-	
-	return $true
-}
-
-# Функция запроса версии ipatool с проверкой наличия файлов:
-function Invoke-IpatoolVersionPrompt {
-	$V2Label = "ipatool_$(Get-ArchSubFolder -Version 'v2')"
-	$V3Label = "ipatool_$(Get-ArchSubFolder -Version 'v3')"
-	
-	while ($true) {
-		Separator
-		$Version_Menu = @"
-$(Get-Lang 'IpatoolVersionMenuTitle')
-1. $V2Label
-2. $V3Label`n
-"@
-		$VersionChoice = Read-MenuChoice -MenuText $Version_Menu -OptionsCount 2
-		$SelectedVersion = if ($VersionChoice -eq '2') { 'v3' } else { 'v2' }
-		
-		if (Set-IpatoolVersion -Version $SelectedVersion) {
-			return
-		}
-	}
-}
-
 # Функция установки приложений из папки Apps:
 function Invoke-InstallApps {
 	if ([string]::IsNullOrWhiteSpace($script:ideviceinstallerFilePath)) {
@@ -1077,7 +1091,7 @@ function Show-ModeBanner {
 	Write-Host "$ModeLabel $ScriptVersion ($ArchSubFolder)"
 }
 
-# Функция первоначальной настройки (язык, режим работы, версия ipatool):
+# Функция первоначальной настройки (язык, режим работы):
 function Invoke-SetupWizard {
 	# Удаление содержимого папки .ipatool
 	Get-ChildItem -Path $ipatoolHomePath -ErrorAction SilentlyContinue | Remove-Item -Force -ErrorAction SilentlyContinue
@@ -1106,11 +1120,6 @@ $(Get-Lang 'ModeMenu2')`n
 	# Режим IPA_Installer сохраняется сразу:
 	if ($Global:WorkMode -eq "Installer") {
 		Set-Setting -Key "Mode" -Value $Global:WorkMode
-	}
-	
-	# Версия ipatool запрашивается только для режима IPA_Downloader:
-	if ($Global:WorkMode -eq "Downloader") {
-		Invoke-IpatoolVersionPrompt
 	}
 	
 	Show-ModeBanner
@@ -1167,6 +1176,7 @@ function Invoke-DownloaderMode {
 		Separator
 		Write-Host (Get-Lang "AuthSuccess")
 		& "$ipatoolFilePath" auth info
+		Get-Current-AppleID
 	}
 	
 	# Вход с Apple ID:
@@ -1174,7 +1184,6 @@ function Invoke-DownloaderMode {
 	
 	# Режим IPA_Downloader сохраняется только после успешной авторизации с Apple ID:
 	Set-Setting -Key "Mode" -Value "Downloader"
-	Set-Setting -Key "IpatoolVersion" -Value $script:IpatoolVersion
 	
 	# Основной цикл:
 	while (Test-Path "$AccountFilePath") {
@@ -1323,17 +1332,121 @@ $(Get-Lang 'ClearMenu3')`n
 				
 				if ($ClearChoice -eq '0') { continue }
 				
-				switch ($ClearChoice) {
+				switch ($ClearChoice) {					
 					"1" {
-						Remove-Item "$DownloadedIDsFilePath" -Force -ErrorAction SilentlyContinue
-						Separator
-						Write-Host (Get-Lang "DownloadedListCleared")
+						if (!(Test-Path "$PurchasedIDsFilePath")) {
+							Separator
+							Write-Host (Get-Lang "ErrorPurchasedEmpty") -ForegroundColor DarkRed
+						} else {
+							$RawData = Get-Content "$PurchasedIDsFilePath" -Raw -Encoding UTF8
+							
+							# Если файл пуст или содержит только пустые скобки {}
+							if ([string]::IsNullOrWhiteSpace($RawData) -or $RawData.Trim() -eq '{}') {
+								Remove-Item "$PurchasedIDsFilePath" -Force -ErrorAction SilentlyContinue
+								Separator
+								Write-Host (Get-Lang "ErrorPurchasedEmpty") -ForegroundColor DarkRed
+								continue
+							}
+
+							$Data = $RawData | ConvertFrom-Json
+							
+							# Если старый формат (массив) или нет свойств
+							if ($Data -isnot [System.Management.Automation.PSCustomObject] -or $Data.psobject.properties.Count -eq 0) {
+								Remove-Item "$PurchasedIDsFilePath" -Force -ErrorAction SilentlyContinue
+								Separator
+								Write-Host (Get-Lang "PurchasedListCleared")
+								continue
+							}
+
+							# Формируем динамическое меню аккаунтов
+							$Accounts = @($Data.psobject.properties.Name)
+							$AccMenuText = "$(Get-Lang 'ClearAccountMenuTitle') $(Get-Lang 'CancelStep')`n"
+							$Counter = 1
+							foreach ($Acc in $Accounts) {
+								$AccMenuText += "$Counter. $Acc`n"
+								$Counter++
+							}
+							$AccMenuText += "$Counter. $(Get-Lang 'ClearAllAccounts')`n"
+							
+							Separator
+							$AccChoice = Read-MenuChoice -MenuText $AccMenuText -OptionsCount $Counter -AllowCancel
+							if ($AccChoice -eq '0') { continue }
+							
+							if ([int]$AccChoice -eq $Counter) {
+								# Выбрано "Все аккаунты"
+								Remove-Item "$PurchasedIDsFilePath" -Force -ErrorAction SilentlyContinue
+								Separator
+								Write-Host (Get-Lang "PurchasedListCleared")
+							} else {
+								# Удаляем выбранный аккаунт
+								$SelectedAcc = $Accounts[[int]$AccChoice - 1]
+								$Data.psobject.properties.Remove($SelectedAcc)
+								
+								# Если аккаунтов больше не осталось, удаляем файл с диска
+								if ($Data.psobject.properties.Count -eq 0) {
+									Remove-Item "$PurchasedIDsFilePath" -Force -ErrorAction SilentlyContinue
+								} else {
+									$Data | ConvertTo-Json -Depth 5 | Set-Content "$PurchasedIDsFilePath" -Encoding UTF8
+								}
+								Separator
+								Write-Host ((Get-Lang "AccountClearedMsg") -f $SelectedAcc)
+							}
+						}
 					}
 					
 					"2" {
-						Remove-Item "$PurchasedIDsFilePath" -Force -ErrorAction SilentlyContinue
-						Separator
-						Write-Host (Get-Lang "PurchasedListCleared")
+						if (!(Test-Path "$DownloadedIDsFilePath")) {
+							Separator
+							Write-Host (Get-Lang "ErrorDownloadedEmpty") -ForegroundColor DarkRed
+						} else {
+							$RawData = Get-Content "$DownloadedIDsFilePath" -Raw -Encoding UTF8
+							
+							if ([string]::IsNullOrWhiteSpace($RawData) -or $RawData.Trim() -eq '{}') {
+								Remove-Item "$DownloadedIDsFilePath" -Force -ErrorAction SilentlyContinue
+								Separator
+								Write-Host (Get-Lang "ErrorDownloadedEmpty") -ForegroundColor DarkRed
+								continue
+							}
+
+							$Data = $RawData | ConvertFrom-Json
+							
+							if ($Data -isnot [System.Management.Automation.PSCustomObject] -or $Data.psobject.properties.Count -eq 0) {
+								Remove-Item "$DownloadedIDsFilePath" -Force -ErrorAction SilentlyContinue
+								Separator
+								Write-Host (Get-Lang "DownloadedListCleared")
+								continue
+							}
+
+							$Accounts = @($Data.psobject.properties.Name)
+							$AccMenuText = "$(Get-Lang 'ClearAccountMenuTitle') $(Get-Lang 'CancelStep')`n"
+							$Counter = 1
+							foreach ($Acc in $Accounts) {
+								$AccMenuText += "$Counter. $Acc`n"
+								$Counter++
+							}
+							$AccMenuText += "$Counter. $(Get-Lang 'ClearAllAccounts')`n"
+							
+							Separator
+							$AccChoice = Read-MenuChoice -MenuText $AccMenuText -OptionsCount $Counter -AllowCancel
+							if ($AccChoice -eq '0') { continue }
+							
+							if ([int]$AccChoice -eq $Counter) {
+								Remove-Item "$DownloadedIDsFilePath" -Force -ErrorAction SilentlyContinue
+								Separator
+								Write-Host (Get-Lang "DownloadedListCleared")
+							} else {
+								$SelectedAcc = $Accounts[[int]$AccChoice - 1]
+								$Data.psobject.properties.Remove($SelectedAcc)
+								
+								if ($Data.psobject.properties.Count -eq 0) {
+									Remove-Item "$DownloadedIDsFilePath" -Force -ErrorAction SilentlyContinue
+								} else {
+									$Data | ConvertTo-Json -Depth 5 | Set-Content "$DownloadedIDsFilePath" -Encoding UTF8
+								}
+								Separator
+								Write-Host ((Get-Lang "AccountClearedMsg") -f $SelectedAcc)
+							}
+						}
 					}
 					
 					"3" {
@@ -1421,7 +1534,6 @@ $(Get-Lang 'InstallerMenu5')`n
 			
 			# 5. Перейти в IPA_Downloader:
 			"5" {
-				Invoke-IpatoolVersionPrompt
 				$Global:WorkMode = "Downloader"
 				return
 			}
