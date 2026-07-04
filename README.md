@@ -86,7 +86,6 @@
 * IPA_Installer (ограниченная версия с проверкой минимальной версии iOS и установкой приложений, работает без входа с Apple ID);
 * Нажимаем Enter.
 #### 5. Если выбран режим IPA_Downloader, то далее:
-* Выбираем версию ipatool (рекомендована версия v3);
 * Вводим Apple ID (Enter email:);
 * Нажимаем Enter;
 * Вводим пароль (Enter password:);
@@ -155,7 +154,6 @@
 * IPA_Installer (ограниченная версия с проверкой минимальной версии iOS и установкой приложений, работает без входа с Apple ID);
 * Нажимаем Enter.
 #### 5. Если выбран режим IPA_Downloader, то далее:
-* Выбираем версию ipatool (рекомендована версия v3);
 * Вводим Apple ID (Enter email:);
 * Нажимаем Enter;
 * Вводим пароль (Enter password:);
@@ -256,6 +254,8 @@
 #### 12. Очистка данных:
 * Вводим список данных для очистки (список загруженных приложений, список приобретенных приложений, приложения в папке Apps);
 * Нажимаем Enter;
+* При выборе очистки списка загруженных приложений или списка приобретенных приложений выбираем аккаунт для очистки;
+* Нажимаем Enter;
 * Скрипт осуществит очистку выбранного типа данных.
 #### 13. Сброс настроек:
 * Скрипт осуществит выход из Apple ID и сброс всех настроек.
@@ -287,7 +287,10 @@
 * Purchase error: app not found - Покупка приложения не удалась, так как приложение удалено из App Store;
 * Purchase error: item is temporarily unavailable - Приложение не было приобретено на этом Apple ID ранее, покупка не удалась, так как приложение удалено из App Store;
 * No device found - Устройство не найдено. Убедитесь, что драйвер AppleMobileDeviceSupport64 установлен (актуально для Windows);
-* WARNING: could not locate Payload/App.app/SC_Info/App.sinf in archive! - В устанавливаемом ipa файле не найдена подпись приложения.
+* WARNING: could not locate Payload/App.app/SC_Info/App.sinf in archive! - В устанавливаемом ipa файле не найдена подпись приложения;
+* Error: anisette exited with code 1 - check that anisette binary is working. iTunes Not Found (0) - Не установлен iTunes с сайта Apple;
+* Error: anisette exited with code 1 - check that anisette binary is working. iCloud Not Found (1) - Не установлен iCloud с сайта Apple;
+* Login error: GSA SRP exception: GSA complete error -27952: Update iCloud for Windows to the latest version to sign in - Необходимо отключить расширенную защиту данных по пути Настройки-Аккаунт-iCloud-Расширенная защита данных.
 
 ## Решение проблем:
 #### Сообщить следующую информацию:
