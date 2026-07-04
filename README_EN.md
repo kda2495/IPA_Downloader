@@ -86,7 +86,6 @@ A complete set of the above programs/updates for Windows 7/8.1 is available at t
 * IPA_Installer (limited version with minimum iOS version check and app installation, works without logging in with Apple ID);
 * Press Enter.
 #### 5. If IPA_Downloader mode is selected, then:
-* Select ipatool version (v3 is recommended);
 * Enter Apple ID (Enter email:);
 * Press Enter;
 * Enter password (Enter password:);
@@ -155,7 +154,6 @@ A complete set of the above programs/updates for Windows 7/8.1 is available at t
 * IPA_Installer (limited version with minimum iOS version check and app installation, works without logging in with Apple ID);
 * Press Enter.
 #### 5. If IPA_Downloader mode is selected, then:
-* Select ipatool version (v3 is recommended);
 * Enter Apple ID (Enter email:);
 * Press Enter;
 * Enter password (Enter password:);
@@ -256,6 +254,8 @@ A complete set of the above programs/updates for Windows 7/8.1 is available at t
 #### 12. Clear data:
 * Enter the data list to clear (downloaded apps list, purchased apps list, apps in Apps folder);
 * Press Enter;
+* When choosing to clear either the downloaded apps list or the purchased apps list, select the specific account you want to clear;
+* Press Enter;
 * The script will clear the selected data type.
 #### 13. Reset settings:
 * The script will log out of the Apple ID and reset all settings.
@@ -287,7 +287,10 @@ A complete set of the above programs/updates for Windows 7/8.1 is available at t
 * Purchase error: app not found - App purchase failed because the app has been removed from the App Store;
 * Purchase error: item is temporarily unavailable - The app was not previously purchased on this Apple ID, the purchase failed because the app has been removed from the App Store;
 * No device found - Device not found. Make sure the AppleMobileDeviceSupport64 driver is installed (relevant for Windows);
-* WARNING: could not locate Payload/App.app/SC_Info/App.sinf in archive! - App signature not found in the installed ipa file.
+* WARNING: could not locate Payload/App.app/SC_Info/App.sinf in archive! - App signature not found in the installed ipa file;
+* Error: anisette exited with code 1 - check that anisette binary is working. iTunes Not Found (0) - iTunes from the Apple website is not installed;
+* Error: anisette exited with code 1 - check that anisette binary is working. iCloud Not Found (1) - iCloud from the Apple website is not installed;
+* Login error: GSA SRP exception: GSA complete error -27952: Update iCloud for Windows to the latest version to sign in - Advanced Data Protection needs to be disabled via Settings-Account Name-iCloud-Advanced Data Protection.
 
 ## Troubleshooting:
 #### Provide the following information:
