@@ -80,6 +80,8 @@ A complete set of the above programs/updates for Windows 7/8.1 is available at t
 #### 2. Double-click the Start_IPA_Downloader.bat file;
 #### 3. On the first run, initial configuration is required:
 * Select language;
+* Press Enter;
+* When update is available, choose to either visit GitHub to download new script version or continue with current version;
 * Press Enter.
 #### 4. Select one of the available modes:
 * IPA_Downloader (full version, works after logging in with Apple ID);
@@ -148,6 +150,8 @@ A complete set of the above programs/updates for Windows 7/8.1 is available at t
 * If necessary, double-click the Start_IPA_Downloader.command file again.
 #### 3. On the first run, initial configuration is required:
 * Select language;
+* Press Enter;
+* When update is available, choose to either visit GitHub to download new script version or continue with current version;
 * Press Enter.
 #### 4. Select one of the available modes:
 * IPA_Downloader (full version, works after logging in with Apple ID);
