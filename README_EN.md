@@ -41,7 +41,7 @@ A script for purchasing/downloading any available App Store apps, as well as res
 ## To run on Windows:
 * iTunes from the Apple website:  
 [Link to download iTunes from the Apple website](https://www.apple.com/itunes/download/win64)  
-* iCloud from the Apple website:  
+* iCloud from the Apple website (for ipatool v3 only):  
 [Link to download iCloud from the Apple website](https://updates.cdn-apple.com/2020/windows/001-39935-20200911-1A70AA56-F448-11EA-8CC0-99D41950005E/iCloudSetup.exe)
 
 ## To run on Windows 7 and 8.1:
@@ -88,11 +88,13 @@ A complete set of the above programs/updates for Windows 7/8.1 is available at t
 * IPA_Installer (limited version with minimum iOS version check and app installation, works without logging in with Apple ID);
 * Press Enter.
 #### 5. If IPA_Downloader mode is selected, then:
+* Select ipatool version;
+* Press Enter;
 * Enter Apple ID (Enter email:);
 * Press Enter;
 * Enter password (Enter password:);
 * Press Enter;
-* Tap Allow on your device and remember the two-factor authentication code;
+* Tap Allow on your device and remember the two-factor authentication (2FA) code;
 * Enter the two-factor authentication code (Enter 2FA code:);
 * Press Enter;
 * Enter the required command;
@@ -158,11 +160,13 @@ A complete set of the above programs/updates for Windows 7/8.1 is available at t
 * IPA_Installer (limited version with minimum iOS version check and app installation, works without logging in with Apple ID);
 * Press Enter.
 #### 5. If IPA_Downloader mode is selected, then:
+* Select ipatool version;
+* Press Enter;
 * Enter Apple ID (Enter email:);
 * Press Enter;
 * Enter password (Enter password:);
 * Press Enter;
-* Get a two-factor authentication code (turn on Airplane Mode on your device, go to Settings -> [Your Account] -> Sign-In & Security -> Get Verification Code);
+* Tap Allow on your device and remember the two-factor authentication (2FA) code;
 * Enter the two-factor authentication code (Enter 2FA code:);
 * Press Enter;
 * Enter the required command;
@@ -174,7 +178,8 @@ A complete set of the above programs/updates for Windows 7/8.1 is available at t
 #### Note:
 * If the script doesn't start, type in Terminal: `brew reinstall minizip ideviceinstaller`
 * Press Enter.
-* There is a bug in ipatool v3 for macOS: an unknown MacBook Pro is added to your account's device list (due to how anisette works). If necessary, you can remove it from the device list, but you will have to obtain a two-factor authentication code again.
+* When using ipatool v3 on macOS, to obtain the two-factor authentication (2FA) code, you need to put your device in Airplane Mode and navigate to Settings > Your account > Sign-In & Security > Get Verification Code.
+* There is a bug in ipatool v3 for macOS: an unknown MacBook Pro is added to your account's device list (due to how anisette works). If necessary, you can remove it from the device list, but you will have to obtain a two-factor authentication (2FA) code again.
 * You can use AirDrop to install the app: simply transfer file to your iPhone, and the app will be installed automatically.
 
 ## IPA_Downloader commands description:
