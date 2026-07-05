@@ -41,7 +41,7 @@
 ## Для запуска на Windows:
 * iTunes с сайта Apple:  
 [Ссылка для загрузки iTunes с сайта Apple](https://www.apple.com/itunes/download/win64)  
-* iCloud с сайта Apple (для версии ipatool v3):  
+* iCloud с сайта Apple (только для версии ipatool v3):  
 [Ссылка для загрузки iCloud с сайта Apple](https://updates.cdn-apple.com/2020/windows/001-39935-20200911-1A70AA56-F448-11EA-8CC0-99D41950005E/iCloudSetup.exe)
 
 ## Для запуска на Windows 7 и 8.1:
