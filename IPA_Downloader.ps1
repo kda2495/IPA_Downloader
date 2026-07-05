@@ -2,7 +2,7 @@
 Set-Location -Path $PSScriptRoot
 
 # Версия скрипта:
-$ScriptVersion = "3.9.3"
+$ScriptVersion = "3.9.4"
 
 # Определение запуска на Windows:
 $IsWin = [System.Runtime.InteropServices.RuntimeInformation]::IsOSPlatform([System.Runtime.InteropServices.OSPlatform]::Windows)
@@ -121,7 +121,7 @@ $Global:GitHubParsedList = $null
 # Перевод текста:
 $LangStrings = @{
 	"RU" = @{
-		"AccountClearedMsg" = "Готово. Данные аккаунта {0} удалены."
+		"AccountCleared" = "Готово. Данные аккаунта {0} удалены."
 		"AddedToDownloadedList" = "Добавлено в список: {0} - {1}"
 		"AddedToPurchasedList" = "Добавлено в список покупок: {0} - {1}"
 		"AlreadyInList" = "Уже есть в списке: {0} - {1}"
@@ -154,6 +154,7 @@ $LangStrings = @{
 		"ErrorNoApps" = "Ошибка: В папке Apps отсутствуют приложения."
 		"ErrorNoAppsFound" = "Ошибка: Приложения не найдены."
 		"ErrorPurchasedEmpty" = "Ошибка: История покупок пуста."
+		"ErrorUpdateCheck" = "Ошибка: Не удалось проверить наличие обновлений."
 		"FileName" = "Имя файла:"
 		"FileSaved" = "Готово. Файл сохранен в папку Apps."
 		"HeaderAppName" = "Название приложения"
@@ -200,9 +201,12 @@ $LangStrings = @{
 		"PurchasedListMenu3" = "3. Список не приобретенных приложений"
 		"SelectedApp" = "Выбрано приложение:"
 		"SelectedVer" = "Выбрана версия:"
+		"UpdateAvailableTitle" = "Доступно обновление (версия {0}). Перейти на страницу GitHub для загрузки?"
+		"UpdateMenu1" = "1. Да"
+		"UpdateMenu2" = "2. Нет"
 	}
 	"EN" = @{
-		"AccountClearedMsg" = "Done. Account {0} data cleared."
+		"AccountCleared" = "Done. Account {0} data cleared."
 		"AddedToDownloadedList" = "Added to list: {0} - {1}"
 		"AddedToPurchasedList" = "Added to purchased list: {0} - {1}"
 		"AlreadyInList" = "Already in list: {0} - {1}"
@@ -235,6 +239,7 @@ $LangStrings = @{
 		"ErrorNoApps" = "Error: No apps found in Apps folder."
 		"ErrorNoAppsFound" = "Error: No apps found."
 		"ErrorPurchasedEmpty" = "Error: Purchase history is empty."
+		"ErrorUpdateCheck" = "Error: Failed to check for updates."
 		"FileName" = "File name:"
 		"FileSaved" = "Done. File saved to Apps folder."
 		"HeaderAppName" = "App Name"
@@ -281,6 +286,9 @@ $LangStrings = @{
 		"PurchasedListMenu3" = "3. Not purchased apps list"
 		"SelectedApp" = "Selected app:"
 		"SelectedVer" = "Selected version:"
+		"UpdateAvailableTitle" = "Update available (version {0}). Go to GitHub page to download?"
+		"UpdateMenu1" = "1. Yes"
+		"UpdateMenu2" = "2. No"
 	}
 }
 
@@ -497,11 +505,11 @@ function Save-App-To-List {
 	$NewItem = [PSCustomObject]@{ name = $AppNameOnly; appid = $AppId }
 	$AccountApps = @($AccountApps) + $NewItem
 	
-	# Сортировка: Английский (0) -> Русский (1) -> Остальное (2), затем по алфавиту:
+	# Сортировка по названию:
 	$AccountApps = $AccountApps | Sort-Object @{Expression={
-		if ($_.name -match '^[A-Za-z]') { 0 }
-		elseif ($_.name -match '^[А-Яа-яЁё]') { 1 }
-		else { 2 }
+		if ($_.name -match '^[A-Za-z]') { 1 }
+		elseif ($_.name -match '^[А-Яа-яЁё]') { 2 }
+		else { 0 }
 	}}, name
 	
 	$Data."$Global:CurrentAppleID" = $AccountApps
@@ -999,32 +1007,27 @@ function Confirm-RequiredFiles {
 
 # Функция добавления папки с ipatool в PATH текущего процесса:
 function Update-PathFolder {
-	param (
-		[string]$NewFolder,
-		[string]$OldFolder = $null
-	)
+	param ([string]$NewFolder)
 	
 	$PathSeparator = if ($IsWin) { ';' } else { ':' }
-	$PathEntries = $env:Path -split [regex]::Escape($PathSeparator) | Where-Object {
-		$_ -and ($_ -ne $NewFolder) -and ($_ -ne $OldFolder)
+	$PathEntries = $env:Path -split [regex]::Escape($PathSeparator)
+	
+	# Добавляем папку, только если её ещё нет в PATH:
+	if ($NewFolder -notin $PathEntries) {
+		$env:Path = $env:Path + $PathSeparator + $NewFolder
 	}
-	$PathEntries += $NewFolder
-	$env:Path = ($PathEntries -join $PathSeparator)
 }
 
-# Функция установки путей к ipatool/ideviceinstaller для указанной папки версии и применения PATH/прав запуска:
+# Функция установки путей к ipatool/ideviceinstaller и применения PATH/прав запуска:
 function Set-IpatoolBinaryPaths {
-	param (
-		[string]$FolderPath,
-		[string]$OldFolderPath = $null
-	)
+	param ([string]$FolderPath)
 	
 	if ($IsWin) {
 		$script:ipatoolFilePath = Join-Path -Path $FolderPath -ChildPath "ipatool.exe"
 		$script:ideviceinstallerFilePath = Join-Path -Path $FolderPath -ChildPath "ideviceinstaller.exe"
 		
-		# Добавление папки с ipatool в PATH текущего процесса (с заменой старой папки при смене версии):
-		Update-PathFolder -NewFolder $FolderPath -OldFolder $OldFolderPath
+		# Добавление папки с ipatool в PATH текущего процесса:
+		Update-PathFolder -NewFolder $FolderPath
 	} else {
 		$script:ipatoolFilePath = Join-Path -Path $FolderPath -ChildPath "ipatool"
 		
@@ -1084,6 +1087,41 @@ function Invoke-InstallApps {
 	}
 }
 
+# Функция проверки обновлений:
+function Check-Update {
+	try {
+		$repoUrl = "https://api.github.com/repos/kda2495/IPA_Downloader/releases/latest"
+		$latestRelease = Invoke-RestMethod -Uri $repoUrl -UseBasicParsing -ErrorAction SilentlyContinue
+		
+		if ($latestRelease -and $latestRelease.tag_name) {
+			
+			# Извлечение версии:
+			$latestVerStr = [regex]::Match($latestRelease.tag_name, '\d+(\.\d+)+').Value
+			$currentVerStr = [regex]::Match($ScriptVersion, '\d+(\.\d+)+').Value
+			
+			# Проверка, что обе переменные не пустые, чтобы избежать ошибок конвертации:
+			if (![string]::IsNullOrEmpty($latestVerStr) -and ![string]::IsNullOrEmpty($currentVerStr)) {
+				if ([version]$latestVerStr -gt [version]$currentVerStr) {
+					Separator
+					$UpdateMenuText = @"
+$((Get-Lang 'UpdateAvailableTitle') -f $latestRelease.tag_name)
+$(Get-Lang 'UpdateMenu1')
+$(Get-Lang 'UpdateMenu2')`n
+"@
+					$Choice = Read-MenuChoice -MenuText $UpdateMenuText -OptionsCount 2
+					if ($Choice -eq '1') {
+						Start-Process "https://github.com/kda2495/IPA_Downloader/releases"
+						exit
+					}
+				}
+			}
+		}
+	} catch {
+		Separator
+		Write-Host (Get-Lang 'ErrorUpdateCheck') -ForegroundColor DarkRed
+	}
+}
+
 # Функция вывода баннера с текущим режимом работы, версией скрипта и системой/архитектурой:
 function Show-ModeBanner {
 	$ModeLabel = if ($Global:WorkMode -eq "Installer") { "IPA_Installer" } else { "IPA_Downloader" }
@@ -1093,7 +1131,7 @@ function Show-ModeBanner {
 
 # Функция первоначальной настройки (язык, режим работы):
 function Invoke-SetupWizard {
-	# Удаление содержимого папки .ipatool
+	# Удаление содержимого папки .ipatool:
 	Get-ChildItem -Path $ipatoolHomePath -ErrorAction SilentlyContinue | Remove-Item -Force -ErrorAction SilentlyContinue
 
 	# Запрос на выбор языка:
@@ -1107,6 +1145,12 @@ $(Get-Lang 'LanguageMenu2')`n
 	$Global:CurrentLang = if ($LanguageChoice -eq '1') { "RU" } else { "EN" }
 	Set-Setting -Key "Language" -Value $Global:CurrentLang
 	
+	# Проверка обновлений после выбора языка:
+	if (-not $Global:UpdateChecked) {
+		Check-Update
+		$Global:UpdateChecked = $true
+	}
+	
 	# Запрос на выбор режима работы:
 	Separator
 	$Mode_Menu = @"
@@ -1117,7 +1161,7 @@ $(Get-Lang 'ModeMenu2')`n
 	$ModeChoice = Read-MenuChoice -MenuText $Mode_Menu -OptionsCount 2
 	$Global:WorkMode = if ($ModeChoice -eq '2') { "Installer" } else { "Downloader" }
 	
-	# Режим IPA_Installer сохраняется сразу:
+	# Сохранение режима IPA_Installer:
 	if ($Global:WorkMode -eq "Installer") {
 		Set-Setting -Key "Mode" -Value $Global:WorkMode
 	}
@@ -1167,7 +1211,11 @@ $AppsIDListDownload = {
 	} catch {}
 }
 
-$BackgroundJob = Start-Job -ScriptBlock $AppsIDListDownload -ArgumentList "https://raw.githubusercontent.com/kda2495/IPA_Downloader/refs/heads/main/Apps_ID_List.txt", $AppsIDListPath, $AppsIDTempListPath
+$Runspace = [runspacefactory]::CreateRunspace()
+$Runspace.Open()
+$PSInstance = [powershell]::Create().AddScript($AppsIDListDownload).AddArgument("https://raw.githubusercontent.com/kda2495/IPA_Downloader/refs/heads/main/Apps_ID_List.txt").AddArgument($AppsIDListPath).AddArgument($AppsIDTempListPath)
+$PSInstance.Runspace = $Runspace
+$null = $PSInstance.BeginInvoke()
 
 # Функция режима IPA_Downloader:
 function Invoke-DownloaderMode {
@@ -1182,13 +1230,11 @@ function Invoke-DownloaderMode {
 	# Вход с Apple ID:
 	Connect-AppleID
 	
-	# Режим IPA_Downloader сохраняется только после успешной авторизации с Apple ID:
+	# Сохранение режима IPA_Downloader после успешной авторизации с Apple ID:
 	Set-Setting -Key "Mode" -Value "Downloader"
 	
 	# Основной цикл:
 	while (Test-Path "$AccountFilePath") {
-		# Удаление завершенных фоновых задач:
-		Get-Job | Where-Object { $_.State -eq 'Completed' } | Remove-Job -Force
 	
 		Separator
 		$MainMenu = @"
@@ -1340,7 +1386,7 @@ $(Get-Lang 'ClearMenu3')`n
 						} else {
 							$RawData = Get-Content "$PurchasedIDsFilePath" -Raw -Encoding UTF8
 							
-							# Если файл пуст или содержит только пустые скобки {}
+							# Если файл пуст или содержит только пустые скобки {}:
 							if ([string]::IsNullOrWhiteSpace($RawData) -or $RawData.Trim() -eq '{}') {
 								Remove-Item "$PurchasedIDsFilePath" -Force -ErrorAction SilentlyContinue
 								Separator
@@ -1350,7 +1396,7 @@ $(Get-Lang 'ClearMenu3')`n
 
 							$Data = $RawData | ConvertFrom-Json
 							
-							# Если старый формат (массив) или нет свойств
+							# Если старый формат (массив) или нет свойств:
 							if ($Data -isnot [System.Management.Automation.PSCustomObject] -or $Data.psobject.properties.Count -eq 0) {
 								Remove-Item "$PurchasedIDsFilePath" -Force -ErrorAction SilentlyContinue
 								Separator
@@ -1358,7 +1404,7 @@ $(Get-Lang 'ClearMenu3')`n
 								continue
 							}
 
-							# Формируем динамическое меню аккаунтов
+							# Формируем динамическое меню аккаунтов:
 							$Accounts = @($Data.psobject.properties.Name)
 							$AccMenuText = "$(Get-Lang 'ClearAccountMenuTitle') $(Get-Lang 'CancelStep')`n"
 							$Counter = 1
@@ -1373,23 +1419,23 @@ $(Get-Lang 'ClearMenu3')`n
 							if ($AccChoice -eq '0') { continue }
 							
 							if ([int]$AccChoice -eq $Counter) {
-								# Выбрано "Все аккаунты"
+								# Если выбрано "Все аккаунты":
 								Remove-Item "$PurchasedIDsFilePath" -Force -ErrorAction SilentlyContinue
 								Separator
 								Write-Host (Get-Lang "PurchasedListCleared")
 							} else {
-								# Удаляем выбранный аккаунт
+								# Удаляем данные выбранного аккаунта:
 								$SelectedAcc = $Accounts[[int]$AccChoice - 1]
-								$Data.psobject.properties.Remove($SelectedAcc)
 								
-								# Если аккаунтов больше не осталось, удаляем файл с диска
-								if ($Data.psobject.properties.Count -eq 0) {
+								# Если в файле отсутствуют аккаунты, то удаляем файл:
+								if ($Accounts.Count -le 1) {
 									Remove-Item "$PurchasedIDsFilePath" -Force -ErrorAction SilentlyContinue
 								} else {
+									$Data.psobject.properties.Remove($SelectedAcc)
 									$Data | ConvertTo-Json -Depth 5 | Set-Content "$PurchasedIDsFilePath" -Encoding UTF8
 								}
 								Separator
-								Write-Host ((Get-Lang "AccountClearedMsg") -f $SelectedAcc)
+								Write-Host ((Get-Lang "AccountCleared") -f $SelectedAcc)
 							}
 						}
 					}
@@ -1431,20 +1477,23 @@ $(Get-Lang 'ClearMenu3')`n
 							if ($AccChoice -eq '0') { continue }
 							
 							if ([int]$AccChoice -eq $Counter) {
+								# Если выбрано "Все аккаунты":
 								Remove-Item "$DownloadedIDsFilePath" -Force -ErrorAction SilentlyContinue
 								Separator
 								Write-Host (Get-Lang "DownloadedListCleared")
 							} else {
+								# Удаляем данные выбранного аккаунта:
 								$SelectedAcc = $Accounts[[int]$AccChoice - 1]
-								$Data.psobject.properties.Remove($SelectedAcc)
 								
-								if ($Data.psobject.properties.Count -eq 0) {
+								# Если в файле отсутствуют аккаунты, то удаляем файл:
+								if ($Accounts.Count -le 1) {
 									Remove-Item "$DownloadedIDsFilePath" -Force -ErrorAction SilentlyContinue
 								} else {
+									$Data.psobject.properties.Remove($SelectedAcc)
 									$Data | ConvertTo-Json -Depth 5 | Set-Content "$DownloadedIDsFilePath" -Encoding UTF8
 								}
 								Separator
-								Write-Host ((Get-Lang "AccountClearedMsg") -f $SelectedAcc)
+								Write-Host ((Get-Lang "AccountCleared") -f $SelectedAcc)
 							}
 						}
 					}
@@ -1547,11 +1596,18 @@ $(Get-Lang 'InstallerMenu5')`n
 }
 
 # Смена режима работы:
+$Global:UpdateChecked = $false
+
 while ($true) {
+	
 	# Если режим работы не выбран, то запускаем мастер настройки, иначе показываем баннер:
 	if ($null -eq $Global:WorkMode) {
 		Invoke-SetupWizard
 	} else {
+		if (-not $Global:UpdateChecked) {
+			Check-Update
+			$Global:UpdateChecked = $true
+		}
 		Show-ModeBanner
 	}
 	
