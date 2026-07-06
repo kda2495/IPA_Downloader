@@ -39,8 +39,9 @@ A script for purchasing/downloading any available App Store apps, as well as res
 * An Apple ID account with previously downloaded apps.
 
 ## To run on Windows:
-* iTunes from the Apple website:  
-[Link to download iTunes from the Apple website](https://www.apple.com/itunes/download/win64)  
+* iTunes from the Apple website (to support app installation via script):  
+[Link to download iTunes from the Apple website](https://www.apple.com/itunes/download/win64)
+* Instead of a full iTunes installation, you can extract the installer with any archiver and selectively install AppleMobileDeviceSupport64.msi.
 * iCloud from the Apple website (for ipatool v3 only):  
 [Link to download iCloud from the Apple website](https://updates.cdn-apple.com/2020/windows/001-39935-20200911-1A70AA56-F448-11EA-8CC0-99D41950005E/iCloudSetup.exe)
 
