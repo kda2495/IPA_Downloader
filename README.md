@@ -39,8 +39,9 @@
 * Аккаунт Apple ID с ранее загруженными приложениями.
 
 ## Для запуска на Windows:
-* iTunes с сайта Apple:  
-[Ссылка для загрузки iTunes с сайта Apple](https://www.apple.com/itunes/download/win64)  
+* iTunes с сайта Apple (для поддержки установки приложений через скрипт):  
+[Ссылка для загрузки iTunes с сайта Apple](https://www.apple.com/itunes/download/win64)
+* Вместо полной установки iTunes можно выполнить выборочную установку AppleMobileDeviceSupport64.msi, распаковав установщик iTunes любым архиватором.
 * iCloud с сайта Apple (только для версии ipatool v3):  
 [Ссылка для загрузки iCloud с сайта Apple](https://updates.cdn-apple.com/2020/windows/001-39935-20200911-1A70AA56-F448-11EA-8CC0-99D41950005E/iCloudSetup.exe)
 
