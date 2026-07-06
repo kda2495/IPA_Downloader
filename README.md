@@ -301,7 +301,7 @@
 * Error: anisette exited with code 1 - check that anisette binary is working. iCloud Not Found (1) - Не установлен iCloud с сайта Apple;
 * Login error: GSA SRP exception: GSA complete error -27952: Update iCloud for Windows to the latest version to sign in - Необходимо отключить расширенную защиту данных по пути Настройки-Аккаунт-iCloud-Расширенная защита данных.
 
-## Решение проблем:
+## При возникновении проблем:
 #### Сообщить следующую информацию:
 * Используемая система и версия;
 * Полный путь до папки IPA_Downloader;
