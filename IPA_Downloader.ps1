@@ -2,12 +2,12 @@
 Set-Location -Path $PSScriptRoot
 
 # Версия скрипта:
-$ScriptVersion = "3.9.4"
+$ScriptVersion = "3.9.5"
 
 # Определение запуска на Windows:
 $IsWin = [System.Runtime.InteropServices.RuntimeInformation]::IsOSPlatform([System.Runtime.InteropServices.OSPlatform]::Windows)
 
-# Папка MainApp и единый файл настроек (язык, режим работы):
+# Папка MainApp и единый файл настроек (язык, режим работы, версия ipatool):
 $MainAppFolderPath = Join-Path -Path $PSScriptRoot -ChildPath "MainApp"
 $SettingsFilePath = Join-Path -Path $MainAppFolderPath -ChildPath "Settings.txt"
 
@@ -33,10 +33,11 @@ function Set-Setting {
 	Set-Content -Path $SettingsFilePath -Value $Lines -Force
 }
 
-# Загрузка сохраненных настроек (язык, режим работы) или значений по умолчанию:
+# Загрузка сохраненных настроек (язык, режим работы, версия ipatool) или значений по умолчанию:
 $SavedSettings = Get-Settings
 $Global:CurrentLang = if ($SavedSettings['Language'] -match '^(RU|EN)$') { $SavedSettings['Language'] } else { "RU" }
 $Global:WorkMode = if ($SavedSettings['Mode'] -in @('Downloader', 'Installer')) { $SavedSettings['Mode'] } else { $null }
+$IpatoolVersion = if ($SavedSettings['IpatoolVersion'] -eq 'v3') { 'v3' } else { 'v2' }
 
 # Определение архитектуры macOS:
 if (-not $IsWin) {
@@ -45,17 +46,18 @@ if (-not $IsWin) {
 
 # Функция вычисления имени папки с ipatool под текущую систему/архитектуру:
 function Get-ArchSubFolder {
+	param ([ValidateSet("v2", "v3")][string]$Version)
 	if ($IsWin) {
-		return "windows_amd64_v3"
+		if ($Version -eq "v3") { return "windows_amd64_v3" } else { return "windows_amd64_v2" }
 	} elseif ($Arch -eq "arm64") {
-		return "macOS_arm64_v3"
+		if ($Version -eq "v3") { return "macOS_arm64_v3" } else { return "macOS_arm64_v2" }
 	} else {
-		return "macOS_amd64_v3"
+		if ($Version -eq "v3") { return "macOS_amd64_v3" } else { return "macOS_amd64_v2" }
 	}
 }
 
 # Определение системы и архитектуры:
-$ArchSubFolder = Get-ArchSubFolder
+$ArchSubFolder = Get-ArchSubFolder -Version $IpatoolVersion
 
 # Определение основных папок и переменных:
 $OSVersion = [System.Environment]::OSVersion
@@ -169,6 +171,7 @@ $LangStrings = @{
 		"InstallerMenu3" = "3. Страница проекта на GitHub"
 		"InstallerMenu4" = "4. Сменить язык (Change Language)"
 		"InstallerMenu5" = "5. Перейти в IPA_Downloader"
+		"IpatoolVersionMenuTitle" = "Выберите версию ipatool:"
 		"LangChanged" = "Язык успешно изменен на Русский."
 		"LanguageMenu1" = "1. Русский"
 		"LanguageMenu2" = "2. English"
@@ -254,6 +257,7 @@ $LangStrings = @{
 		"InstallerMenu3" = "3. GitHub project page"
 		"InstallerMenu4" = "4. Change Language (Сменить язык)"
 		"InstallerMenu5" = "5. Switch to IPA_Downloader"
+		"IpatoolVersionMenuTitle" = "Select ipatool version:"
 		"LangChanged" = "Language successfully changed to English."
 		"LanguageMenu1" = "1. Русский"
 		"LanguageMenu2" = "2. English"
@@ -464,6 +468,7 @@ function Save-App-To-List {
 	
 	$HistoryFile = if ($Type -eq "Purchased") { "$PurchasedIDsFilePath" } else { "$DownloadedIDsFilePath" }
 	
+	# Создание файла, если его нет:
 	if (!(Test-Path $HistoryFile)) {
 		$null = New-Item -Path $HistoryFile -ItemType "File" -Value '{}'
 	}
@@ -476,14 +481,14 @@ function Save-App-To-List {
 		$Data = New-Object PSCustomObject
 	}
 	
-	# Если файл в старом формате, конвертируем его:
+	# Конвертация старого формата (массив) в новый (объект с аккаунтами):
 	if ($Data -is [System.Collections.IEnumerable] -and $Data -isnot [System.Management.Automation.PSCustomObject]) {
 		$OldArray = $Data
 		$Data = New-Object PSCustomObject
 		$Data | Add-Member -MemberType NoteProperty -Name "UnknownAccount" -Value $OldArray
 	}
 	
-	# Получаем текущий список приложений для текущего аккаунта:
+	# Получение списка приложений для текущего аккаунта:
 	$AccountApps = @()
 	if ($Data.psobject.properties.match($Global:CurrentAppleID).Count -gt 0) {
 		$AccountApps = $Data."$Global:CurrentAppleID"
@@ -493,30 +498,54 @@ function Save-App-To-List {
 	
 	if ($AccountApps -isnot [System.Collections.IEnumerable]) { $AccountApps = @($AccountApps) }
 
-	# Проверка на дубликаты в рамках аккаунта:
+	# Загрузка списка:
+	Initialize-GitHub-List
+	
+	# Создание хэш-таблицы для поиска актуальных имен и индексов:
+	$ReferenceMap = @{}
+	for ($i = 0; $i -lt $Global:GitHubParsedList.Count; $i++) {
+		$RefApp = $Global:GitHubParsedList[$i]
+		$ReferenceMap[$RefApp.Id] = @{ Index = $i; Name = $RefApp.Name }
+	}
+
+	$IsDuplicate = $false
+
+	# Синхронизация имен сохраненных приложений с Apps_ID_List.txt и поиск дубликатов:
 	foreach ($Item in $AccountApps) {
+		if ($ReferenceMap.ContainsKey($Item.appid)) {
+			$Item.name = $ReferenceMap[$Item.appid].Name
+		}
 		if ($Item.appid -eq $AppId) {
-			Write-Host ((Get-Lang "AlreadyInList") -f $Item.name, $AppId)
-			return
+			$IsDuplicate = $true
 		}
 	}
 
-	# Добавление нового приложения:
-	$NewItem = [PSCustomObject]@{ name = $AppNameOnly; appid = $AppId }
-	$AccountApps = @($AccountApps) + $NewItem
+	# Добавление нового приложения, если это не дубликат:
+	if (-not $IsDuplicate) {
+		$NewItem = [PSCustomObject]@{ name = $AppNameOnly; appid = $AppId }
+		$AccountApps = @($AccountApps) + $NewItem
+	}
 	
-	# Сортировка по названию:
-	$AccountApps = $AccountApps | Sort-Object @{Expression={
-		if ($_.name -match '^[A-Za-z]') { 1 }
-		elseif ($_.name -match '^[А-Яа-яЁё]') { 2 }
-		else { 0 }
-	}}, name
+	# Сортировка: 
+	$AccountApps = $AccountApps | Sort-Object `
+		@{ Expression = { if ($ReferenceMap.ContainsKey($_.appid)) { $ReferenceMap[$_.appid].Index } else { [int]::MaxValue } } }, `
+		@{ Expression = { 
+			$name = [regex]::Replace("$($_.name)".ToUpper().Replace('Ё','Е'), '\d+', { $args[0].Value.PadLeft(10, '0') })
+			[BitConverter]::ToString([Text.Encoding]::BigEndianUnicode.GetBytes($name))
+		} }
 	
+	# Сохранение обновленных данных:
 	$Data."$Global:CurrentAppleID" = $AccountApps
 	$Data | ConvertTo-Json -Depth 5 | Set-Content $HistoryFile -Encoding UTF8
 
-	$MsgKey = if ($Type -eq "Purchased") { "AddedToPurchasedList" } else { "AddedToDownloadedList" }
-	Write-Host ((Get-Lang $MsgKey) -f $AppNameOnly, $AppId)
+	# Вывод сообщений:
+	if ($IsDuplicate) {
+		$CurrentName = if ($ReferenceMap.ContainsKey($AppId)) { $ReferenceMap[$AppId].Name } else { $AppNameOnly }
+		Write-Host ((Get-Lang "AlreadyInList") -f $CurrentName, $AppId)
+	} else {
+		$MsgKey = if ($Type -eq "Purchased") { "AddedToPurchasedList" } else { "AddedToDownloadedList" }
+		Write-Host ((Get-Lang $MsgKey) -f $AppNameOnly, $AppId)
+	}
 }
 
 # Функция инициализации и кэширования GitHub списка:
@@ -586,12 +615,12 @@ function Move-IPA-Files {
 					}
 				}
 				
-				# Применяем найденное имя, очищая его от недопустимых символов:
+				# Применение найденного имени, очищенного от недопустимых символов:
 				if (![string]::IsNullOrWhiteSpace($AppName) -and $AppName -ne "Unknown") {
 					$FinalAppName = $AppName -replace '[\\/:*?"<>|]', ''
 				}
 				
-				# Формируем имя файла и заменяем все пробелы на "_":
+				# Формирование имени файла и замена всех пробелов на "_":
 				$NewName = "$($FinalAppName)_$($Meta.Version)_iOS_$($Meta.MinIOS)+_$($Global:CurrentAppleID).ipa" -replace '\s+', '_'
 				$TargetFile = Join-Path -Path $AppsFolderPath -ChildPath $NewName
 				
@@ -1062,6 +1091,54 @@ function Get-MissingBinaryFiles {
 	}
 }
 
+# Функция установки конкретной версии ipatool:
+function Set-IpatoolVersion {
+	param ([ValidateSet("v2", "v3")][string]$Version)
+	
+	$OldBinaryFolderPath = $script:BinaryFolderPath
+	$NewArchSubFolder = Get-ArchSubFolder -Version $Version
+	$NewBinaryFolderPath = Join-Path -Path $MainAppFolderPath -ChildPath $NewArchSubFolder
+	
+	# Проверка наличия необходимых файлов в папке выбранной версии:
+	$MissingVersionFiles = Get-MissingBinaryFiles -FolderPath $NewBinaryFolderPath
+	if ($MissingVersionFiles) {
+		Separator
+		Write-Host (Get-Lang "ErrorMissingFiles") -ForegroundColor DarkRed
+		$MissingVersionFiles | ForEach-Object { Write-Host "$_" -ForegroundColor DarkRed }
+		return $false
+	}
+	
+	# Применение выбранной версии ipatool:
+	$script:IpatoolVersion = $Version
+	$script:ArchSubFolder = $NewArchSubFolder
+	$script:BinaryFolderPath = $NewBinaryFolderPath
+	
+	Set-IpatoolBinaryPaths -FolderPath $script:BinaryFolderPath -OldFolderPath $OldBinaryFolderPath
+	
+	return $true
+}
+
+# Функция запроса версии ipatool с проверкой наличия файлов:
+function Invoke-IpatoolVersionPrompt {
+	$V2Label = "ipatool_$(Get-ArchSubFolder -Version 'v2')"
+	$V3Label = "ipatool_$(Get-ArchSubFolder -Version 'v3')"
+	
+	while ($true) {
+		Separator
+		$Version_Menu = @"
+$(Get-Lang 'IpatoolVersionMenuTitle')
+1. $V2Label
+2. $V3Label`n
+"@
+		$VersionChoice = Read-MenuChoice -MenuText $Version_Menu -OptionsCount 2
+		$SelectedVersion = if ($VersionChoice -eq '2') { 'v3' } else { 'v2' }
+		
+		if (Set-IpatoolVersion -Version $SelectedVersion) {
+			return
+		}
+	}
+}
+
 # Функция установки приложений из папки Apps:
 function Invoke-InstallApps {
 	if ([string]::IsNullOrWhiteSpace($script:ideviceinstallerFilePath)) {
@@ -1122,6 +1199,28 @@ $(Get-Lang 'UpdateMenu2')`n
 	}
 }
 
+# Функция вывода предупреждения:
+function Check-WarningMessage {
+	try {
+		$WarningUrl = "https://raw.githubusercontent.com/kda2495/IPA_Downloader/refs/heads/main/Warning_Message.txt"
+		$WarningText = Invoke-RestMethod -Uri $WarningUrl -UseBasicParsing -ErrorAction SilentlyContinue
+		
+		if (![string]::IsNullOrWhiteSpace($WarningText)) {
+			# Разбиваем текст на отдельные строки и отсекаем пустые:
+			$Lines = $WarningText -split '\r?\n' | Where-Object { $_ -match '\S' }
+			
+			if ($Lines) {
+				Separator
+				# Выводим предупреждение для каждой строки:
+				foreach ($Line in $Lines) {
+					Write-Warning $Line.Trim()
+				}
+			}
+		}
+	} catch {
+	}
+}
+
 # Функция вывода баннера с текущим режимом работы, версией скрипта и системой/архитектурой:
 function Show-ModeBanner {
 	$ModeLabel = if ($Global:WorkMode -eq "Installer") { "IPA_Installer" } else { "IPA_Downloader" }
@@ -1129,7 +1228,7 @@ function Show-ModeBanner {
 	Write-Host "$ModeLabel $ScriptVersion ($ArchSubFolder)"
 }
 
-# Функция первоначальной настройки (язык, режим работы):
+# Функция первоначальной настройки (язык, режим работы, версия ipatool):
 function Invoke-SetupWizard {
 	# Удаление содержимого папки .ipatool:
 	Get-ChildItem -Path $ipatoolHomePath -ErrorAction SilentlyContinue | Remove-Item -Force -ErrorAction SilentlyContinue
@@ -1151,6 +1250,12 @@ $(Get-Lang 'LanguageMenu2')`n
 		$Global:UpdateChecked = $true
 	}
 	
+	# Вывод сообщения:
+	if (-not $Global:WarningChecked) {
+		Check-WarningMessage
+		$Global:WarningChecked = $true
+	}
+	
 	# Запрос на выбор режима работы:
 	Separator
 	$Mode_Menu = @"
@@ -1164,6 +1269,11 @@ $(Get-Lang 'ModeMenu2')`n
 	# Сохранение режима IPA_Installer:
 	if ($Global:WorkMode -eq "Installer") {
 		Set-Setting -Key "Mode" -Value $Global:WorkMode
+	}
+	
+	# Версия ipatool запрашивается только для режима IPA_Downloader:
+	if ($Global:WorkMode -eq "Downloader") {
+		Invoke-IpatoolVersionPrompt
 	}
 	
 	Show-ModeBanner
@@ -1208,7 +1318,8 @@ $AppsIDListDownload = {
 				Remove-Item $TempPath -Force
 			}
 		}
-	} catch {}
+	} catch {
+	}
 }
 
 $Runspace = [runspacefactory]::CreateRunspace()
@@ -1232,6 +1343,7 @@ function Invoke-DownloaderMode {
 	
 	# Сохранение режима IPA_Downloader после успешной авторизации с Apple ID:
 	Set-Setting -Key "Mode" -Value "Downloader"
+	Set-Setting -Key "IpatoolVersion" -Value $script:IpatoolVersion
 	
 	# Основной цикл:
 	while (Test-Path "$AccountFilePath") {
@@ -1583,6 +1695,7 @@ $(Get-Lang 'InstallerMenu5')`n
 			
 			# 5. Перейти в IPA_Downloader:
 			"5" {
+				Invoke-IpatoolVersionPrompt
 				$Global:WorkMode = "Downloader"
 				return
 			}
@@ -1597,6 +1710,7 @@ $(Get-Lang 'InstallerMenu5')`n
 
 # Смена режима работы:
 $Global:UpdateChecked = $false
+$Global:WarningChecked = $false
 
 while ($true) {
 	
@@ -1608,12 +1722,18 @@ while ($true) {
 			Check-Update
 			$Global:UpdateChecked = $true
 		}
+		
+		if (-not $Global:WarningChecked) {
+			Check-WarningMessage
+			$Global:WarningChecked = $true
+		}
+		
 		Show-ModeBanner
 	}
 	
 	# Проверка наличия необходимых файлов:
 	if ($IsWin) {
-		# Windows: ищем ideviceinstaller.exe и ipatool.exe в локальной папке:
+		# Windows: поиск ideviceinstaller.exe и ipatool.exe в локальной папке:
 		$MissingMainAppFiles = Get-MissingBinaryFiles -FolderPath $BinaryFolderPath
 		Confirm-RequiredFiles -MissingFiles $MissingMainAppFiles
 		
