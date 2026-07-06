@@ -89,7 +89,7 @@ A complete set of the above programs/updates for Windows 7/8.1 is available at t
 * IPA_Installer (limited version with minimum iOS version check and app installation, works without logging in with Apple ID);
 * Press Enter.
 #### 5. If IPA_Downloader mode is selected, then:
-* Select ipatool version;
+* Select ipatool version (v2 by default; if v2 doesn't work, select v3);
 * Press Enter;
 * Enter Apple ID (Enter email:);
 * Press Enter;
@@ -161,7 +161,7 @@ A complete set of the above programs/updates for Windows 7/8.1 is available at t
 * IPA_Installer (limited version with minimum iOS version check and app installation, works without logging in with Apple ID);
 * Press Enter.
 #### 5. If IPA_Downloader mode is selected, then:
-* Select ipatool version;
+* Select ipatool version (v2 by default; if v2 doesn't work, select v3);
 * Press Enter;
 * Enter Apple ID (Enter email:);
 * Press Enter;
