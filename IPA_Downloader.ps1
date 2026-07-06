@@ -1250,7 +1250,7 @@ $(Get-Lang 'LanguageMenu2')`n
 		$Global:UpdateChecked = $true
 	}
 	
-	# Вывод сообщения:
+	# Вывод предупреждения:
 	if (-not $Global:WarningChecked) {
 		Check-WarningMessage
 		$Global:WarningChecked = $true
