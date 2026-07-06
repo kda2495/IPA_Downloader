@@ -271,7 +271,7 @@ A complete set of the above programs/updates for Windows 7/8.1 is available at t
 * The script will log out of the Apple ID and reset all settings.
 #### 14. GitHub project page:
 * The script will navigate to the project page on GitHub.
-#### 15. Change Language:
+#### 15. Change Language (Сменить язык):
 * The script will change its interface language.
 
 ## IPA_Installer commands description:
