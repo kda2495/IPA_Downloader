@@ -2,7 +2,7 @@
 Set-Location -Path $PSScriptRoot
 
 # Версия скрипта:
-$ScriptVersion = "3.9.5"
+$ScriptVersion = "3.9.6"
 
 # Определение запуска на Windows:
 $IsWin = [System.Runtime.InteropServices.RuntimeInformation]::IsOSPlatform([System.Runtime.InteropServices.OSPlatform]::Windows)
@@ -62,6 +62,7 @@ $ArchSubFolder = Get-ArchSubFolder -Version $IpatoolVersion
 # Определение основных папок и переменных:
 $OSVersion = [System.Environment]::OSVersion
 $WindowsVersion = [System.Environment]::OSVersion.Version
+$PSVersion = $PSVersionTable.PSVersion.ToString()
 $BinaryFolderPath = Join-Path -Path $MainAppFolderPath -ChildPath $ArchSubFolder
 $ListsFolderPath = Join-Path -Path $PSScriptRoot -ChildPath "Lists"
 $DownloadedIDsFilePath = Join-Path -Path $ListsFolderPath -ChildPath "Downloaded_IDs.json"
@@ -1199,28 +1200,6 @@ $(Get-Lang 'UpdateMenu2')`n
 	}
 }
 
-# Функция вывода предупреждения:
-function Check-WarningMessage {
-	try {
-		$WarningUrl = "https://raw.githubusercontent.com/kda2495/IPA_Downloader/refs/heads/main/Warning_Message.txt"
-		$WarningText = Invoke-RestMethod -Uri $WarningUrl -UseBasicParsing -ErrorAction SilentlyContinue
-		
-		if (![string]::IsNullOrWhiteSpace($WarningText)) {
-			# Разбиваем текст на отдельные строки и отсекаем пустые:
-			$Lines = $WarningText -split '\r?\n' | Where-Object { $_ -match '\S' }
-			
-			if ($Lines) {
-				Separator
-				# Выводим предупреждение для каждой строки:
-				foreach ($Line in $Lines) {
-					Write-Warning $Line.Trim()
-				}
-			}
-		}
-	} catch {
-	}
-}
-
 # Функция вывода баннера с текущим режимом работы, версией скрипта и системой/архитектурой:
 function Show-ModeBanner {
 	$ModeLabel = if ($Global:WorkMode -eq "Installer") { "IPA_Installer" } else { "IPA_Downloader" }
@@ -1250,12 +1229,6 @@ $(Get-Lang 'LanguageMenu2')`n
 		$Global:UpdateChecked = $true
 	}
 	
-	# Вывод предупреждения:
-	if (-not $Global:WarningChecked) {
-		Check-WarningMessage
-		$Global:WarningChecked = $true
-	}
-	
 	# Запрос на выбор режима работы:
 	Separator
 	$Mode_Menu = @"
@@ -1282,6 +1255,9 @@ $(Get-Lang 'ModeMenu2')`n
 # Операционная система:
 Separator
 Write-Host "$OSVersion"
+
+# Версия PowerShell:
+Write-Host "PowerShell $PSVersion"
 
 # Проверка на наличие базовых папок:
 foreach ($Dir in @("$AppsFolderPath", "$ListsFolderPath", "$MainAppFolderPath", "$ipatoolHomePath")) {
@@ -1710,7 +1686,6 @@ $(Get-Lang 'InstallerMenu5')`n
 
 # Смена режима работы:
 $Global:UpdateChecked = $false
-$Global:WarningChecked = $false
 
 while ($true) {
 	
@@ -1721,11 +1696,6 @@ while ($true) {
 		if (-not $Global:UpdateChecked) {
 			Check-Update
 			$Global:UpdateChecked = $true
-		}
-		
-		if (-not $Global:WarningChecked) {
-			Check-WarningMessage
-			$Global:WarningChecked = $true
 		}
 		
 		Show-ModeBanner
