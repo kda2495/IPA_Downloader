@@ -106,35 +106,39 @@ A complete set of the above programs/updates for Windows 7/8.1 is available at t
 
 ## To run on macOS:
 #### All steps must be performed strictly in the following order:
-#### 1. Install PowerShell:
-* Follow the link to download PowerShell:  
-[Link to download PowerShell](https://github.com/PowerShell/PowerShell/releases)
-* Find the latest PowerShell release (currently 7.6.3, on older versions of macOS this version of PowerShell may not be supported);
-* Click Show all assets;
-* Download the files: powershell-7.6.3-osx-arm64.pkg (for Mac on Apple Silicon) or powershell-7.6.3-osx-x64.pkg (for Mac on Intel);
-* Install powershell-7.6.3-osx-arm64.pkg (for Mac on Apple Silicon) or powershell-7.6.3-osx-x64.pkg (for Mac on Intel).
-#### 2. Install the Homebrew package manager:
+#### 1. Install the Homebrew package manager:
 * Open Terminal (Command + Space, then type Terminal in the Spotlight search field);
 * Type in Terminal: `/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"`
 * Press Enter;
 * During the Homebrew installation, you may be prompted to enter your password;
 * After Homebrew is installed, the text ==> Next steps will appear at the bottom of the Terminal.
-#### 3. When installing on a Mac with Intel processors:
+#### 2. When installing on a Mac with Intel processors:
 * Type in Terminal: `echo >> ~/.zprofile`
 * Press Enter;
 * Type in Terminal: `echo 'eval "$(/usr/local/bin/brew shellenv zsh)"' >> ~/.zprofile`
 * Press Enter;
 * Type in Terminal: `eval "$(/usr/local/bin/brew shellenv zsh)"`
 * Press Enter.
-#### 3.1. When installing on a Mac with Apple Silicon processors:
+#### 2.1. When installing on a Mac with Apple Silicon processors:
 * Type in Terminal: `echo >> ~/.zprofile`
 * Press Enter;
 * Type in Terminal: `echo 'eval "$(/opt/homebrew/bin/brew shellenv zsh)"' >> ~/.zprofile`
 * Press Enter;
 * Type in Terminal: `eval "$(/opt/homebrew/bin/brew shellenv zsh)"`
 * Press Enter.
-#### 4. Install the minizip and ideviceinstaller packages:
-* Type in Terminal: `brew install minizip ideviceinstaller`
+#### 3. Install ideviceinstaller, minizip and powershell packages:
+* Type in Terminal: `brew install ideviceinstaller minizip powershell`
+* Press Enter.
+
+#### 3.1 Installing PowerShell on legacy macOS Versions (e.g. Catalina)
+* Repeat steps 1–2 from the previous section;
+* Go to the PowerShell download page:  
+  [PowerShell Download Link](https://github.com/PowerShell/PowerShell/releases)
+* Find the appropriate PowerShell version (for macOS Catalina, use 7.3.12);
+* Click Show all assets;
+* Download the file: powershell-7.3.12-osx-x64.pkg;
+* Install powershell-7.3.12-osx-x64.pkg;
+* Open Terminal and run the following command: `brew install ideviceinstaller minizip`
 * Press Enter.
 
 ## How to use (macOS):
@@ -177,8 +181,7 @@ A complete set of the above programs/updates for Windows 7/8.1 is available at t
 * Press Enter.
 
 #### Note:
-* If the script doesn't start, type in Terminal: `brew reinstall minizip ideviceinstaller`
-* Press Enter.
+* To update Homebrew and all its components, open Terminal, run the following command: `brew update && brew upgrade && brew cleanup` and press Enter.
 * When using ipatool v3 on macOS, to obtain the two-factor authentication (2FA) code, you need to put your device in Airplane Mode and navigate to Settings > Your account > Sign-In & Security > Get Verification Code.
 * There is a bug in ipatool v3 for macOS: an unknown MacBook Pro is added to your account's device list (due to how anisette works). If necessary, you can remove it from the device list, but you will have to obtain a two-factor authentication (2FA) code again.
 * You can use AirDrop to install the app: simply transfer file to your iPhone, and the app will be installed automatically.
