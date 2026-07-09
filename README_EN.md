@@ -307,7 +307,7 @@ A complete set of the above programs/updates for Windows 7/8.1 is available at t
 
 ## If you encounter an issue:
 #### Provide the following information:
-* The system and version you are using;
+* The system and ipatool version you are using;
 * The full path to the IPA_Downloader folder;
 * A screenshot of the error;
 * The sequence of actions to reproduce the error.
