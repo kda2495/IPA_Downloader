@@ -129,15 +129,14 @@ A complete set of the above programs/updates for Windows 7/8.1 is available at t
 #### 3. Install ideviceinstaller, minizip and powershell packages:
 * Type in Terminal: `brew install ideviceinstaller minizip powershell`
 * Press Enter.
-
-#### 3.1 Installing PowerShell on legacy macOS Versions (e.g. Catalina)
+#### 3.1 Alternative PowerShell installation:
 * Repeat steps 1–2 from the previous section;
 * Go to the PowerShell download page:  
   [PowerShell Download Link](https://github.com/PowerShell/PowerShell/releases)
-* Find the appropriate PowerShell version (for macOS Catalina, use 7.3.12);
+* Find the appropriate PowerShell version;
 * Click Show all assets;
-* Download the file: powershell-7.3.12-osx-x64.pkg;
-* Install powershell-7.3.12-osx-x64.pkg;
+* Download the file: powershell-@-osx-x64.pkg (for Mac with Intel CPU) or powershell-@-osx-arm64.pkg (for Mac with Apple Silicon CPU);
+* Install powershell-@-osx-x64.pkg (for Mac with Intel CPU) or powershell-@-osx-arm64.pkg (for Mac with Apple Silicon CPU);
 * Open Terminal and run the following command: `brew install ideviceinstaller minizip`
 * Press Enter.
 
@@ -181,6 +180,7 @@ A complete set of the above programs/updates for Windows 7/8.1 is available at t
 * Press Enter.
 
 #### Note:
+* macOS Catalina supports PowerShell version 7.3.12.
 * To update Homebrew and all its components, open Terminal, run the following command: `brew update && brew upgrade && brew cleanup` and press Enter.
 * When using ipatool v3 on macOS, to obtain the two-factor authentication (2FA) code, you need to put your device in Airplane Mode and navigate to Settings > Your account > Sign-In & Security > Get Verification Code.
 * There is a bug in ipatool v3 for macOS: an unknown MacBook Pro is added to your account's device list (due to how anisette works). If necessary, you can remove it from the device list, but you will have to obtain a two-factor authentication (2FA) code again.
