@@ -129,15 +129,14 @@
 #### 3. Устанавливаем пакеты ideviceinstaller, minizip и powershell:
 * Вводим в Терминал: `brew install ideviceinstaller minizip powershell`
 * Нажимаем Enter.
-
-#### 3.1 Установка PowerShell на старых версиях macOS (например, Catalina):
+#### 3.1 Альтернативная установка PowerShell:
 * Повторяем шаги 1-2 из предыдущего пункта;
 * Переходим по ссылке для загрузки PowerShell:  
 [Ссылка для загрузки PowerShell](https://github.com/PowerShell/PowerShell/releases)
-* Находим версию PowerShell (для Catalina это 7.3.12);
+* Находим версию PowerShell;
 * Нажимаем Show all assets;
-* Загружаем файл: powershell-7.3.12-osx-x64.pkg;
-* Производим установку powershell-7.3.12-osx-x64.pkg;
+* Загружаем файл: powershell-@-osx-x64.pkg (для Mac с процессорами Intel) или powershell-@-osx-arm64.pkg (для Mac с процессорами Apple Silicon);
+* Производим установку powershell-@-osx-x64.pkg (для Mac с процессорами Intel) или powershell-@-osx-arm64.pkg (для Mac с процессорами Apple Silicon);
 * Вводим в Терминал: `brew install ideviceinstaller minizip`
 * Нажимаем Enter.
 
@@ -181,6 +180,7 @@
 * Нажимаем Enter.
 
 #### Примечание:
+* Для установки PowerShell на macOS Catalina подходит версия 7.3.12.
 * Для обновления Homebrew и всех компонентов вводим в Терминал: `brew update && brew upgrade && brew cleanup` и нажимаем Enter.
 * При использовании ipatool v3 на macOS для получения кода двухфакторной аутентификации (2FA) необходимо ввести устройство в авиарежим, перейти в Настройки > Ваш аккаунт > Вход и безопасность > Получить код проверки.
 * При использовании ipatool v3 на macOS есть баг: в список устройств учетной записи добавляется неизвестный MacBook Pro (связано с работой anisette), при необходимости его можно удалить из списка устройств, но придется заново получить код двухфакторной аутентификации (2FA).
