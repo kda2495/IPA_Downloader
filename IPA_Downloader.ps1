@@ -2,7 +2,7 @@
 Set-Location -Path $PSScriptRoot
 
 # Версия скрипта:
-$ScriptVersion = "3.9.6"
+$ScriptVersion = "3.9.7"
 
 # Определение запуска на Windows:
 $IsWin = [System.Runtime.InteropServices.RuntimeInformation]::IsOSPlatform([System.Runtime.InteropServices.OSPlatform]::Windows)
@@ -169,7 +169,7 @@ $LangStrings = @{
 		"InstallApp" = "Установка:"
 		"InstallerMenu1" = "1. Проверка минимальной версии iOS для приложений в папке Apps"
 		"InstallerMenu2" = "2. Установка приложений из папки Apps"
-		"InstallerMenu3" = "3. Страница проекта на GitHub"
+		"InstallerMenu3" = "3. Поддержка проекта"
 		"InstallerMenu4" = "4. Сменить язык (Change Language)"
 		"InstallerMenu5" = "5. Перейти в IPA_Downloader"
 		"IpatoolVersionMenuTitle" = "Выберите версию ipatool:"
@@ -192,7 +192,7 @@ $LangStrings = @{
 		"Menu11" = "11. Установка приложений из папки Apps"
 		"Menu12" = "12. Очистка данных"
 		"Menu13" = "13. Сброс настроек"
-		"Menu14" = "14. Страница проекта на GitHub"
+		"Menu14" = "14. Поддержка проекта"
 		"Menu15" = "15. Сменить язык (Change Language)"
 		"MenuTitle" = "Введите команду:"
 		"MinIOS" = "Минимальная версия iOS:"
@@ -255,7 +255,7 @@ $LangStrings = @{
 		"InstallApp" = "Installing:"
 		"InstallerMenu1" = "1. Check minimum iOS version for apps in Apps folder"
 		"InstallerMenu2" = "2. Install apps from Apps folder"
-		"InstallerMenu3" = "3. GitHub project page"
+		"InstallerMenu3" = "3. Project support"
 		"InstallerMenu4" = "4. Change Language (Сменить язык)"
 		"InstallerMenu5" = "5. Switch to IPA_Downloader"
 		"IpatoolVersionMenuTitle" = "Select ipatool version:"
@@ -278,7 +278,7 @@ $LangStrings = @{
 		"Menu11" = "11. Install apps from Apps folder"
 		"Menu12" = "12. Clear data"
 		"Menu13" = "13. Reset settings"
-		"Menu14" = "14. GitHub project page"
+		"Menu14" = "14. Project support"
 		"Menu15" = "15. Change Language (Сменить язык)"
 		"MenuTitle" = "Enter a command:"
 		"MinIOS" = "Minimum iOS version:"
@@ -1610,9 +1610,9 @@ $(Get-Lang 'ClearMenu3')`n
 				return
 			}
 			
-			# 14. Страница проекта на GitHub:
+			# 14. Поддержка проекта:
 			"14" {
-				Start-Process "https://github.com/kda2495/IPA_Downloader"
+				Start-Process "https://github.com/kda2495/IPA_Downloader#поддержка-проекта"
 			}
 			
 			# 15. Сменить язык (Change Language):
@@ -1656,9 +1656,9 @@ $(Get-Lang 'InstallerMenu5')`n
 				Invoke-InstallApps
 			}
 			
-			# 3. Страница проекта на GitHub:
+			# 3. Поддержка проекта:
 			"3" {
-				Start-Process "https://github.com/kda2495/IPA_Downloader"
+				Start-Process "https://github.com/kda2495/IPA_Downloader#поддержка-проекта"
 			}
 			
 			# 4. Сменить язык (Change Language):
