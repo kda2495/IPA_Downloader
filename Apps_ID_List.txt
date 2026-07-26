@@ -172,6 +172,7 @@ Yota: 871741640
 YouTube: 544007664
 YouTube Music: 1017492454
 YouTube Детям: 936971630
+YPlaces: 6448745076
 Zarina: 1640213769
 Zoom Workplace: 546505307
 Аверс Бизнес: 1553926438
