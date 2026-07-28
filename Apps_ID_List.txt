@@ -17,6 +17,7 @@ AmoCRM: 1128315486
 AppBank (MoodPetal): 6760329045
 AppBank (Document List): 6762059195
 Au.ru (Барахолка 24: объявления 24/7): 6760170997
+Avanpost Authenticator: 6758136708
 Boosty: 1619978403
 CamScanner: 388627783
 CapCut: 1500855883
