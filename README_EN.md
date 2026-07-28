@@ -52,7 +52,7 @@ A script for purchasing/downloading any available App Store apps, as well as res
 [Link to download UpdRootsCert](https://disk.yandex.ru/d/SdHMgwJ55MTQRg)  
 * Download the UpdRootsCert.exe file;  
 * Run the UpdRootsCert.exe file;  
-* Check the boxes: System Root Certificates, Russian Ministry of Digital Development Certificates, Add a monthly task to the Task Scheduler;  
+* Check the boxes: System Root Certificates, Add a monthly task to the Task Scheduler;  
 * Click the Install button.
 
 #### 2. Install .NET Framework 4.8:
