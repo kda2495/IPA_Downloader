@@ -270,7 +270,7 @@ A complete set of the above programs/updates for Windows 7/8.1 is available at t
 * When choosing to clear either the downloaded apps list or the purchased apps list, select the specific account you want to clear;
 * Press Enter;
 * The script will clear the selected data type.
-#### 13. Reset settings:
+#### 13. Log out of Apple ID + reset settings:
 * The script will log out of the Apple ID and reset all settings.
 #### 14. GitHub project page:
 * The script will navigate to the project page on GitHub.
