@@ -2,7 +2,7 @@
 Set-Location -Path $PSScriptRoot
 
 # Версия скрипта:
-$ScriptVersion = "3.9.7"
+$ScriptVersion = "3.9.8"
 
 # Определение запуска на Windows:
 $IsWin = [System.Runtime.InteropServices.RuntimeInformation]::IsOSPlatform([System.Runtime.InteropServices.OSPlatform]::Windows)
@@ -160,8 +160,6 @@ $LangStrings = @{
 		"ErrorUpdateCheck" = "Ошибка: Не удалось проверить наличие обновлений."
 		"FileName" = "Имя файла:"
 		"FileSaved" = "Готово. Файл сохранен в папку Apps."
-		"HeaderAppName" = "Название приложения"
-		"HeaderAppID" = "ID приложения"
 		"HeaderFileName" = "Имя файла"
 		"HeaderMinIOS" = "Мин. iOS"
 		"HeaderVerID" = "ID версии"
@@ -171,7 +169,8 @@ $LangStrings = @{
 		"InstallerMenu2" = "2. Установка приложений из папки Apps"
 		"InstallerMenu3" = "3. Поддержка проекта"
 		"InstallerMenu4" = "4. Сменить язык (Change Language)"
-		"InstallerMenu5" = "5. Перейти в IPA_Downloader"
+		"InstallerMenu5" = "5. Сброс настроек"
+		"InstallerMenu6" = "6. Перейти в IPA_Downloader"
 		"IpatoolVersionMenuTitle" = "Выберите версию ipatool:"
 		"LangChanged" = "Язык успешно изменен на Русский."
 		"LanguageMenu1" = "1. Русский"
@@ -191,7 +190,7 @@ $LangStrings = @{
 		"Menu10" = "10. Проверка минимальной версии iOS для приложений в папке Apps"
 		"Menu11" = "11. Установка приложений из папки Apps"
 		"Menu12" = "12. Очистка данных"
-		"Menu13" = "13. Сброс настроек"
+		"Menu13" = "13. Выход из Apple ID + сброс настроек"
 		"Menu14" = "14. Поддержка проекта"
 		"Menu15" = "15. Сменить язык (Change Language)"
 		"MenuTitle" = "Введите команду:"
@@ -246,8 +245,6 @@ $LangStrings = @{
 		"ErrorUpdateCheck" = "Error: Failed to check for updates."
 		"FileName" = "File name:"
 		"FileSaved" = "Done. File saved to Apps folder."
-		"HeaderAppName" = "App Name"
-		"HeaderAppID" = "App ID"
 		"HeaderFileName" = "File name"
 		"HeaderMinIOS" = "Min. iOS"
 		"HeaderVerID" = "Version ID"
@@ -257,7 +254,8 @@ $LangStrings = @{
 		"InstallerMenu2" = "2. Install apps from Apps folder"
 		"InstallerMenu3" = "3. Project support"
 		"InstallerMenu4" = "4. Change Language (Сменить язык)"
-		"InstallerMenu5" = "5. Switch to IPA_Downloader"
+		"InstallerMenu5" = "5. Reset settings"
+		"InstallerMenu6" = "6. Switch to IPA_Downloader"
 		"IpatoolVersionMenuTitle" = "Select ipatool version:"
 		"LangChanged" = "Language successfully changed to English."
 		"LanguageMenu1" = "1. Русский"
@@ -277,7 +275,7 @@ $LangStrings = @{
 		"Menu10" = "10. Check minimum iOS version for apps in Apps folder"
 		"Menu11" = "11. Install apps from Apps folder"
 		"Menu12" = "12. Clear data"
-		"Menu13" = "13. Reset settings"
+		"Menu13" = "13. Log out of Apple ID + reset settings"
 		"Menu14" = "14. Project support"
 		"Menu15" = "15. Change Language (Сменить язык)"
 		"MenuTitle" = "Enter a command:"
@@ -828,37 +826,53 @@ function Search-Apps-Menu {
 		Show-Error "ErrorInvalidInput"
 	}
 
+	# Инициализация списка из Apps_ID_List.txt:
+	Initialize-GitHub-List
+
+	# Поиск в списке приложений:
+	$FoundApps = @()
+	if ($null -ne $Global:GitHubParsedList) {
+		$FoundApps += @($Global:GitHubParsedList | Where-Object { $_.Name -match [regex]::Escape($AppName) } | ForEach-Object {
+			[PSCustomObject]@{
+				name = $_.Name
+				id = $_.Id
+			}
+		})
+	}
+
+	# Поиск в App Store:
 	$SearchOutput = & "$ipatoolFilePath" search $AppName --limit 10 *>&1 | Out-String
 	if ($SearchOutput -match 'apps=(\[.*?\])') {
 		$JsonString = $Matches[1]
-		if ($JsonString -eq '[]') {
-			Show-Error "ErrorNoAppsFound"
-			return $null
-		} else {
-			$FoundApps = $JsonString | ConvertFrom-Json
-			Separator
-			Write-Host ("{0,-3} {1,-30} {2}" -f "№", (Get-Lang "HeaderAppName"), (Get-Lang "HeaderAppID"))
-			
-			$Counter = 1
-			foreach ($App in $FoundApps) {
-				$PrintName = if ($App.name.Length -gt 30) { $App.name.Substring(0, 27) + "..." } else { $App.name }
-				Write-Host ("{0,-3} {1,-30} {2}" -f $Counter, $PrintName, $App.id)
-				$Counter++
-			}
-			Separator
-			$Indices = Read-NumberSelection -PromptKey 'AskAppNum' -MaxCount $FoundApps.Count
-			if ($null -eq $Indices) { return $null }
-
-			$SelectedApps = @()
-			foreach ($Idx in $Indices) {
-				$SelectedApps += $FoundApps[$Idx - 1]
-			}
-			return $SelectedApps
+		if ($JsonString -ne '[]') {
+			$FoundApps += @($JsonString | ConvertFrom-Json)
 		}
-	} else {
+	}
+
+	# Проверка на пустой результат:
+	if ($FoundApps.Count -eq 0) {
 		Show-Error "ErrorNoAppsFound"
 		return $null
 	}
+
+	# Вывод результатов:
+	Separator
+	$Counter = 1
+	foreach ($App in $FoundApps) {
+		Write-Host ("{0,-3} {1} (ID: {2})" -f $Counter, $App.name, $App.id)
+		$Counter++
+	}
+	Separator
+	
+	# Выбор приложений:
+	$Indices = Read-NumberSelection -PromptKey 'AskAppNum' -MaxCount $FoundApps.Count
+	if ($null -eq $Indices) { return $null }
+
+	$SelectedApps = @()
+	foreach ($Idx in $Indices) {
+		$SelectedApps += $FoundApps[$Idx - 1]
+	}
+	return $SelectedApps
 }
 
 # Функция получения списка ID:
@@ -1599,7 +1613,7 @@ $(Get-Lang 'ClearMenu3')`n
 				}
 			}
 			
-			# 13. Сброс настроек:
+			# 13. Выход из Apple ID + сброс настроек:
 			"13" {
 				Separator
 				Write-Host (Get-Lang "LoggedOut")
@@ -1641,7 +1655,8 @@ $(Get-Lang 'InstallerMenu1')
 $(Get-Lang 'InstallerMenu2')
 $(Get-Lang 'InstallerMenu3')
 $(Get-Lang 'InstallerMenu4')
-$(Get-Lang 'InstallerMenu5')`n
+$(Get-Lang 'InstallerMenu5')
+$(Get-Lang 'InstallerMenu6')`n
 "@
 		$SwitchValue = Read-Host $Installer_Menu
 		switch ($SwitchValue) {
@@ -1669,8 +1684,15 @@ $(Get-Lang 'InstallerMenu5')`n
 				Write-Host (Get-Lang "LangChanged")
 			}
 			
-			# 5. Перейти в IPA_Downloader:
+			# 5. Сброс настроек:
 			"5" {
+				Remove-Item -Path $SettingsFilePath -Force -ErrorAction SilentlyContinue
+				$Global:WorkMode = $null
+				return
+			}
+			
+			# 6. Перейти в IPA_Downloader:
+			"6" {
 				Invoke-IpatoolVersionPrompt
 				$Global:WorkMode = "Downloader"
 				return
