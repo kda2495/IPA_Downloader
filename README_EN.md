@@ -317,8 +317,10 @@ A complete set of the above programs/updates for Windows 7/8.1 is available at t
 [AppBank Telegram Channel](https://t.me/appbankRu)  
 
 ## Finding an App ID:
-#### Option 1: Find the app link in the App Store and copy the numeric identifier (the value after "id" in the URL).
-#### Option 2: If the app is installed on your device, press and hold the app icon:
+#### Option 1:
+Find the app link in the App Store and copy the numeric identifier (the value after "id" in the URL).
+#### Option 2:
+If the app is installed on your device, press and hold the app icon:
 * The Share App option will appear;
 * Copy the link and paste it into a browser;
 * Copy the numeric identifier (the value after id in the URL).
