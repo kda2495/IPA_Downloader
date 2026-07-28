@@ -2,7 +2,7 @@
 Set-Location -Path $PSScriptRoot
 
 # Версия скрипта:
-$ScriptVersion = "3.9.8"
+$ScriptVersion = "3.9.8.1"
 
 # Определение запуска на Windows:
 $IsWin = [System.Runtime.InteropServices.RuntimeInformation]::IsOSPlatform([System.Runtime.InteropServices.OSPlatform]::Windows)
@@ -845,7 +845,10 @@ function Search-Apps-Menu {
 	if ($SearchOutput -match 'apps=(\[.*?\])') {
 		$JsonString = $Matches[1]
 		if ($JsonString -ne '[]') {
-			$FoundApps += @($JsonString | ConvertFrom-Json)
+			$ParsedApps = $JsonString | ConvertFrom-Json
+			foreach ($Item in $ParsedApps) {
+				$FoundApps += $Item
+			}
 		}
 	}
 
