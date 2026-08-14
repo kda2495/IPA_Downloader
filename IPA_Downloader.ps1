@@ -2,12 +2,12 @@
 Set-Location -Path $PSScriptRoot
 
 # Версия скрипта:
-$ScriptVersion = "3.9.8.1"
+$ScriptVersion = "3.9.9"
 
 # Определение запуска на Windows:
 $IsWin = [System.Runtime.InteropServices.RuntimeInformation]::IsOSPlatform([System.Runtime.InteropServices.OSPlatform]::Windows)
 
-# Папка MainApp и единый файл настроек (язык, режим работы, версия ipatool):
+# Папка MainApp и файл настроек (язык, режим работы, версия ipatool):
 $MainAppFolderPath = Join-Path -Path $PSScriptRoot -ChildPath "MainApp"
 $SettingsFilePath = Join-Path -Path $MainAppFolderPath -ChildPath "Settings.txt"
 
@@ -24,7 +24,7 @@ function Get-Settings {
 	return $Settings
 }
 
-# Функция сохранения одной настройки:
+# Функция сохранения настройки:
 function Set-Setting {
 	param ([string]$Key, [string]$Value)
 	$Settings = Get-Settings
@@ -76,7 +76,7 @@ $TempIpaFilePath = Join-Path -Path $TempFolderPath -ChildPath "Temp.ipa"
 $AppsIDListPath = Join-Path -Path $ListsFolderPath -ChildPath "Apps_ID_List.txt"
 $AppsIDTempListPath = Join-Path -Path $MainAppFolderPath -ChildPath "Apps_ID_List_tmp.txt"
 
-# Настройка консоли:
+# Настройка консоли (для Windows):
 if ($IsWin) {
 Add-Type -TypeDefinition @"
 using System;
@@ -118,10 +118,10 @@ public class ConsoleFont {
 # Подключение системных сборок для работы с Zip-архивами:
 Add-Type -AssemblyName System.IO.Compression.FileSystem
 
-# Глобальная переменная для кэширования структурированного списка с GitHub:
+# Глобальная переменная для кэширования списка с GitHub:
 $Global:GitHubParsedList = $null
 
-# Перевод текста:
+# Перевод:
 $LangStrings = @{
 	"RU" = @{
 		"AccountCleared" = "Готово. Данные аккаунта {0} удалены."
@@ -160,10 +160,10 @@ $LangStrings = @{
 		"ErrorUpdateCheck" = "Ошибка: Не удалось проверить наличие обновлений."
 		"FileName" = "Имя файла:"
 		"FileSaved" = "Готово. Файл сохранен в папку Apps."
-		"HeaderFileName" = "Имя файла"
-		"HeaderMinIOS" = "Мин. iOS"
-		"HeaderVerID" = "ID версии"
-		"HeaderVersion" = "Версия"
+		"HeaderFileName" = "Имя файла:"
+		"HeaderMinIOS" = "Мин. версия iOS:"
+		"HeaderVerID" = "ID версии:"
+		"HeaderVersion" = "Версия:"
 		"InstallApp" = "Установка:"
 		"InstallerMenu1" = "1. Проверка минимальной версии iOS для приложений в папке Apps"
 		"InstallerMenu2" = "2. Установка приложений из папки Apps"
@@ -245,10 +245,10 @@ $LangStrings = @{
 		"ErrorUpdateCheck" = "Error: Failed to check for updates."
 		"FileName" = "File name:"
 		"FileSaved" = "Done. File saved to Apps folder."
-		"HeaderFileName" = "File name"
-		"HeaderMinIOS" = "Min. iOS"
-		"HeaderVerID" = "Version ID"
-		"HeaderVersion" = "Version"
+		"HeaderFileName" = "File name:"
+		"HeaderMinIOS" = "Min. iOS version:"
+		"HeaderVerID" = "Version ID:"
+		"HeaderVersion" = "Version:"
 		"InstallApp" = "Installing:"
 		"InstallerMenu1" = "1. Check minimum iOS version for apps in Apps folder"
 		"InstallerMenu2" = "2. Install apps from Apps folder"
@@ -297,7 +297,96 @@ $LangStrings = @{
 
 # Функция разделителя:
 function Separator {
-	Write-Host "================================================" -ForegroundColor Green
+	Write-Host "====================================================================" -ForegroundColor Green
+}
+
+# Функция вывода данных в виде таблицы:
+function Out-Table {
+	param (
+		[Parameter(Mandatory = $true)][array]$Data,
+		[Parameter(Mandatory = $true)][string[]]$Headers,
+		[Parameter(Mandatory = $true)][string[]]$Properties
+	)
+	
+	if (-not $Data -or $Data.Count -eq 0) { return }
+	
+	$reANSI = [regex]'\x1b\[[0-9;]*[a-zA-Z]'
+	$reSpaces = [regex]'[\u00A0\u2000-\u200A\u202F\u205F\u3000]'
+	$reDashes = [regex]'[\u2010-\u2015]'
+	$reHidden = [regex]'[\u200B-\u200F\u202A-\u202E\u2060\uFEFF\u00AD\p{Cc}\p{Cf}]'
+	$reWide = [regex]'[\u1100-\u115F\u2E80-\uA4CF\uAC00-\uD7A3\uF900-\uFAFF\uFF01-\uFF60]'
+	
+	# Очистка и измерение ячеек:
+	function Get-CellInfo([string]$text) {
+		if ([string]::IsNullOrEmpty($text)) { return @{ Text = ""; Width = 0 } }
+		
+		# Замена текста для корректного отображения:
+		$s = $reANSI.Replace($text, '')
+		$s = $reSpaces.Replace($s, ' ')
+		$s = $reDashes.Replace($s, '-')
+		$s = $reHidden.Replace($s, '')
+		$s = $s.Normalize([System.Text.NormalizationForm]::FormC)
+		
+		# Расчет ширины:
+		$visualWidth = $s.Length + $reWide.Matches($s).Count
+		return @{ Text = $s; Width = $visualWidth }
+	}
+	
+	# Обработка заголовков таблицы:
+	$CleanHeaders = foreach ($h in $Headers) { Get-CellInfo $h }
+	$ColWidths = $CleanHeaders | ForEach-Object { $_.Width }
+	
+	# Обработка данных:
+	$CleanRows = @()
+	foreach ($Row in $Data) {
+		$cells = @()
+		for ($i = 0; $i -lt $Properties.Count; $i++) {
+			$cellInfo = Get-CellInfo "$($Row.($Properties[$i]))"
+			
+			# Обновление ширины колонки:
+			if ($cellInfo.Width -gt $ColWidths[$i]) {
+				$ColWidths[$i] = $cellInfo.Width
+			}
+			$cells += $cellInfo
+		}
+		# Добавляем массив ячеек как единый элемент:
+		$CleanRows += , $cells 
+	}
+	
+	# Формирование элементов рамок:
+	$TopParts = @(); $SepParts = @(); $BottomParts = @()
+	foreach ($w in $ColWidths) {
+		$line = "─" * ($w + 2)
+		$TopParts += $line; $SepParts += $line; $BottomParts += $line
+	}
+	
+	$LineTop = "┌" + ($TopParts -join "┬") + "┐"
+	$LineSep = "├" + ($SepParts -join "┼") + "┤"
+	$LineBottom = "└" + ($BottomParts -join "┴") + "┘"
+	
+	# Сборка готовой строки:
+	function Build-Row($cellsInfo) {
+		$formatted = for ($i = 0; $i -lt $cellsInfo.Count; $i++) {
+			$cell = $cellsInfo[$i]
+			$padCount = [Math]::Max(0, $ColWidths[$i] - $cell.Width)
+			" " + $cell.Text + (" " * $padCount) + " "
+		}
+		return "│" + ($formatted -join "│") + "│"
+	}
+	
+	# Итоговый вывод:
+	Write-Host $LineTop
+	Write-Host (Build-Row $CleanHeaders)
+	Write-Host $LineSep
+	
+	for ($r = 0; $r -lt $CleanRows.Count; $r++) {
+		Write-Host (Build-Row $CleanRows[$r])
+		if ($r -lt $CleanRows.Count - 1) {
+			Write-Host $LineSep
+		}
+	}
+	
+	Write-Host $LineBottom
 }
 
 # Функция перевода текста:
@@ -377,7 +466,7 @@ function Read-AppList-Json {
 		return $null
 	}
 	
-	# Поддержка старого формата (простой массив без привязки к аккаунту):
+	# Поддержка старого формата:
 	if ($Data -is [System.Collections.IEnumerable] -and $Data -isnot [System.Management.Automation.PSCustomObject]) {
 		return $Data
 	}
@@ -480,7 +569,7 @@ function Save-App-To-List {
 		$Data = New-Object PSCustomObject
 	}
 	
-	# Конвертация старого формата (массив) в новый (объект с аккаунтами):
+	# Конвертация старого формата в новый:
 	if ($Data -is [System.Collections.IEnumerable] -and $Data -isnot [System.Management.Automation.PSCustomObject]) {
 		$OldArray = $Data
 		$Data = New-Object PSCustomObject
@@ -496,7 +585,7 @@ function Save-App-To-List {
 	}
 	
 	if ($AccountApps -isnot [System.Collections.IEnumerable]) { $AccountApps = @($AccountApps) }
-
+	
 	# Загрузка списка:
 	Initialize-GitHub-List
 	
@@ -506,9 +595,9 @@ function Save-App-To-List {
 		$RefApp = $Global:GitHubParsedList[$i]
 		$ReferenceMap[$RefApp.Id] = @{ Index = $i; Name = $RefApp.Name }
 	}
-
+	
 	$IsDuplicate = $false
-
+	
 	# Синхронизация имен сохраненных приложений с Apps_ID_List.txt и поиск дубликатов:
 	foreach ($Item in $AccountApps) {
 		if ($ReferenceMap.ContainsKey($Item.appid)) {
@@ -518,7 +607,7 @@ function Save-App-To-List {
 			$IsDuplicate = $true
 		}
 	}
-
+	
 	# Добавление нового приложения, если это не дубликат:
 	if (-not $IsDuplicate) {
 		$NewItem = [PSCustomObject]@{ name = $AppNameOnly; appid = $AppId }
@@ -536,7 +625,7 @@ function Save-App-To-List {
 	# Сохранение обновленных данных:
 	$Data."$Global:CurrentAppleID" = $AccountApps
 	$Data | ConvertTo-Json -Depth 5 | Set-Content $HistoryFile -Encoding UTF8
-
+	
 	# Вывод сообщений:
 	if ($IsDuplicate) {
 		$CurrentName = if ($ReferenceMap.ContainsKey($AppId)) { $ReferenceMap[$AppId].Name } else { $AppNameOnly }
@@ -547,11 +636,11 @@ function Save-App-To-List {
 	}
 }
 
-# Функция инициализации и кэширования GitHub списка:
+# Функция инициализации и кэширования списка с GitHub:
 function Initialize-GitHub-List {
 	if ($null -ne $Global:GitHubParsedList) { return }
 	try {
-		# Если файла нет, скачиваем синхронно:
+		# Загрузка файла, если его нет:
 		if (!(Test-Path "$AppsIDListPath")) {
 			Invoke-RestMethod -Uri "https://raw.githubusercontent.com/kda2495/IPA_Downloader/refs/heads/main/Apps_ID_List.txt" -OutFile "$AppsIDListPath" -ErrorAction SilentlyContinue
 		}
@@ -606,7 +695,7 @@ function Move-IPA-Files {
 			if ($Meta) {
 				$FinalAppName = $Meta.AppName
 				
-				# Проверяем GitHub список, если имя неизвестно или не было передано:
+				# Проверка списка с GitHub, если имя неизвестно или не было передано:
 				if ([string]::IsNullOrWhiteSpace($AppName) -or $AppName -eq "Unknown") {
 					$GitHubName = Get-GitHub-AppName -AppId $AppId
 					if (![string]::IsNullOrWhiteSpace($GitHubName)) {
@@ -629,8 +718,8 @@ function Move-IPA-Files {
 				
 				Rename-Item -Path $DestPath -NewName $NewName -Force
 				Write-Host "$(Get-Lang 'FileName') $NewName"
-				Write-Host "$(Get-Lang 'MinIOS') $($Meta.MinIOS)+"
-
+				Write-Host "$(Get-Lang 'MinIOS') $($Meta.MinIOS)"
+				
 				if (![string]::IsNullOrEmpty($AppId)) {
 					Save-App-To-List -AppId $AppId -AppNameOnly $FinalAppName -Type "Downloaded"
 				}
@@ -658,9 +747,14 @@ function Parse-NumberSelection {
 	)
 	$SelectedIndices = @()
 	$Parts = $Selection -split ','
-
+	
 	foreach ($Part in $Parts) {
 		$Part = $Part.Trim()
+		
+		if ([string]::IsNullOrWhiteSpace($Part)) { 
+			continue 
+		}
+		
 		if ($Part -match '^\d+-\d+$') {
 			$Range = $Part -split '-'
 			$Start = 0; $End = 0
@@ -674,7 +768,7 @@ function Parse-NumberSelection {
 			return $null
 		}
 	}
-
+	
 	$SelectedIndices = $SelectedIndices | Select-Object -Unique | Where-Object { $_ -ge 1 -and $_ -le $MaxCount }
 	
 	if ($SelectedIndices.Count -eq 0) { return $null }
@@ -732,16 +826,16 @@ function IPA-Download-With-Version {
 	
 	Separator
 	$RawOutput = & "$ipatoolFilePath" list-versions -i $AppId 2>&1
-
+	
 	if ($RawOutput -match "Error:") {
 		Write-Host $RawOutput -ForegroundColor DarkRed
 		return
 	}
-
+	
 	if ([string]::IsNullOrEmpty($RawOutput)) { return }
-
+	
 	$RawVersions = [regex]::Matches($RawOutput, '(?<=")\d+(?=")') | ForEach-Object { $_.Value }
-
+	
 	$VerQty = 0
 	while ($true) {
 		$VersionsQuantity = Read-Host "$(Get-Lang 'AskVerCount') $(Get-Lang 'CancelStep')`n"
@@ -755,22 +849,83 @@ function IPA-Download-With-Version {
 		Show-Error "ErrorInvalidInput"
 		Separator
 	}
-
+	
 	$RecentVersions = $RawVersions | Select-Object -Last $VerQty | Sort-Object -Descending
 	
+	# Заголовки таблицы:
+	$HeaderNum = "№"
+	$HeaderVerID = Get-Lang "HeaderVerID"
+	$HeaderVersion = Get-Lang "HeaderVersion"
+	
+	# Расчет ширины колонок:
+	$W1 = [Math]::Max($HeaderNum.Length, "$($RecentVersions.Count)".Length)
+	
+	$MaxIdLen = $HeaderVerID.Length
+	foreach ($id in $RecentVersions) {
+		if ($id.Length -gt $MaxIdLen) { $MaxIdLen = $id.Length }
+	}
+	
+	$W2 = $MaxIdLen
+	$W3 = [Math]::Max($HeaderVersion.Length, 25)
+	
+	$ColWidths = @($W1, $W2, $W3)
+	
+	# Формирование рамок:
+	$TopParts = foreach ($w in $ColWidths) { "─" * ($w + 2) }
+	$SepParts = foreach ($w in $ColWidths) { "─" * ($w + 2) }
+	$BottomParts = foreach ($w in $ColWidths) { "─" * ($w + 2) }
+	$LineTop = "┌" + ($TopParts -join "┬") + "┐"
+	$LineSep = "├" + ($SepParts -join "┼") + "┤"
+	$LineBottom = "└" + ($BottomParts -join "┴") + "┘"
+	
+	# Функция быстрой печати строки:
+	function Print-StreamRow ([string[]]$cells) {
+		$formatted = for ($i = 0; $i -lt $cells.Count; $i++) {
+			$text = "$($cells[$i])"
+			$pad = [Math]::Max(0, $ColWidths[$i] - $text.Length)
+			" " + $text + (" " * $pad) + " "
+		}
+		Write-Host ("│" + ($formatted -join "│") + "│")
+	}
+	
+	Separator
+	# Вывод шапки таблицы:
+	Write-Host $LineTop
+	Print-StreamRow @($HeaderNum, $HeaderVerID, $HeaderVersion)
+	Write-Host $LineSep
+	
+	# Получение данных с выводом строк:
 	$VersionMapping = @()
 	$Counter = 1
-	Separator
-	Write-Host ("{0,-3} {1,-12} {2}" -f "№", (Get-Lang "HeaderVerID"), (Get-Lang "HeaderVersion"))
-	foreach ($VersionId in $RecentVersions) {
+	
+	for ($idx = 0; $idx -lt $RecentVersions.Count; $idx++) {
+		$VersionId = $RecentVersions[$idx]
+		
+		# Запрос к ipatool:
 		$Meta = & "$ipatoolFilePath" get-version-metadata -i $AppId --external-version-id $VersionId 2>$null
 		$DisplayVersion = if ($Meta -match 'displayVersion=([^\s,]+)') { $Matches[1] } else { "NA" }
-		Write-Host ("{0,-3} {1,-12} {2}" -f $Counter, $VersionId, $DisplayVersion)
-		$VersionMapping += [PSCustomObject]@{ Index = $Counter; ID = $VersionId; Version = $DisplayVersion }
+		
+		$VersionMapping += [PSCustomObject]@{
+			Index = $Counter
+			ID = $VersionId
+			Version = $DisplayVersion
+		}
+		
+		# Печать строки после получения версии:
+		Print-StreamRow @("$Counter", "$VersionId", "$DisplayVersion")
+		
+		# Разделитель между строками:
+		if ($idx -lt $RecentVersions.Count - 1) {
+			Write-Host $LineSep
+		}
 		$Counter++
 	}
+	
+	# Нижняя граница:
+	Write-Host $LineBottom
 	Separator
 	
+	# Выбор версий:
 	$SelectedIndices = Read-NumberSelection -PromptKey 'AskVerNum' -MaxCount $VersionMapping.Count
 	if ($null -eq $SelectedIndices) { return }
 	
@@ -778,7 +933,7 @@ function IPA-Download-With-Version {
 	foreach ($Idx in $SelectedIndices) {
 		$SelectedVersions += $VersionMapping[$Idx - 1]
 	}
-
+	
 	foreach ($SelectedObject in $SelectedVersions) {
 		Separator
 		Write-Host "$(Get-Lang 'SelectedVer') $($SelectedObject.Version)"
@@ -825,10 +980,10 @@ function Search-Apps-Menu {
 		
 		Show-Error "ErrorInvalidInput"
 	}
-
+	
 	# Инициализация списка из Apps_ID_List.txt:
 	Initialize-GitHub-List
-
+	
 	# Поиск в списке приложений:
 	$FoundApps = @()
 	if ($null -ne $Global:GitHubParsedList) {
@@ -839,7 +994,7 @@ function Search-Apps-Menu {
 			}
 		})
 	}
-
+	
 	# Поиск в App Store:
 	$SearchOutput = & "$ipatoolFilePath" search $AppName --limit 10 *>&1 | Out-String
 	if ($SearchOutput -match 'apps=(\[.*?\])') {
@@ -851,26 +1006,33 @@ function Search-Apps-Menu {
 			}
 		}
 	}
-
+	
 	# Проверка на пустой результат:
 	if ($FoundApps.Count -eq 0) {
 		Show-Error "ErrorNoAppsFound"
 		return $null
 	}
-
+	
 	# Вывод результатов:
 	Separator
 	$Counter = 1
-	foreach ($App in $FoundApps) {
-		Write-Host ("{0,-3} {1} (ID: {2})" -f $Counter, $App.name, $App.id)
-		$Counter++
+	$TableData = foreach ($App in $FoundApps) {
+		[PSCustomObject]@{
+			Num = $Counter++
+			Name = $App.name
+			ID = $App.id
+		}
 	}
+	
+	Out-Table -Data $TableData `
+		-Headers "№", (Get-Lang "HeaderFileName"), "ID:" `
+		-Properties "Num", "Name", "ID"
 	Separator
 	
 	# Выбор приложений:
 	$Indices = Read-NumberSelection -PromptKey 'AskAppNum' -MaxCount $FoundApps.Count
 	if ($null -eq $Indices) { return $null }
-
+	
 	$SelectedApps = @()
 	foreach ($Idx in $Indices) {
 		$SelectedApps += $FoundApps[$Idx - 1]
@@ -924,7 +1086,6 @@ function Get-Apps-From-List {
 	$Menu3 = if ($ListMode -eq "Purchase") { Get-Lang 'PurchasedListMenu3' } else { Get-Lang 'DownloadedListMenu3' }
 	$TargetFile = if ($ListMode -eq "Purchase") { "$PurchasedIDsFilePath" } else { "$DownloadedIDsFilePath" }
 	$EmptyError = if ($ListMode -eq "Purchase") { "ErrorPurchasedEmpty" } else { "ErrorDownloadedEmpty" }
-
 	$List_Menu = @"
 $MenuTitle $(Get-Lang 'CancelStep')
 $Menu1
@@ -932,11 +1093,11 @@ $Menu2
 $Menu3`n
 "@
 	$ListChoice = Read-MenuChoice -MenuText $List_Menu -OptionsCount 3 -AllowCancel
-
+	
 	if ($ListChoice -eq '0') { return $null }
-
+	
 	$Lines = @()
-
+	
 	switch ($ListChoice) {
 		"1" {
 			Initialize-GitHub-List
@@ -964,7 +1125,7 @@ $Menu3`n
 				Show-Error "ErrorListLoadError"
 				return $null
 			}
-
+			
 			$SavedIds = @()
 			if (Test-Path $TargetFile) {
 				$HistoryData = Read-AppList-Json -FilePath $TargetFile -EmptyError $EmptyError
@@ -972,7 +1133,7 @@ $Menu3`n
 					$SavedIds = $HistoryData.appid
 				}
 			}
-
+			
 			foreach ($App in $Global:GitHubParsedList) {
 				if ($App.Id -and $SavedIds -notcontains $App.Id) {
 					$Lines += "{0}: {1}" -f $App.Name, $App.Id
@@ -980,37 +1141,45 @@ $Menu3`n
 			}
 		}
 	}
-
+	
 	if ($Lines.Count -eq 0) {
 		Show-Error "ErrorNoAppsFound"
 		return $null
 	}
-
-	Separator
+	
+	# Парсинг данных для таблицы:
+	$TableData = @()
 	for ($I = 0; $I -lt $Lines.Count; $I++) {
-		$Index = $I + 1
-		Write-Host ("{0}. {1}" -f $Index, $Lines[$I])
-	}
-	
-	Separator
-	$SelectedIndices = Read-NumberSelection -PromptKey 'AskAppNum' -MaxCount $Lines.Count
-	if ($null -eq $SelectedIndices) { return $null }
-
-	$SelectedApps = @()
-	
-	foreach ($Idx in $SelectedIndices) {
-		$SelectedLine = $Lines[$Idx - 1]
+		$SelectedLine = $Lines[$I]
 		$AppId = [System.Text.RegularExpressions.Regex]::Match($SelectedLine, '\b\d{6,}\b').Value
-		
 		$AppName = "Unknown"
 		if ($SelectedLine -match '^(.+?):\s*\d') {
 			$AppName = $Matches[1].Trim()
 		}
-
-		if (![string]::IsNullOrEmpty($AppId)) {
+		
+		$TableData += [PSCustomObject]@{
+			Num = $I + 1
+			Name = $AppName
+			ID = $AppId
+		}
+	}
+	
+	Separator
+	Out-Table -Data $TableData `
+		-Headers "№", (Get-Lang "HeaderFileName"), "ID:" `
+		-Properties "Num", "Name", "ID"
+	Separator
+	
+	$SelectedIndices = Read-NumberSelection -PromptKey 'AskAppNum' -MaxCount $Lines.Count
+	if ($null -eq $SelectedIndices) { return $null }
+	
+	$SelectedApps = @()
+	foreach ($Idx in $SelectedIndices) {
+		$SelectedObject = $TableData[$Idx - 1]
+		if (![string]::IsNullOrEmpty($SelectedObject.ID)) {
 			$SelectedApps += [PSCustomObject]@{
-				Id = $AppId.Trim()
-				Name = $AppName
+				Id = $SelectedObject.ID
+				Name = $SelectedObject.Name
 			}
 		}
 	}
@@ -1027,20 +1196,29 @@ function Get-iOS-MinVersion {
 	}
 	
 	Separator
-	Write-Host ("{0,-3} {1,-30} {2}" -f "№", (Get-Lang "HeaderFileName"), (Get-Lang "HeaderMinIOS"))
 	$Counter = 1
+	$TableData = @()
 	
-	foreach ($File in $FilesToProcess) {
+	foreach ($File in @($FilesToProcess)) { 
 		$Meta = Get-IPA-Metadata -IpaPath $File.FullName
-		$MinOs = if ($Meta) { "$($Meta.MinIOS)+" } else { "Error" }
-		$PrintName = if ($File.Name.Length -gt 30) { $File.Name.Substring(0,27) + "..." } else { $File.Name }
-		Write-Host ("{0,-3} {1,-30} {2}" -f $Counter, $PrintName, $MinOs)
+		$MinOs = if ($Meta) { "$($Meta.MinIOS)" } else { "Error" }
+		
+		$TableData += [PSCustomObject]@{
+			Num = $Counter
+			Name = $File.Name
+			MinOs = $MinOs
+		}
 		$Counter++
 	}
+	
+	Out-Table -Data @($TableData) `
+		-Headers "№", (Get-Lang "HeaderFileName"), (Get-Lang "HeaderMinIOS") `
+		-Properties "Num", "Name", "MinOs"
+		
 	return @($FilesToProcess)
 }
 
-# Функция вывода ошибки об отсутствующих файлах:
+# Функция вывода ошибки об отсутствии необходимых файлов:
 function Confirm-RequiredFiles {
 	param ([array]$MissingFiles)
 	if ($MissingFiles) {
@@ -1228,7 +1406,7 @@ function Show-ModeBanner {
 function Invoke-SetupWizard {
 	# Удаление содержимого папки .ipatool:
 	Get-ChildItem -Path $ipatoolHomePath -ErrorAction SilentlyContinue | Remove-Item -Force -ErrorAction SilentlyContinue
-
+	
 	# Запрос на выбор языка:
 	Separator
 	$Language_Menu = @"
@@ -1238,9 +1416,8 @@ $(Get-Lang 'LanguageMenu2')`n
 "@
 	$LanguageChoice = Read-MenuChoice -MenuText $Language_Menu -OptionsCount 2
 	$Global:CurrentLang = if ($LanguageChoice -eq '1') { "RU" } else { "EN" }
-	Set-Setting -Key "Language" -Value $Global:CurrentLang
 	
-	# Проверка обновлений после выбора языка:
+	# Проверка обновлений:
 	if (-not $Global:UpdateChecked) {
 		Check-Update
 		$Global:UpdateChecked = $true
@@ -1259,6 +1436,7 @@ $(Get-Lang 'ModeMenu2')`n
 	# Сохранение режима IPA_Installer:
 	if ($Global:WorkMode -eq "Installer") {
 		Set-Setting -Key "Mode" -Value $Global:WorkMode
+		Set-Setting -Key "Language" -Value $Global:CurrentLang
 	}
 	
 	# Версия ipatool запрашивается только для режима IPA_Downloader:
@@ -1334,9 +1512,10 @@ function Invoke-DownloaderMode {
 	# Вход с Apple ID:
 	Connect-AppleID
 	
-	# Сохранение режима IPA_Downloader после успешной авторизации с Apple ID:
+	# Сохранение настроек режима IPA_Downloader только после успешной авторизации с Apple ID:
 	Set-Setting -Key "Mode" -Value "Downloader"
 	Set-Setting -Key "IpatoolVersion" -Value $script:IpatoolVersion
+	Set-Setting -Key "Language" -Value $Global:CurrentLang
 	
 	# Основной цикл:
 	while (Test-Path "$AccountFilePath") {
@@ -1498,17 +1677,17 @@ $(Get-Lang 'ClearMenu3')`n
 								Write-Host (Get-Lang "ErrorPurchasedEmpty") -ForegroundColor DarkRed
 								continue
 							}
-
+							
 							$Data = $RawData | ConvertFrom-Json
 							
-							# Если старый формат (массив) или нет свойств:
+							# Если старый формат или нет свойств:
 							if ($Data -isnot [System.Management.Automation.PSCustomObject] -or $Data.psobject.properties.Count -eq 0) {
 								Remove-Item "$PurchasedIDsFilePath" -Force -ErrorAction SilentlyContinue
 								Separator
 								Write-Host (Get-Lang "PurchasedListCleared")
 								continue
 							}
-
+							
 							# Формируем динамическое меню аккаунтов:
 							$Accounts = @($Data.psobject.properties.Name)
 							$AccMenuText = "$(Get-Lang 'ClearAccountMenuTitle') $(Get-Lang 'CancelStep')`n"
@@ -1558,7 +1737,7 @@ $(Get-Lang 'ClearMenu3')`n
 								Write-Host (Get-Lang "ErrorDownloadedEmpty") -ForegroundColor DarkRed
 								continue
 							}
-
+							
 							$Data = $RawData | ConvertFrom-Json
 							
 							if ($Data -isnot [System.Management.Automation.PSCustomObject] -or $Data.psobject.properties.Count -eq 0) {
@@ -1567,7 +1746,7 @@ $(Get-Lang 'ClearMenu3')`n
 								Write-Host (Get-Lang "DownloadedListCleared")
 								continue
 							}
-
+							
 							$Accounts = @($Data.psobject.properties.Name)
 							$AccMenuText = "$(Get-Lang 'ClearAccountMenuTitle') $(Get-Lang 'CancelStep')`n"
 							$Counter = 1
@@ -1714,7 +1893,7 @@ $Global:UpdateChecked = $false
 
 while ($true) {
 	
-	# Если режим работы не выбран, то запускаем мастер настройки, иначе показываем баннер:
+	# Если режим работы не выбран, то запускаем мастер первоначальной настройки, иначе показываем баннер:
 	if ($null -eq $Global:WorkMode) {
 		Invoke-SetupWizard
 	} else {
