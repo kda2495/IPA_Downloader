@@ -5,7 +5,7 @@
 
 # IPA_Downloader
 [![Russian README](https://img.shields.io/badge/README-Russian-blue.svg)](README.md)  
-A script for purchasing/downloading any available App Store apps, as well as restoring removed ones - provided they were previously purchased via your Apple ID account (powered by [ipatool-cpp](https://github.com/Sorvigolova/ipatool)).
+A script for purchasing/downloading any available App Store apps, as well as restoring removed ones - provided they were previously purchased via your Apple Account (powered by [ipatool-cpp](https://github.com/Sorvigolova/ipatool)).
 
 ## IPA_Downloader Features:
 * Search for app and purchase (without downloading);
@@ -36,7 +36,7 @@ A script for purchasing/downloading any available App Store apps, as well as res
 * Windows 7, 8.1, 10, 11 (x64);
 * macOS starting from 10.15 Catalina (both Apple Silicon and Intel are supported);
 * Stable internet connection;
-* An Apple ID account with previously downloaded apps.
+* An Apple Account with previously downloaded apps.
 
 ## To run on Windows:
 * iTunes from the Apple website (to support app installation via script):  
@@ -85,13 +85,13 @@ A complete set of the above programs/updates for Windows 7/8.1 is available at t
 * When update is available, choose to either visit GitHub to download new script version or continue with current version;
 * Press Enter.
 #### 4. Select one of the available modes:
-* IPA_Downloader (full version, works after logging in with Apple ID);
-* IPA_Installer (limited version with minimum iOS version check and app installation, works without logging in with Apple ID);
+* IPA_Downloader (full version, works after logging in with Apple Account);
+* IPA_Installer (limited version with minimum iOS version check and app installation, works without logging in with Apple Account);
 * Press Enter.
 #### 5. If IPA_Downloader mode is selected, then:
 * Select ipatool version (v2 by default; if v2 doesn't work, select v3);
 * Press Enter;
-* Enter Apple ID (Enter email:);
+* Enter Apple Account (Enter email:);
 * Press Enter;
 * Enter password (Enter password:);
 * Press Enter;
@@ -160,13 +160,13 @@ A complete set of the above programs/updates for Windows 7/8.1 is available at t
 * When update is available, choose to either visit GitHub to download new script version or continue with current version;
 * Press Enter.
 #### 4. Select one of the available modes:
-* IPA_Downloader (full version, works after logging in with Apple ID);
-* IPA_Installer (limited version with minimum iOS version check and app installation, works without logging in with Apple ID);
+* IPA_Downloader (full version, works after logging in with Apple Account);
+* IPA_Installer (limited version with minimum iOS version check and app installation, works without logging in with Apple Account);
 * Press Enter.
 #### 5. If IPA_Downloader mode is selected, then:
 * Select ipatool version (v2 by default; if v2 doesn't work, select v3);
 * Press Enter;
-* Enter Apple ID (Enter email:);
+* Enter Apple Account (Enter email:);
 * Press Enter;
 * Enter password (Enter password:);
 * Press Enter;
@@ -270,8 +270,8 @@ A complete set of the above programs/updates for Windows 7/8.1 is available at t
 * When choosing to clear either the downloaded apps list or the purchased apps list, select the specific account you want to clear;
 * Press Enter;
 * The script will clear the selected data type.
-#### 13. Log out of Apple ID + reset settings:
-* The script will log out of the Apple ID and reset all settings.
+#### 13. Log out of Apple Account and reset settings:
+* The script will log out of the Apple Account and reset all settings.
 #### 14. GitHub project page:
 * The script will navigate to the project page on GitHub.
 #### 15. Change Language (Сменить язык):
@@ -296,9 +296,9 @@ A complete set of the above programs/updates for Windows 7/8.1 is available at t
 
 ## Troubleshooting errors:
 * Download error: HTTP request failed: Timeout was reached - Failed to connect to Apple servers, check your internet connection;
-* Error: license is required - The app was not previously purchased on this Apple ID;
+* Error: license is required - The app was not previously purchased on this Apple Account;
 * Purchase error: app not found - App purchase failed because the app has been removed from the App Store;
-* Purchase error: item is temporarily unavailable - The app was not previously purchased on this Apple ID, the purchase failed because the app has been removed from the App Store;
+* Purchase error: item is temporarily unavailable - The app was not previously purchased on this Apple Account, the purchase failed because the app has been removed from the App Store;
 * No device found - Device not found. Make sure the AppleMobileDeviceSupport64 driver is installed (relevant for Windows);
 * WARNING: could not locate Payload/App.app/SC_Info/App.sinf in archive! - App signature not found in the installed ipa file;
 * Error: anisette exited with code 1 - check that anisette binary is working. iTunes Not Found (0) - iTunes from the Apple website is not installed;
