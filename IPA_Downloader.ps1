@@ -2,7 +2,7 @@
 Set-Location -Path $PSScriptRoot
 
 # Версия скрипта:
-$ScriptVersion = "3.9.9.1"
+$ScriptVersion = "3.9.9.2"
 
 # Определение запуска на Windows:
 $IsWin = [System.Runtime.InteropServices.RuntimeInformation]::IsOSPlatform([System.Runtime.InteropServices.OSPlatform]::Windows)
@@ -37,7 +37,10 @@ function Set-Setting {
 $SavedSettings = Get-Settings
 $Global:CurrentLang = if ($SavedSettings['Language'] -match '^(RU|EN)$') { $SavedSettings['Language'] } else { "RU" }
 $Global:WorkMode = if ($SavedSettings['Mode'] -in @('Downloader', 'Installer')) { $SavedSettings['Mode'] } else { $null }
-$IpatoolVersion = if ($SavedSettings['IpatoolVersion'] -eq 'v3') { 'v3' } else { 'v2' }
+$IpatoolVersion = 'v2'
+
+# Закомментировано в связи с неработоспособностью ipatool v3:
+#$IpatoolVersion = if ($SavedSettings['IpatoolVersion'] -eq 'v3') { 'v3' } else { 'v2' }
 
 # Определение архитектуры macOS:
 if (-not $IsWin) {
@@ -172,7 +175,7 @@ $LangStrings = @{
 		"InstallerMenu4" = "4. Сменить язык (Change Language)"
 		"InstallerMenu5" = "5. Сброс настроек"
 		"InstallerMenu6" = "6. Перейти в IPA_Downloader"
-		"IpatoolVersionMenuTitle" = "Выберите версию ipatool (рекомендуется v2):"
+		"IpatoolVersionMenuTitle" = "Выберите версию ipatool:"
 		"LangChanged" = "Язык успешно изменен на русский."
 		"LanguageMenu1" = "1. Русский"
 		"LanguageMenu2" = "2. English"
@@ -260,7 +263,7 @@ $LangStrings = @{
 		"InstallerMenu4" = "4. Change Language (Сменить язык)"
 		"InstallerMenu5" = "5. Reset settings"
 		"InstallerMenu6" = "6. Switch to IPA_Downloader"
-		"IpatoolVersionMenuTitle" = "Select ipatool version (v2 is recommended):"
+		"IpatoolVersionMenuTitle" = "Select ipatool version:"
 		"LangChanged" = "Language successfully changed to English."
 		"LanguageMenu1" = "1. Русский"
 		"LanguageMenu2" = "2. English"
@@ -1445,10 +1448,11 @@ $(Get-Lang 'ModeMenu2')`n
 		Set-Setting -Key "Language" -Value $Global:CurrentLang
 	}
 	
+	# Закомментировано в связи с неработоспособностью ipatool v3:
 	# Версия ipatool запрашивается только для режима IPA_Downloader:
-	if ($Global:WorkMode -eq "Downloader") {
-		Invoke-IpatoolVersionPrompt
-	}
+	#if ($Global:WorkMode -eq "Downloader") {
+		#Invoke-IpatoolVersionPrompt
+	#}
 	
 	Show-ModeBanner
 }
@@ -1885,7 +1889,8 @@ $(Get-Lang 'InstallerMenu6')`n
 			
 			# 6. Перейти в IPA_Downloader:
 			"6" {
-				Invoke-IpatoolVersionPrompt
+				# Закомментировано в связи с неработоспособностью ipatool v3:
+				#Invoke-IpatoolVersionPrompt
 				$Global:WorkMode = "Downloader"
 				return
 			}
