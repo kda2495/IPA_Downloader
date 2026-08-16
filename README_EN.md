@@ -295,15 +295,16 @@ A complete set of the above programs/updates for Windows 7/8.1 is available at t
 * The script will switch the mode to IPA_Downloader.
 
 ## Troubleshooting errors:
-* Download error: HTTP request failed: Timeout was reached - Failed to connect to Apple servers, check your internet connection;
-* Error: license is required - The app was not previously purchased on this Apple Account;
-* Purchase error: app not found - App purchase failed because the app has been removed from the App Store;
-* Purchase error: item is temporarily unavailable - The app was not previously purchased on this Apple Account, the purchase failed because the app has been removed from the App Store;
-* No device found - Device not found. Make sure the AppleMobileDeviceSupport64 driver is installed (relevant for Windows);
-* WARNING: could not locate Payload/App.app/SC_Info/App.sinf in archive! - App signature not found in the installed ipa file;
-* Error: anisette exited with code 1 - check that anisette binary is working. iTunes Not Found (0) - iTunes from the Apple website is not installed;
-* Error: anisette exited with code 1 - check that anisette binary is working. iCloud Not Found (1) - iCloud from the Apple website is not installed;
+* Download error: HTTP request failed: Timeout was reached - Failed to connect to Apple servers, check your internet connection.
+* Error: license is required - The app was not previously purchased on this Apple Account.
+* Purchase error: app not found - App purchase failed because the app has been removed from the App Store.
+* Purchase error: item is temporarily unavailable - The app was not previously purchased on this Apple Account, the purchase failed because the app has been removed from the App Store.
+* No device found - Device not found. Make sure the AppleMobileDeviceSupport64 driver is installed (relevant for Windows).
+* WARNING: could not locate Payload/App.app/SC_Info/App.sinf in archive! - App signature not found in the installed ipa file.
+* Error: anisette exited with code 1 - check that anisette binary is working. iTunes Not Found (0) - iTunes from the Apple website is not installed.
+* Error: anisette exited with code 1 - check that anisette binary is working. iCloud Not Found (1) - iCloud from the Apple website is not installed.
 * Login error: GSA SRP exception: GSA complete error -27952: Update iCloud for Windows to the latest version to sign in - Advanced Data Protection needs to be disabled via Settings-Account Name-iCloud-Advanced Data Protection.
+* If the app immediately closes when launched after installation, log in to the App Store using the account from which it was downloaded, and install any free/paid app. After that, launch the problematic app again.
 
 ## If you encounter an issue:
 #### Provide the following information:
