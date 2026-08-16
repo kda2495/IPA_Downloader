@@ -295,15 +295,16 @@
 * Скрипт осуществит смену режима на IPA_Downloader.
 
 ## Расшифровка ошибок:
-* Download error: HTTP request failed: Timeout was reached - Не удалось подключиться к серверам Apple, проверьте Ваше интернет-соединение;
-* Error: license is required - Приложение не было приобретено на этом Аккаунте Apple ранее;
-* Purchase error: app not found - Покупка приложения не удалась, так как приложение удалено из App Store;
-* Purchase error: item is temporarily unavailable - Приложение не было приобретено на этом Аккаунте Apple ранее, покупка не удалась, так как приложение удалено из App Store;
-* No device found - Устройство не найдено. Убедитесь, что драйвер AppleMobileDeviceSupport64 установлен (актуально для Windows);
-* WARNING: could not locate Payload/App.app/SC_Info/App.sinf in archive! - В устанавливаемом ipa файле не найдена подпись приложения;
-* Error: anisette exited with code 1 - check that anisette binary is working. iTunes Not Found (0) - Не установлен iTunes с сайта Apple;
-* Error: anisette exited with code 1 - check that anisette binary is working. iCloud Not Found (1) - Не установлен iCloud с сайта Apple;
+* Download error: HTTP request failed: Timeout was reached - Не удалось подключиться к серверам Apple, проверьте Ваше интернет-соединение.
+* Error: license is required - Приложение не было приобретено на этом Аккаунте Apple ранее.
+* Purchase error: app not found - Покупка приложения не удалась, так как приложение удалено из App Store.
+* Purchase error: item is temporarily unavailable - Приложение не было приобретено на этом Аккаунте Apple ранее, покупка не удалась, так как приложение удалено из App Store.
+* No device found - Устройство не найдено. Убедитесь, что драйвер AppleMobileDeviceSupport64 установлен (актуально для Windows).
+* WARNING: could not locate Payload/App.app/SC_Info/App.sinf in archive! - В устанавливаемом ipa файле не найдена подпись приложения.
+* Error: anisette exited with code 1 - check that anisette binary is working. iTunes Not Found (0) - Не установлен iTunes с сайта Apple.
+* Error: anisette exited with code 1 - check that anisette binary is working. iCloud Not Found (1) - Не установлен iCloud с сайта Apple.
 * Login error: GSA SRP exception: GSA complete error -27952: Update iCloud for Windows to the latest version to sign in - Необходимо отключить расширенную защиту данных по пути Настройки-Аккаунт-iCloud-Расширенная защита данных.
+* Если после установки приложение сразу сворачивается при запуске, войдите в App Store под аккаунтом, с которого оно было загружено, и установите любое бесплатное/платное приложение. После этого запустите проблемное приложение снова.
 
 ## При возникновении проблем:
 #### Сообщить следующую информацию:
