@@ -35,6 +35,7 @@ A script for purchasing/downloading any available App Store apps, as well as res
 ## General requirements for use:
 * Windows 7, 8.1, 10, 11 (x64);
 * macOS starting from 10.15 Catalina (both Apple Silicon and Intel are supported);
+* Linux (x64 and ARM64: Arch Linux, Ubuntu, Debian, Fedora, etc.);
 * Stable internet connection;
 * An Apple Account with previously downloaded apps.
 
@@ -187,6 +188,54 @@ A complete set of the above programs/updates for Windows 7/8.1 is available at t
 * When using ipatool v3 on macOS, to obtain the two-factor authentication (2FA) code, you need to put your device in Airplane Mode and navigate to Settings > Your account > Sign-In & Security > Get Verification Code.
 * There is a bug in ipatool v3 for macOS: an unknown MacBook Pro is added to your account's device list (due to how anisette works). If necessary, you can remove it from the device list, but you will have to obtain a two-factor authentication (2FA) code again.
 * You can use AirDrop to install the app: simply transfer file to your iPhone, and the app will be installed automatically.
+
+## To run on Linux:
+#### 1. Install the required packages:
+* **Arch Linux / Manjaro:**
+  * Install PowerShell: `sudo pacman -S powershell-bin` (or via AUR: `yay -S powershell-bin`)
+  * Install iOS utilities: `sudo pacman -S ideviceinstaller usbmuxd`
+  * Enable usbmuxd service: `sudo systemctl enable --now usbmuxd`
+* **Ubuntu / Debian:**
+  * Install PowerShell: [Microsoft Instructions](https://learn.microsoft.com/powershell/scripting/install/install-ubuntu) or `sudo apt install powershell`
+  * Install iOS utilities: `sudo apt install ideviceinstaller usbmuxd`
+  * Enable usbmuxd service: `sudo systemctl enable --now usbmuxd`
+* **Fedora / RHEL:**
+  * Install PowerShell: `sudo dnf install powershell`
+  * Install iOS utilities: `sudo dnf install ideviceinstaller usbmuxd`
+  * Enable usbmuxd service: `sudo systemctl enable --now usbmuxd`
+
+## How to use (Linux):
+#### 1. Extract the IPA_Downloader archive using any archiver;
+#### 2. Make the launcher script executable (if needed):
+* Type in Terminal: `chmod +x Start_IPA_Downloader.sh`
+* Press Enter.
+#### 3. Run the script:
+* Type in Terminal: `./Start_IPA_Downloader.sh` (or double-click Start_IPA_Downloader.sh in your file manager);
+* Press Enter.
+#### 4. On the first run, initial configuration is required:
+* Select language;
+* Press Enter;
+* When update is available, choose to either visit GitHub to download new script version or continue with current version;
+* Press Enter.
+#### 5. Select one of the available modes:
+* IPA_Downloader (full version, works after logging in with Apple Account);
+* IPA_Installer (limited version with minimum iOS version check and app installation, works without logging in with Apple Account);
+* Press Enter.
+#### 6. If IPA_Downloader mode is selected, then:
+* Select ipatool version (v2 by default; if v2 doesn't work, select v3);
+* Press Enter;
+* Enter Apple Account (Enter email:);
+* Press Enter;
+* Enter password (Enter password:);
+* Press Enter;
+* Tap Allow on your device and remember the two-factor authentication (2FA) code;
+* Enter the two-factor authentication code (Enter 2FA code:);
+* Press Enter;
+* Enter the required command;
+* Press Enter.
+#### 6.1. If IPA_Installer mode is selected, then:
+* Enter the required command;
+* Press Enter.
 
 ## IPA_Downloader commands description:
 #### 1. Search for app and purchase (without downloading):
