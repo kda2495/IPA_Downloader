@@ -7,7 +7,7 @@ $ScriptVersion = "3.9.9.2"
 # Определение операционной системы:
 $IsWin = [System.Runtime.InteropServices.RuntimeInformation]::IsOSPlatform([System.Runtime.InteropServices.OSPlatform]::Windows)
 $IsMac = [System.Runtime.InteropServices.RuntimeInformation]::IsOSPlatform([System.Runtime.InteropServices.OSPlatform]::OSX)
-$IsLinux = [System.Runtime.InteropServices.RuntimeInformation]::IsOSPlatform([System.Runtime.InteropServices.OSPlatform]::Linux)
+$IsLin = [System.Runtime.InteropServices.RuntimeInformation]::IsOSPlatform([System.Runtime.InteropServices.OSPlatform]::Linux)
 
 # Папка MainApp и файл настроек (язык, режим работы, версия ipatool):
 $MainAppFolderPath = Join-Path -Path $PSScriptRoot -ChildPath "MainApp"
@@ -54,7 +54,7 @@ function Get-ArchSubFolder {
 	param ([ValidateSet("v2", "v3")][string]$Version)
 	if ($IsWin) {
 		if ($Version -eq "v3") { return "windows_amd64_v3" } else { return "windows_amd64_v2" }
-	} elseif ($IsLinux) {
+	} elseif ($IsLin) {
 		if ($Arch -eq "arm64") {
 			if ($Version -eq "v3") { return "linux_arm64_v3" } else { return "linux_arm64_v2" }
 		} else {
