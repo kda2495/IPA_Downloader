@@ -132,13 +132,17 @@ A complete set of the above programs/updates for Windows 7/8.1 is available at t
 #### 3.1 Alternative PowerShell installation:
 * Repeat steps 1–2 from the previous section;
 * Go to the PowerShell download page:  
-  [PowerShell Download Link](https://github.com/PowerShell/PowerShell/releases)
+[Link to download PowerShell](https://github.com/PowerShell/PowerShell/releases)
 * Find the appropriate PowerShell version;
 * Click Show all assets;
 * Download the file: powershell-@-osx-x64.pkg (for Mac with Intel CPU) or powershell-@-osx-arm64.pkg (for Mac with Apple Silicon CPU);
 * Install powershell-@-osx-x64.pkg (for Mac with Intel CPU) or powershell-@-osx-arm64.pkg (for Mac with Apple Silicon CPU);
 * Open Terminal and run the following command: `brew install ideviceinstaller minizip`
 * Press Enter.
+#### Notes:
+* On macOS Big Sur/Catalina, you need to install PowerShell 7.3.12:  
+[Link to download PowerShell 7.3.12](https://github.com/PowerShell/PowerShell/releases/tag/v7.3.12)
+* To update Homebrew and all its components, open Terminal, run the following command: `brew update && brew upgrade && brew cleanup` and press Enter.
 
 ## How to use (macOS):
 #### 1. Extract the IPA_Downloader.zip archive using any archiver;
@@ -179,9 +183,7 @@ A complete set of the above programs/updates for Windows 7/8.1 is available at t
 * Enter the required command;
 * Press Enter.
 
-#### Note:
-* macOS Catalina supports PowerShell version 7.3.12.
-* To update Homebrew and all its components, open Terminal, run the following command: `brew update && brew upgrade && brew cleanup` and press Enter.
+#### Notes:
 * When using ipatool v3 on macOS, to obtain the two-factor authentication (2FA) code, you need to put your device in Airplane Mode and navigate to Settings > Your account > Sign-In & Security > Get Verification Code.
 * There is a bug in ipatool v3 for macOS: an unknown MacBook Pro is added to your account's device list (due to how anisette works). If necessary, you can remove it from the device list, but you will have to obtain a two-factor authentication (2FA) code again.
 * You can use AirDrop to install the app: simply transfer file to your iPhone, and the app will be installed automatically.
