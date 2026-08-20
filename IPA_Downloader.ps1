@@ -159,9 +159,9 @@ $LangStrings = @{
 		"DownloadedListMenu2" = "2. Список загруженных приложений"
 		"DownloadedListMenu3" = "3. Список незагруженных приложений"
 		"ErrorDownloadedEmpty" = "Ошибка: История загрузок пуста."
+		"ErrorIdeviceinstallerNotFound" = "Ошибка: ideviceinstaller не найден. Установка приложений по USB невозможна (только по AirDrop на macOS)"
 		"ErrorInvalidInput" = "Ошибка: Неверный ввод."
 		"ErrorListLoadError" = "Ошибка загрузки списка приложений."
-		"ErrorMacIdeviceinstallerNotFound" = "Ошибка: ideviceinstaller не найден. Установка приложений через скрипт невозможна."
 		"ErrorMissingFiles" = "Ошибка. Следующие файлы не найдены:"
 		"ErrorNoApps" = "Ошибка: В папке Apps отсутствуют приложения."
 		"ErrorNoAppsFound" = "Ошибка: Приложения не найдены."
@@ -247,10 +247,10 @@ $LangStrings = @{
 		"DownloadedListMenu2" = "2. List of downloaded apps"
 		"DownloadedListMenu3" = "3. List of non-downloaded apps"
 		"ErrorDownloadedEmpty" = "Error: Download history is empty."
+		"ErrorIdeviceinstallerNotFound" = "Error: ideviceinstaller not found. Apps installation via USB is impossible (only via AirDrop on macOS)"
 		"ErrorInvalidInput" = "Error: Invalid input."
 		"ErrorListLoadError" = "Failed to load apps list."
 		"ErrorMissingFiles" = "Error. Following files were not found:"
-		"ErrorMacIdeviceinstallerNotFound" = "Error: ideviceinstaller not found. Apps installation via script is impossible."
 		"ErrorNoApps" = "Error: No apps found in Apps folder."
 		"ErrorNoAppsFound" = "Error: No apps found."
 		"ErrorPurchasedEmpty" = "Error: Purchase history is empty."
@@ -1358,7 +1358,7 @@ $(Get-Lang 'IpatoolVersionMenuTitle')
 # Функция установки приложений из папки Apps:
 function Invoke-InstallApps {
 	if ([string]::IsNullOrWhiteSpace($script:ideviceinstallerFilePath)) {
-		Show-Error "ErrorMacIdeviceinstallerNotFound"
+		Show-Error "ErrorIdeviceinstallerNotFound"
 		return
 	}
 	
@@ -1944,7 +1944,7 @@ while ($true) {
 		# macOS и Linux: поиск ideviceinstaller в системном PATH:
 		$ideviceinstallerFilePath = (Get-Command ideviceinstaller -ErrorAction SilentlyContinue).Source
 		if (-not $ideviceinstallerFilePath) {
-			Write-Host (Get-Lang "ErrorMacIdeviceinstallerNotFound") -ForegroundColor DarkRed
+			Write-Host (Get-Lang "ErrorIdeviceinstallerNotFound") -ForegroundColor DarkRed
 		}
 		
 		# Финальная проверка файлов:
