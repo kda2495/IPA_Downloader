@@ -1,8 +1,8 @@
-# Переключение рабочей директории в папку со скриптом:
+﻿# Переключение рабочей директории в папку со скриптом:
 Set-Location -Path $PSScriptRoot
 
 # Версия скрипта:
-$ScriptVersion = "3.9.9.2"
+$ScriptVersion = "4.0.0"
 
 # Определение операционной системы:
 $IsWin = [System.Runtime.InteropServices.RuntimeInformation]::IsOSPlatform([System.Runtime.InteropServices.OSPlatform]::Windows)
@@ -39,10 +39,7 @@ function Set-Setting {
 $SavedSettings = Get-Settings
 $Global:CurrentLang = if ($SavedSettings['Language'] -match '^(RU|EN)$') { $SavedSettings['Language'] } else { "RU" }
 $Global:WorkMode = if ($SavedSettings['Mode'] -in @('Downloader', 'Installer')) { $SavedSettings['Mode'] } else { $null }
-$IpatoolVersion = 'v2'
-
-# Закомментировано в связи с неработоспособностью ipatool v3:
-#$IpatoolVersion = if ($SavedSettings['IpatoolVersion'] -eq 'v3') { 'v3' } else { 'v2' }
+$IpatoolVersion = if ($SavedSettings['IpatoolVersion'] -eq 'ipatool-cpp') { 'ipatool-cpp' } else { 'ipatool-go' }
 
 # Определение архитектуры macOS и Linux:
 if (-not $IsWin) {
@@ -51,20 +48,20 @@ if (-not $IsWin) {
 
 # Функция вычисления имени папки с ipatool под текущую систему/архитектуру:
 function Get-ArchSubFolder {
-	param ([ValidateSet("v2", "v3")][string]$Version)
+	param ([ValidateSet("ipatool-cpp", "ipatool-go")][string]$Version)
 	if ($IsWin) {
-		if ($Version -eq "v3") { return "windows_amd64_v3" } else { return "windows_amd64_v2" }
+		if ($Version -eq "ipatool-cpp") { return "windows_amd64_ipatool-cpp" } else { return "windows_amd64_ipatool-go" }
 	} elseif ($IsLin) {
 		if ($Arch -eq "arm64") {
-			if ($Version -eq "v3") { return "linux_arm64_v3" } else { return "linux_arm64_v2" }
+			if ($Version -eq "ipatool-cpp") { return "linux_arm64_ipatool-cpp" } else { return "linux_arm64_ipatool-go" }
 		} else {
-			if ($Version -eq "v3") { return "linux_amd64_v3" } else { return "linux_amd64_v2" }
+			if ($Version -eq "ipatool-cpp") { return "linux_amd64_ipatool-cpp" } else { return "linux_amd64_ipatool-go" }
 		}
 	} else {
 		if ($Arch -eq "arm64") {
-			if ($Version -eq "v3") { return "macOS_arm64_v3" } else { return "macOS_arm64_v2" }
+			if ($Version -eq "ipatool-cpp") { return "macOS_arm64_ipatool-cpp" } else { return "macOS_arm64_ipatool-go" }
 		} else {
-			if ($Version -eq "v3") { return "macOS_amd64_v3" } else { return "macOS_amd64_v2" }
+			if ($Version -eq "ipatool-cpp") { return "macOS_amd64_ipatool-cpp" } else { return "macOS_amd64_ipatool-go" }
 		}
 	}
 }
@@ -506,7 +503,12 @@ function Connect-AppleAccount {
 		Remove-Item "$CookiesFilePath" -Force -ErrorAction SilentlyContinue
 		Separator
 		Write-Host (Get-Lang "AuthFail")
-		& "$ipatoolFilePath" auth login
+		if ($IpatoolVersion -eq "ipatool-cpp") {
+			& "$ipatoolFilePath" auth login
+		} elseif ($IpatoolVersion -eq "ipatool-go") {
+			$AppleAccount = Read-Host "Enter email"
+			& "$ipatoolFilePath" auth login -email $AppleAccount
+		}
 	}
 	Get-Current-AppleAccount
 }
@@ -1308,7 +1310,7 @@ function Get-MissingBinaryFiles {
 
 # Функция установки конкретной версии ipatool:
 function Set-IpatoolVersion {
-	param ([ValidateSet("v2", "v3")][string]$Version)
+	param ([ValidateSet("ipatool-cpp", "ipatool-go")][string]$Version)
 	
 	$NewArchSubFolder = Get-ArchSubFolder -Version $Version
 	$NewBinaryFolderPath = Join-Path -Path $MainAppFolderPath -ChildPath $NewArchSubFolder
@@ -1334,18 +1336,18 @@ function Set-IpatoolVersion {
 
 # Функция запроса версии ipatool с проверкой наличия файлов:
 function Invoke-IpatoolVersionPrompt {
-	$V2Label = "ipatool_$(Get-ArchSubFolder -Version 'v2')"
-	$V3Label = "ipatool_$(Get-ArchSubFolder -Version 'v3')"
+	$IpatoolCppLabel = "$(Get-ArchSubFolder -Version 'ipatool-cpp')"
+	$IpatoolGoLabel = "$(Get-ArchSubFolder -Version 'ipatool-go')"
 	
 	while ($true) {
 		Separator
 		$Version_Menu = @"
 $(Get-Lang 'IpatoolVersionMenuTitle')
-1. $V2Label
-2. $V3Label`n
+1. $IpatoolCppLabel
+2. $IpatoolGoLabel`n
 "@
 		$VersionChoice = Read-MenuChoice -MenuText $Version_Menu -OptionsCount 2
-		$SelectedVersion = if ($VersionChoice -eq '2') { 'v3' } else { 'v2' }
+		$SelectedVersion = if ($VersionChoice -eq '2') { 'ipatool-go' } else { 'ipatool-cpp' }
 		
 		if (Set-IpatoolVersion -Version $SelectedVersion) {
 			return
@@ -1460,11 +1462,10 @@ $(Get-Lang 'ModeMenu2')`n
 		Set-Setting -Key "Language" -Value $Global:CurrentLang
 	}
 	
-	# Закомментировано в связи с неработоспособностью ipatool v3:
 	# Версия ipatool запрашивается только для режима IPA_Downloader:
-	#if ($Global:WorkMode -eq "Downloader") {
-		#Invoke-IpatoolVersionPrompt
-	#}
+	if ($Global:WorkMode -eq "Downloader") {
+		Invoke-IpatoolVersionPrompt
+	}
 	
 	Show-ModeBanner
 }
@@ -1901,8 +1902,7 @@ $(Get-Lang 'InstallerMenu6')`n
 			
 			# 6. Перейти в IPA_Downloader:
 			"6" {
-				# Закомментировано в связи с неработоспособностью ipatool v3:
-				#Invoke-IpatoolVersionPrompt
+				Invoke-IpatoolVersionPrompt
 				$Global:WorkMode = "Downloader"
 				return
 			}
