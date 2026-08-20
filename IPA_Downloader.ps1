@@ -1,11 +1,13 @@
-﻿# Переключение рабочей директории в папку со скриптом:
+# Переключение рабочей директории в папку со скриптом:
 Set-Location -Path $PSScriptRoot
 
 # Версия скрипта:
 $ScriptVersion = "3.9.9.2"
 
-# Определение запуска на Windows:
+# Определение операционной системы:
 $IsWin = [System.Runtime.InteropServices.RuntimeInformation]::IsOSPlatform([System.Runtime.InteropServices.OSPlatform]::Windows)
+$IsMac = [System.Runtime.InteropServices.RuntimeInformation]::IsOSPlatform([System.Runtime.InteropServices.OSPlatform]::OSX)
+$IsLin = [System.Runtime.InteropServices.RuntimeInformation]::IsOSPlatform([System.Runtime.InteropServices.OSPlatform]::Linux)
 
 # Папка MainApp и файл настроек (язык, режим работы, версия ipatool):
 $MainAppFolderPath = Join-Path -Path $PSScriptRoot -ChildPath "MainApp"
@@ -42,7 +44,7 @@ $IpatoolVersion = 'v2'
 # Закомментировано в связи с неработоспособностью ipatool v3:
 #$IpatoolVersion = if ($SavedSettings['IpatoolVersion'] -eq 'v3') { 'v3' } else { 'v2' }
 
-# Определение архитектуры macOS:
+# Определение архитектуры macOS и Linux:
 if (-not $IsWin) {
 	$Arch = [System.Runtime.InteropServices.RuntimeInformation]::OSArchitecture.ToString().ToLower()
 }
@@ -52,10 +54,18 @@ function Get-ArchSubFolder {
 	param ([ValidateSet("v2", "v3")][string]$Version)
 	if ($IsWin) {
 		if ($Version -eq "v3") { return "windows_amd64_v3" } else { return "windows_amd64_v2" }
-	} elseif ($Arch -eq "arm64") {
-		if ($Version -eq "v3") { return "macOS_arm64_v3" } else { return "macOS_arm64_v2" }
+	} elseif ($IsLin) {
+		if ($Arch -eq "arm64") {
+			if ($Version -eq "v3") { return "linux_arm64_v3" } else { return "linux_arm64_v2" }
+		} else {
+			if ($Version -eq "v3") { return "linux_amd64_v3" } else { return "linux_amd64_v2" }
+		}
 	} else {
-		if ($Version -eq "v3") { return "macOS_amd64_v3" } else { return "macOS_amd64_v2" }
+		if ($Arch -eq "arm64") {
+			if ($Version -eq "v3") { return "macOS_arm64_v3" } else { return "macOS_arm64_v2" }
+		} else {
+			if ($Version -eq "v3") { return "macOS_amd64_v3" } else { return "macOS_amd64_v2" }
+		}
 	}
 }
 
@@ -1263,8 +1273,10 @@ function Set-IpatoolBinaryPaths {
 	} else {
 		$script:ipatoolFilePath = Join-Path -Path $FolderPath -ChildPath "ipatool"
 		
-		# Снятие карантина и выдача прав на запуск:
-		xattr -cr "$FolderPath" 2>$null
+		# Снятие карантина (macOS) и выдача прав на запуск:
+		if ($IsMac) {
+			xattr -cr "$FolderPath" 2>$null
+		}
 		chmod +x "$script:ipatoolFilePath" 2>$null
 	}
 }
@@ -1929,15 +1941,15 @@ while ($true) {
 		Set-IpatoolBinaryPaths -FolderPath $BinaryFolderPath
 		
 	} else {
-		# macOS: поиск ideviceinstaller в системном PATH:
+		# macOS и Linux: поиск ideviceinstaller в системном PATH:
 		$ideviceinstallerFilePath = (Get-Command ideviceinstaller -ErrorAction SilentlyContinue).Source
 		if (-not $ideviceinstallerFilePath) {
 			Write-Host (Get-Lang "ErrorMacIdeviceinstallerNotFound") -ForegroundColor DarkRed
 		}
 		
 		# Финальная проверка файлов:
-		$MissingMacFiles = Get-MissingBinaryFiles -FolderPath $BinaryFolderPath
-		Confirm-RequiredFiles -MissingFiles $MissingMacFiles
+		$MissingUnixFiles = Get-MissingBinaryFiles -FolderPath $BinaryFolderPath
+		Confirm-RequiredFiles -MissingFiles $MissingUnixFiles
 		Set-IpatoolBinaryPaths -FolderPath $BinaryFolderPath
 	}
 	
