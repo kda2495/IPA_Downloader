@@ -421,7 +421,6 @@ $Global:CurrentAppleAccount = "UnknownAccount"
 function Get-Current-AppleAccount {
 	$AuthInfo = & "$ipatoolFilePath" auth info 2>&1 | Out-String
 	if ($AuthInfo -match 'email=([^\s]+)') {
-		# Извлекаем почту и очищаем её от консольных ANSI-кодов цвета:
 		$Global:CurrentAppleAccount = $Matches[1].Trim() -replace '\x1b\[[0-9;]*[a-zA-Z]', ''
 	} else {
 		$Global:CurrentAppleAccount = "UnknownAccount"
@@ -633,7 +632,7 @@ function Initialize-RemoteFiles {
 
 	foreach ($RemoteFile in $RemoteFiles) {
 		try {
-			# Скачивание во временный файл:
+			# Загрузка во временный файл:
 			Invoke-RestMethod -Uri $RemoteFile.Url -OutFile $RemoteFile.Temp -TimeoutSec 2 -ErrorAction Stop
 
 			# Проверка, что временный файл действительно появился:
@@ -1499,7 +1498,7 @@ function Check-Update {
 			$latestVerStr = [regex]::Match($latestRelease.tag_name, '\d+(\.\d+)+').Value
 			$currentVerStr = [regex]::Match($ScriptVersion, '\d+(\.\d+)+').Value
 			
-			# Проверяем, есть ли текстовые приписки после версии:
+			# Проверка, есть ли текстовые приписки после версии:
 			$latestHasSuffix = ($latestRelease.tag_name -replace '\d+(\.\d+)+', '').Trim().Length -gt 0
 			$currentHasSuffix = ($ScriptVersion -replace '\d+(\.\d+)+', '').Trim().Length -gt 0
 			
