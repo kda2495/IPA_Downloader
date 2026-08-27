@@ -1,3 +1,0 @@
-Language=RU
-Mode=Downloader
-IpatoolVersion=ipatool-go
