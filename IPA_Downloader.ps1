@@ -2,7 +2,7 @@
 Set-Location -Path $PSScriptRoot
 
 # Версия скрипта:
-$ScriptVersion = "4.0.0"
+$ScriptVersion = "4.0.0_Test"
 
 # Определение операционной системы:
 $IsWin = [System.Runtime.InteropServices.RuntimeInformation]::IsOSPlatform([System.Runtime.InteropServices.OSPlatform]::Windows)
@@ -571,6 +571,105 @@ function Get-IPA-Metadata {
 	return $Metadata
 }
 
+# Функция инициализации и кэширования списка приложений:
+function Initialize-GitHub-List {
+	if ($null -ne $Global:GitHubParsedList) {
+		return
+	}
+
+	try {
+		# Если файл отсутствует — возвращаем пустой список:
+		if (!(Test-Path $AppsIDListPath)) {
+			$Global:GitHubParsedList = @()
+			return
+		}
+
+		# Чтение уже загруженного локального файла:
+		$Raw = Get-Content -Path $AppsIDListPath -Raw -Encoding UTF8 -ErrorAction Stop
+
+		if ([string]::IsNullOrWhiteSpace($Raw)) {
+			$Global:GitHubParsedList = @()
+			return
+		}
+
+		# Парсинг списка:
+		$Global:GitHubParsedList = @(
+			$Raw -split "`r?`n" |
+				Where-Object {
+					$_ -match '^(.+?):\s*(\d+)'
+				} |
+				ForEach-Object {
+					[PSCustomObject]@{
+						Name = $Matches[1].Trim()
+						Id   = $Matches[2].Trim()
+					}
+				}
+		)
+	}
+	catch {
+		$Global:GitHubParsedList = @()
+	}
+}
+
+# Функция предварительной загрузки списка приложений и файлов предупреждений:
+function Initialize-RemoteFiles {
+	$RemoteFiles = @(
+		[PSCustomObject]@{
+			Url   = "https://raw.githubusercontent.com/kda2495/IPA_Downloader/refs/heads/main/Files/Apps_ID_List.txt"
+			Temp  = $AppsIDTempListPath
+			Final = $AppsIDListPath
+		}
+		[PSCustomObject]@{
+			Url   = "https://raw.githubusercontent.com/kda2495/IPA_Downloader/refs/heads/main/Files/Warning_RU.txt"
+			Temp  = $WarningRUTempPath
+			Final = $WarningRUPath
+		}
+		[PSCustomObject]@{
+			Url   = "https://raw.githubusercontent.com/kda2495/IPA_Downloader/refs/heads/main/Files/Warning_EN.txt"
+			Temp  = $WarningENTempPath
+			Final = $WarningENPath
+		}
+	)
+
+	foreach ($RemoteFile in $RemoteFiles) {
+		try {
+			# Скачивание во временный файл:
+			Invoke-RestMethod -Uri $RemoteFile.Url -OutFile $RemoteFile.Temp -TimeoutSec 2 -ErrorAction Stop
+
+			# Проверка, что временный файл действительно появился:
+			if (Test-Path $RemoteFile.Temp) {
+
+				# Замена старого файла только после успешной загрузки:
+				Move-Item -Path $RemoteFile.Temp -Destination $RemoteFile.Final -Force -ErrorAction Stop
+			}
+		}
+		catch {
+			# Удаление поврежденного временного файла:
+			if (Test-Path $RemoteFile.Temp) {
+				Remove-Item -Path $RemoteFile.Temp -Force -ErrorAction SilentlyContinue
+			}
+		}
+	}
+
+	# Сброс кэша перед повторной инициализацией:
+	$Global:GitHubParsedList = $null
+
+	# Чтение Apps_ID_List.txt и сохранение в памяти:
+	Initialize-GitHub-List
+
+	# Чтение предупреждения и сохранение в памяти:
+	$Global:WarningRUText = $null
+	$Global:WarningENText = $null
+
+	if (Test-Path $WarningRUPath) {
+		$Global:WarningRUText = Get-Content -Path $WarningRUPath -Raw -Encoding UTF8 -ErrorAction SilentlyContinue
+	}
+
+	if (Test-Path $WarningENPath) {
+		$Global:WarningENText = Get-Content -Path $WarningENPath -Raw -Encoding UTF8 -ErrorAction SilentlyContinue
+	}
+}
+
 # Функция сохранения списков с привязкой к аккаунту и сортировкой:
 function Save-App-To-List {
 	param (
@@ -667,46 +766,15 @@ function Save-App-To-List {
 
 # Функция вывода предупреждения:
 function Show-WarningMsg {
-	$WarnFile = if ($Global:CurrentLang -eq "RU") { $WarningRUPath } else { $WarningENPath }
-	if (Test-Path $WarnFile) {
-		$WarnText = Get-Content -Path $WarnFile -Raw -Encoding UTF8 -ErrorAction SilentlyContinue
-		if (![string]::IsNullOrWhiteSpace($WarnText)) {
-			Separator
-			Write-Warning $WarnText
-		}
+	$WarnText = if ($Global:CurrentLang -eq "RU") {
+		$Global:WarningRUText
+	} else {
+		$Global:WarningENText
 	}
-}
 
-# Функция инициализации и кэширования списка с GitHub:
-function Initialize-GitHub-List {
-	if ($null -ne $Global:GitHubParsedList) { return }
-	try {
-		# Загрузка файла, если его нет:
-		if (!(Test-Path "$AppsIDListPath")) {
-			Invoke-RestMethod -Uri "https://raw.githubusercontent.com/kda2495/IPA_Downloader/refs/heads/main/Files/Apps_ID_List.txt" -OutFile "$AppsIDListPath" -ErrorAction SilentlyContinue
-		}
-		
-		# Защита от сбоя сети при первом запуске:
-		if (!(Test-Path "$AppsIDListPath")) {
-			$Global:GitHubParsedList = @()
-			return
-		}
-		
-		# Чтение данных из локального файла:
-		$Raw = Get-Content -Path "$AppsIDListPath" -Raw -Encoding UTF8 -ErrorAction SilentlyContinue
-		if ([string]::IsNullOrWhiteSpace($Raw)) { 
-			$Global:GitHubParsedList = @()
-			return 
-		}
-		
-		$Global:GitHubParsedList = $Raw -split "`n" | Where-Object { $_ -match '^(.+?):\s*(\d+)' } | ForEach-Object {
-			[PSCustomObject]@{
-				Name = $Matches[1].Trim()
-				Id = $Matches[2].Trim()
-			}
-		}
-	} catch {
-		$Global:GitHubParsedList = @()
+	if (![string]::IsNullOrWhiteSpace($WarnText)) {
+		Separator
+		Write-Warning $WarnText
 	}
 }
 
@@ -1041,17 +1109,32 @@ function Search-Apps-Menu {
 	}
 	
 	# Поиск в App Store:
-	$SearchOutput = & "$ipatoolFilePath" search $AppName --limit 10 *>&1 | Out-String
-	if ($SearchOutput -match 'apps=(\[.*?\])') {
-		$JsonString = $Matches[1]
-		if ($JsonString -ne '[]') {
-			$ParsedApps = $JsonString | ConvertFrom-Json
-			foreach ($Item in $ParsedApps) {
-				$FoundApps += $Item
+	$SearchOutput = & "$ipatoolFilePath" search $AppName --limit 10 --format json --non-interactive 2>$null | Out-String
+
+	if ($LASTEXITCODE -eq 0 -and ![string]::IsNullOrWhiteSpace($SearchOutput)) {
+		try {
+			$SearchResult = $SearchOutput | ConvertFrom-Json
+			
+			if ($SearchResult.apps) {
+				foreach ($Item in @($SearchResult.apps)) {
+					$FoundApps += [PSCustomObject]@{
+						Name = $Item.name
+						Id = $Item.id
+					}
+				}
 			}
+		}
+		catch {
 		}
 	}
 	
+	# Удаление дублей по ID:
+	$FoundApps = @(
+		$FoundApps |
+			Group-Object -Property Id |
+			ForEach-Object { $_.Group[0] }
+	)
+
 	# Проверка на пустой результат:
 	if ($FoundApps.Count -eq 0) {
 		Show-Error "ErrorNoAppsFound"
@@ -1069,9 +1152,7 @@ function Search-Apps-Menu {
 		}
 	}
 	
-	Out-Table -Data $TableData `
-		-Headers (Get-Lang "HeaderNum"), (Get-Lang "HeaderAppName"), (Get-Lang "HeaderAppID") `
-		-Properties "Num", "Name", "ID"
+	Out-Table -Data $TableData -Headers (Get-Lang "HeaderNum"), (Get-Lang "HeaderAppName"), (Get-Lang "HeaderAppID") -Properties "Num", "Name", "ID"
 	Separator
 	
 	# Выбор приложений:
@@ -1210,9 +1291,7 @@ $Menu3`n
 	}
 	
 	Separator
-	Out-Table -Data $TableData `
-		-Headers (Get-Lang "HeaderNum"), (Get-Lang "HeaderAppName"), (Get-Lang "HeaderAppID") `
-		-Properties "Num", "Name", "ID"
+	Out-Table -Data $TableData -Headers (Get-Lang "HeaderNum"), (Get-Lang "HeaderAppName"), (Get-Lang "HeaderAppID") -Properties "Num", "Name", "ID"
 	Separator
 	
 	$PromptKey = if ($ListMode -eq "Purchase") { 'AskAppNumPurchase' } else { 'AskAppNumDownload' }
@@ -1257,9 +1336,7 @@ function Get-iOS-MinVersion {
 		$Counter++
 	}
 	
-	Out-Table -Data @($TableData) `
-		-Headers (Get-Lang "HeaderNum"), (Get-Lang "FileName"), (Get-Lang "HeaderMinIOS") `
-		-Properties "Num", "Name", "MinOs"
+	Out-Table -Data @($TableData) -Headers (Get-Lang "HeaderNum"), (Get-Lang "FileName"), (Get-Lang "HeaderMinIOS") -Properties "Num", "Name", "MinOs"
 		
 	return @($FilesToProcess)
 }
@@ -1518,46 +1595,6 @@ if (Test-Path $AppsIDTempListPath) { Remove-Item $AppsIDTempListPath -Force -Err
 
 # Включение TLS 1.2 для совместимости со старыми версиями Windows:
 [Net.ServicePointManager]::SecurityProtocol = [Net.ServicePointManager]::SecurityProtocol -bor [Net.SecurityProtocolType]::Tls12
-
-# Асинхронное фоновое обновление списка приложений и предупреждений с GitHub:
-$BackgroundDownload = {
-	param($ListUrl, $ListFinal, $ListTemp, $WarnRuUrl, $WarnRuFinal, $WarnRuTemp, $WarnEnUrl, $WarnEnFinal, $WarnEnTemp)
-	try {
-		[Net.ServicePointManager]::SecurityProtocol = [Net.ServicePointManager]::SecurityProtocol -bor [Net.SecurityProtocolType]::Tls12
-		
-		# Функция скачивания и перемещения:
-		function Download-And-Move($Url, $Temp, $Final, $MinSize) {
-			Invoke-RestMethod -Uri $Url -OutFile $Temp -ErrorAction SilentlyContinue
-			if (Test-Path $Temp) {
-				if ((Get-Item $Temp).Length -gt $MinSize) {
-					Move-Item -Path $Temp -Destination $Final -Force
-				} else {
-					Remove-Item $Temp -Force
-				}
-			}
-		}
-
-		# Скачиваем файлы:
-		Download-And-Move -Url $ListUrl -Temp $ListTemp -Final $ListFinal -MinSize 10
-		Download-And-Move -Url $WarnRuUrl -Temp $WarnRuTemp -Final $WarnRuFinal -MinSize 5
-		Download-And-Move -Url $WarnEnUrl -Temp $WarnEnTemp -Final $WarnEnFinal -MinSize 5
-	} catch {
-	}
-}
-
-$Runspace = [runspacefactory]::CreateRunspace()
-$Runspace.Open()
-$PSInstance = [powershell]::Create().AddScript($BackgroundDownload).AddArgument("https://raw.githubusercontent.com/kda2495/IPA_Downloader/refs/heads/main/Files/Apps_ID_List.txt").AddArgument($AppsIDListPath).AddArgument($AppsIDTempListPath).AddArgument("https://raw.githubusercontent.com/kda2495/IPA_Downloader/refs/heads/main/Files/Warning_RU.txt").AddArgument($WarningRUPath).AddArgument($WarningRUTempPath).AddArgument("https://raw.githubusercontent.com/kda2495/IPA_Downloader/refs/heads/main/Files/Warning_EN.txt").AddArgument($WarningENPath).AddArgument($WarningENTempPath)
-$PSInstance.Runspace = $Runspace
-$null = $PSInstance.BeginInvoke()
-
-# Очистка ресурсов после завершения фонового потока:
-Register-ObjectEvent -InputObject $PSInstance -EventName InvocationStateChanged -Action {
-	if ($Event.Sender.InvocationStateInfo.State -in 'Completed', 'Failed', 'Stopped') {
-		$Event.Sender.Dispose()
-		$Event.Sender.Runspace.Dispose()
-	}
-} | Out-Null
 
 # Функция режима IPA_Downloader:
 function Invoke-DownloaderMode {
@@ -1939,6 +1976,9 @@ $(Get-Lang 'InstallerMenu5')`n
 		}
 	}
 }
+
+# Предварительная загрузка списка приложений и файлов предупреждений:
+Initialize-RemoteFiles
 
 # Смена режима работы:
 $Global:UpdateChecked = $false
