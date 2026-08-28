@@ -1,0 +1,5 @@
+ipatool-cpp временно недоступен, используйте ipatool-go.
+Работает только на macOS, для Windows исправления пока нет.
+
+ipatool-cpp is temporarily unavailable; use ipatool-go.
+Works only on macOS; there is no fix yet for Windows.

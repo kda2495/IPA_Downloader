@@ -1,2 +1,0 @@
-ipatool-cpp is temporarily unavailable; use ipatool-go.
-Works only on macOS; there is no fix yet for Windows.
