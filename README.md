@@ -366,7 +366,6 @@
 
 ## Отслеживание выхода новых приложений:
 [Сайт AppBank](https://pwa.appbank.pw/)  
-[Telegram-канал AppBank](https://t.me/appbankRu)  
 
 ## Поиск ID приложения:
 #### Вариант 1:
