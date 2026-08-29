@@ -1,5 +1,4 @@
-Предупреждение:
+ВНИМАНИЕ!!!
 ipatool-cpp временно недоступен, используйте ipatool-go.
-
-Warning:
+ATTENTION!!!
 ipatool-cpp is temporarily unavailable, use ipatool-go.
