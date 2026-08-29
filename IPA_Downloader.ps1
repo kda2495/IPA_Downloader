@@ -14,9 +14,10 @@ $MainAppFolderPath = Join-Path -Path $PSScriptRoot -ChildPath "MainApp"
 $FilesFolderPath = Join-Path -Path $PSScriptRoot -ChildPath "Files"
 $SettingsFilePath = Join-Path -Path $FilesFolderPath -ChildPath "Settings.txt"
 
-# Функция чтения всех настроек из Settings.txt:
+# Функция чтения настроек из Settings.txt:
 function Get-Settings {
-	$Settings = @{}
+	$Settings = [ordered]@{}
+	
 	if (Test-Path $SettingsFilePath) {
 		Get-Content $SettingsFilePath -ErrorAction SilentlyContinue | ForEach-Object {
 			if ($_ -match '^\s*([^=]+?)\s*=\s*(.*)$') {
@@ -24,15 +25,24 @@ function Get-Settings {
 			}
 		}
 	}
+
 	return $Settings
 }
 
-# Функция сохранения настройки:
+# Функция сохранения настроек в Settings.txt:
 function Set-Setting {
-	param ([string]$Key, [string]$Value)
+	param (
+		[string]$Key,
+		[string]$Value
+	)
+	
 	$Settings = Get-Settings
 	$Settings[$Key] = $Value
-	$Lines = foreach ($K in $Settings.Keys) { "$K=$($Settings[$K])" }
+	
+	$Lines = foreach ($K in $Settings.Keys) {
+		"$K=$($Settings[$K])"
+	}
+	
 	Set-Content -Path $SettingsFilePath -Value $Lines -Force
 }
 
@@ -1538,11 +1548,23 @@ $(Get-Lang 'UpdateMenu2')`n
 	}
 }
 
-# Функция вывода баннера с текущим режимом работы, версией скрипта и системой/архитектурой:
+# Функция вывода баннера с текущим режимом работы, версией скрипта и именем файла:
 function Show-ModeBanner {
-	$ModeLabel = if ($script:WorkMode -eq "Installer") { "IPA_Installer" } else { "IPA_Downloader" }
 	Separator
-	Write-Host "$ModeLabel $ScriptVersion ($script:ArchSubFolder)"
+	
+	if ($script:WorkMode -eq "Installer") {
+		Write-Host "IPA_Installer $ScriptVersion"
+	} else {
+		$IpatoolFileName = if ($script:ipatoolFilePath) {
+			Split-Path -Leaf $script:ipatoolFilePath
+		} else {
+			$Filter = if ($IsWin) { "ipatool*.exe" } else { "ipatool*" }
+			$FoundFile = Get-ChildItem -Path $script:BinaryFolderPath -Filter $Filter -File -ErrorAction SilentlyContinue | Select-Object -First 1
+			if ($FoundFile) { $FoundFile.Name } else { $script:IpatoolVersion }
+		}
+		
+		Write-Host "IPA_Downloader $ScriptVersion ($IpatoolFileName)"
+	}
 }
 
 # Функция первоначальной настройки (язык):
@@ -1567,9 +1589,9 @@ $(Get-Lang 'LanguageMenu2')`n
 	}
 	
 	# Установка режима IPA_Installer по умолчанию:
+	Set-Setting -Key "Language" -Value $script:CurrentLang
 	$script:WorkMode = "Installer"
 	Set-Setting -Key "Mode" -Value $script:WorkMode
-	Set-Setting -Key "Language" -Value $script:CurrentLang
 	
 	Show-ModeBanner
 }
@@ -1617,9 +1639,9 @@ function Invoke-DownloaderMode {
 	Connect-AppleAccount
 	
 	# Сохранение настроек режима IPA_Downloader только после успешной авторизации с Аккаунтом Apple:
+	Set-Setting -Key "Language" -Value $script:CurrentLang
 	Set-Setting -Key "Mode" -Value "Downloader"
 	Set-Setting -Key "IpatoolVersion" -Value $script:IpatoolVersion
-	Set-Setting -Key "Language" -Value $script:CurrentLang
 	
 	# Основной цикл:
 	while (Test-Path "$AccountFilePath") {
@@ -1905,7 +1927,7 @@ $(Get-Lang 'ClearMenu3')`n
 				Write-Host (Get-Lang "LoggedOut")
 				& "$script:ipatoolFilePath" auth revoke
 				
-				# Удаление файлов настроке и папки .ipatool:
+				# Удаление файлов настроек и папки .ipatool:
 				Remove-Item -Path $SettingsFilePath -Force -ErrorAction SilentlyContinue
 				Remove-Item -Path $ipatoolHomePath -Recurse -Force -ErrorAction SilentlyContinue
 				
