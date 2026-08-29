@@ -5,9 +5,13 @@
 
 # IPA_Downloader
 [![Russian README](https://img.shields.io/badge/README-Russian-blue.svg)](README.md)  
-A script for purchasing/downloading any available App Store apps, as well as restoring removed ones - provided they were previously purchased via your Apple Account (powered by [ipatool-cpp](https://github.com/Sorvigolova/ipatool)).
+A script for purchasing/downloading any available App Store apps, as well as restoring removed ones - provided they were previously purchased via your Apple Account (powered by [ipatool-cpp](https://github.com/Sorvigolova/ipatool) and [ipatool-go](https://github.com/majd/ipatool)).
 
-## IPA_Downloader Features:
+## Script Features:
+#### IPA_Installer:
+* Check minimum iOS version for apps in the IPA_Downloader/Apps folder;
+* Install apps from the IPA_Downloader/Apps folder.
+#### IPA_Downloader:
 * Search for app and purchase (without downloading);
 * Search for app and download latest version;
 * Search for app and download (with version selection);
@@ -17,8 +21,8 @@ A script for purchasing/downloading any available App Store apps, as well as res
 * Show list of apps and purchase (without downloading);
 * Show list of apps and download latest version;
 * Show list of apps and download (with version selection);
-* Check minimum iOS version for apps in Apps folder;
-* Install apps from Apps folder.
+* Check minimum iOS version for apps in the IPA_Downloader/Apps folder;
+* Install apps from the IPA_Downloader/Apps folder.
 
 #### The script CANNOT:
 * Download apps that have **NOT** been previously purchased from the App Store;
@@ -28,10 +32,6 @@ A script for purchasing/downloading any available App Store apps, as well as res
 * To purchase or download apps, they must be previously acquired in the App Store;
 * Apps are downloaded directly from the App Store.
 
-## IPA_Installer Features:
-* Check minimum iOS version for apps in Apps folder;
-* Install apps from Apps folder.
-
 ## General requirements for use:
 * Windows 7, 8.1, 10, 11 (x64);
 * macOS starting from 10.15 Catalina (both Apple Silicon and Intel are supported);
@@ -40,13 +40,12 @@ A script for purchasing/downloading any available App Store apps, as well as res
 * An Apple Account with previously downloaded apps.
 
 ## To run on Windows:
-* iTunes from the Apple website (to support app installation via script):  
+### Windows requirements:
+* Installed iTunes from the Apple website (to support app installation via script):  
 [Link to download iTunes from the Apple website](https://www.apple.com/itunes/download/win64)
-* Instead of a full iTunes installation, you can extract the installer with any archiver and selectively install AppleMobileDeviceSupport64.msi.
-* iCloud from the Apple website (for ipatool v3 only):  
-[Link to download iCloud from the Apple website](https://updates.cdn-apple.com/2020/windows/001-39935-20200911-1A70AA56-F448-11EA-8CC0-99D41950005E/iCloudSetup.exe)
+* Instead of a full iTunes installation, you can extract the iTunes installer with any archiver and selectively install AppleMobileDeviceSupport64.msi.
 
-## To run on Windows 7 and 8.1:
+### Requirements for Windows 7 and 8.1:
 #### All steps must be performed strictly in the following order:
 #### 1. Update system certificates via UpdRootsCert:
 * Follow the link to download UpdRootsCert:  
@@ -77,7 +76,7 @@ A script for purchasing/downloading any available App Store apps, as well as res
 A complete set of the above programs/updates for Windows 7/8.1 is available at the link:  
 [Link for the complete set of programs/updates](https://disk.yandex.ru/d/Fft0whzAz-C7Jg)  
 
-## How to use (Windows):
+### How to use (Windows):
 #### 1. Extract the IPA_Downloader.zip archive using any archiver;
 #### 2. Double-click the Start_IPA_Downloader.bat file;
 #### 3. On the first run, initial configuration is required:
@@ -85,27 +84,27 @@ A complete set of the above programs/updates for Windows 7/8.1 is available at t
 * Press Enter;
 * When update is available, choose to either visit GitHub to download new script version or continue with current version;
 * Press Enter.
-#### 4. Select one of the available modes:
-* IPA_Downloader (full version, works after logging in with Apple Account);
-* IPA_Installer (limited version with minimum iOS version check and app installation, works without logging in with Apple Account);
+#### 4. By default, the script starts in IPA_Installer mode:
+* Enter the required command;
 * Press Enter.
-#### 5. If IPA_Downloader mode is selected, then:
-* Select ipatool version (v2 by default; if v2 doesn't work, select v3);
+* To switch to IPA_Downloader mode, enter command 5. Switch to IPA_Downloader.
+#### 5. After switching to IPA_Downloader mode:
+* Select ipatool version (ipatool-cpp or ipatool-go);
+* If ipatool-go version is selected, enter a master key that you must remember, as it will be requested every time the script is launched;
 * Press Enter;
 * Enter Apple Account (Enter email:);
 * Press Enter;
 * Enter password (Enter password:);
 * Press Enter;
 * Tap Allow on your device and remember the two-factor authentication (2FA) code;
+* If the two-factor authentication (2FA) code doesn't arrive automatically, turn on Airplane mode on your device, go to Settings - Apple Account - Sign-In & Security - Get Verification Code (this is the two-factor authentication (2FA) code);
 * Enter the two-factor authentication code (Enter 2FA code:);
 * Press Enter;
 * Enter the required command;
 * Press Enter.
-#### 5.1. If IPA_Installer mode is selected, then:
-* Enter the required command;
-* Press Enter.
 
 ## To run on macOS:
+### macOS requirements:
 #### All steps must be performed strictly in the following order:
 #### 1. Install the Homebrew package manager:
 * Open Terminal (Command + Space, then type Terminal in the Spotlight search field);
@@ -136,16 +135,16 @@ A complete set of the above programs/updates for Windows 7/8.1 is available at t
 [Link to download PowerShell](https://github.com/PowerShell/PowerShell/releases)
 * Find the appropriate PowerShell version;
 * Click Show all assets;
-* Download the file: powershell-@-osx-x64.pkg (for Mac with Intel CPU) or powershell-@-osx-arm64.pkg (for Mac with Apple Silicon CPU);
-* Install powershell-@-osx-x64.pkg (for Mac with Intel CPU) or powershell-@-osx-arm64.pkg (for Mac with Apple Silicon CPU);
-* Open Terminal and run the following command: `brew install ideviceinstaller minizip`
+* Download the file: powershell-@-osx-x64.pkg (for Mac with Intel processors) or powershell-@-osx-arm64.pkg (for Mac with Apple Silicon processors);
+* Install powershell-@-osx-x64.pkg (for Mac with Intel processors) or powershell-@-osx-arm64.pkg (for Mac with Apple Silicon processors);
+* Type in Terminal: `brew install ideviceinstaller minizip`
 * Press Enter.
-#### Notes:
+#### Note:
 * On macOS Big Sur/Catalina, you need to install PowerShell 7.3.12:  
 [Link to download PowerShell 7.3.12](https://github.com/PowerShell/PowerShell/releases/tag/v7.3.12)
-* To update Homebrew and all its components, open Terminal, run the following command: `brew update && brew upgrade && brew cleanup` and press Enter.
+* To update Homebrew and all its components, type in Terminal: `brew update && brew upgrade && brew cleanup` and press Enter.
 
-## How to use (macOS):
+### How to use (macOS):
 #### 1. Extract the IPA_Downloader.zip archive using any archiver;
 * Type in Terminal: `chmod +x ` (including the trailing space after x) and drag and drop the Start_IPA_Downloader.command file into Terminal;
 * Press Enter.
@@ -164,47 +163,46 @@ A complete set of the above programs/updates for Windows 7/8.1 is available at t
 * Press Enter;
 * When update is available, choose to either visit GitHub to download new script version or continue with current version;
 * Press Enter.
-#### 4. Select one of the available modes:
-* IPA_Downloader (full version, works after logging in with Apple Account);
-* IPA_Installer (limited version with minimum iOS version check and app installation, works without logging in with Apple Account);
+#### 4. By default, the script starts in IPA_Installer mode:
+* Enter the required command;
 * Press Enter.
-#### 5. If IPA_Downloader mode is selected, then:
-* Select ipatool version (v2 by default; if v2 doesn't work, select v3);
+* To switch to IPA_Downloader mode, enter command 5. Switch to IPA_Downloader.
+#### 5. After switching to IPA_Downloader mode:
+* Select ipatool version (ipatool-cpp or ipatool-go);
 * Press Enter;
 * Enter Apple Account (Enter email:);
 * Press Enter;
 * Enter password (Enter password:);
 * Press Enter;
 * Tap Allow on your device and remember the two-factor authentication (2FA) code;
+* If the two-factor authentication (2FA) code doesn't arrive automatically, turn on Airplane mode on your device, go to Settings - Apple Account - Sign-In & Security - Get Verification Code (this is the two-factor authentication (2FA) code);
 * Enter the two-factor authentication code (Enter 2FA code:);
 * Press Enter;
-* Enter the required command;
-* Press Enter.
-#### 5.1. If IPA_Installer mode is selected, then:
+* Enter your Mac password;
+* Click Always Allow;
 * Enter the required command;
 * Press Enter.
 
-#### Notes:
-* When using ipatool v3 on macOS, to obtain the two-factor authentication (2FA) code, you need to put your device in Airplane Mode and navigate to Settings > Your account > Sign-In & Security > Get Verification Code.
-* There is a bug in ipatool v3 for macOS: an unknown MacBook Pro is added to your account's device list (due to how anisette works). If necessary, you can remove it from the device list, but you will have to obtain a two-factor authentication (2FA) code again.
-* You can use AirDrop to install the app: simply transfer file to your iPhone, and the app will be installed automatically.
+#### Note:
+* You can use AirDrop to install the app: simply transfer the file to your iPhone, and the app will be installed automatically.
 
 ## To run on Linux:
-#### 1. Install the required packages:
-* **Arch Linux / Manjaro:**
+### Linux requirements:
+#### Install the required packages:
+#### Arch Linux / Manjaro:
   * Install PowerShell: `sudo pacman -S powershell-bin` (or via AUR: `yay -S powershell-bin`)
   * Install iOS utilities: `sudo pacman -S ideviceinstaller usbmuxd`
   * Enable usbmuxd service: `sudo systemctl enable --now usbmuxd`
-* **Ubuntu / Debian:**
+#### Ubuntu / Debian:
   * Install PowerShell: [Microsoft Instructions](https://learn.microsoft.com/powershell/scripting/install/install-ubuntu) or `sudo apt install powershell`
   * Install iOS utilities: `sudo apt install ideviceinstaller usbmuxd`
   * Enable usbmuxd service: `sudo systemctl enable --now usbmuxd`
-* **Fedora / RHEL:**
+#### Fedora / RHEL:
   * Install PowerShell: `sudo dnf install powershell`
   * Install iOS utilities: `sudo dnf install ideviceinstaller usbmuxd`
   * Enable usbmuxd service: `sudo systemctl enable --now usbmuxd`
 
-## How to use (Linux):
+### How to use (Linux):
 #### 1. Extract the IPA_Downloader archive using any archiver;
 #### 2. Make the launcher script executable (if needed):
 * Type in Terminal: `chmod +x Start_IPA_Downloader.sh`
@@ -217,25 +215,40 @@ A complete set of the above programs/updates for Windows 7/8.1 is available at t
 * Press Enter;
 * When update is available, choose to either visit GitHub to download new script version or continue with current version;
 * Press Enter.
-#### 5. Select one of the available modes:
-* IPA_Downloader (full version, works after logging in with Apple Account);
-* IPA_Installer (limited version with minimum iOS version check and app installation, works without logging in with Apple Account);
+#### 5. By default, the script starts in IPA_Installer mode:
+* Enter the required command;
 * Press Enter.
-#### 6. If IPA_Downloader mode is selected, then:
-* Select ipatool version (v2 by default; if v2 doesn't work, select v3);
+* To switch to IPA_Downloader mode, enter command 5. Switch to IPA_Downloader.
+#### 6. After switching to IPA_Downloader mode:
+* Select ipatool version (ipatool-cpp or ipatool-go);
 * Press Enter;
 * Enter Apple Account (Enter email:);
 * Press Enter;
 * Enter password (Enter password:);
 * Press Enter;
 * Tap Allow on your device and remember the two-factor authentication (2FA) code;
+* If the two-factor authentication (2FA) code doesn't arrive automatically, turn on Airplane mode on your device, go to Settings - Apple Account - Sign-In & Security - Get Verification Code (this is the two-factor authentication (2FA) code);
 * Enter the two-factor authentication code (Enter 2FA code:);
 * Press Enter;
 * Enter the required command;
 * Press Enter.
-#### 6.1. If IPA_Installer mode is selected, then:
-* Enter the required command;
-* Press Enter.
+
+## IPA_Installer commands description:
+#### 1. Check minimum iOS version for apps in the IPA_Downloader/Apps folder:
+* Apps must be located in the IPA_Downloader/Apps path;
+* The script will check the minimum iOS version required for the app to work.
+#### 2. Install apps from the IPA_Downloader/Apps folder:
+* Connect the device using a cable;
+* Apps must be located in the IPA_Downloader/Apps path;
+* Enter the index numbers of the apps to install on the device (in the format 1, 2, 3-5);
+* Press Enter;
+* The script will install the selected apps on the device.
+#### 3. Project support:
+* The script will navigate to the project page on GitHub.
+#### 4. Change Language:
+* The script will change its interface language.
+#### 5. Switch to IPA_Downloader:
+* The script will switch the mode to IPA_Downloader.
 
 ## IPA_Downloader commands description:
 #### 1. Search for app and purchase (without downloading):
@@ -306,44 +319,27 @@ A complete set of the above programs/updates for Windows 7/8.1 is available at t
 * Enter the index numbers of the app versions to download (in the format 1, 2, 3-5);
 * Press Enter;
 * The script will download the selected app versions.
-#### 10. Check minimum iOS version for apps in Apps folder:
+#### 10. Check minimum iOS version for apps in the IPA_Downloader/Apps folder:
 * Apps must be located in the IPA_Downloader/Apps path;
 * The script will check the minimum iOS version required for the app to work.
-#### 11. Install apps from Apps folder:
+#### 11. Install apps from the IPA_Downloader/Apps folder:
 * Connect the device using a cable;
 * Apps must be located in the IPA_Downloader/Apps path;
 * Enter the index numbers of the apps to install on the device (in the format 1, 2, 3-5);
 * Press Enter;
 * The script will install the selected apps on the device.
 #### 12. Clear data:
-* Enter the data list to clear (downloaded apps list, purchased apps list, apps in Apps folder);
+* Enter the data list to clear (downloaded apps list, purchased apps list, apps in the Apps folder);
 * Press Enter;
 * When choosing to clear either the downloaded apps list or the purchased apps list, select the specific account you want to clear;
 * Press Enter;
 * The script will clear the selected data type.
 #### 13. Log out of Apple Account and reset settings:
 * The script will log out of the Apple Account and reset all settings.
-#### 14. GitHub project page:
+#### 14. Project support:
 * The script will navigate to the project page on GitHub.
-#### 15. Change Language (Сменить язык):
+#### 15. Change Language:
 * The script will change its interface language.
-
-## IPA_Installer commands description:
-#### 1. Check minimum iOS version for apps in Apps folder:
-* Apps must be located in the IPA_Downloader/Apps path;
-* The script will check the minimum iOS version required for the app to work.
-#### 2. Install apps from Apps folder:
-* Connect the device using a cable;
-* Apps must be located in the IPA_Downloader/Apps path;
-* Enter the index numbers of the apps to install on the device (in the format 1, 2, 3-5);
-* Press Enter;
-* The script will install the selected apps on the device.
-#### 3. GitHub project page:
-* The script will navigate to the project page on GitHub.
-#### 4. Change Language:
-* The script will change its interface language.
-#### 5. Switch to IPA_Downloader:
-* The script will switch the mode to IPA_Downloader.
 
 ## Troubleshooting errors:
 * Download error: HTTP request failed: Timeout was reached - Failed to connect to Apple servers, check your internet connection.
@@ -354,15 +350,13 @@ A complete set of the above programs/updates for Windows 7/8.1 is available at t
 * WARNING: could not locate Payload/App.app/SC_Info/App.sinf in archive! - App signature not found in the installed ipa file.
 * Error: anisette exited with code 1 - check that anisette binary is working. iTunes Not Found (0) - iTunes from the Apple website is not installed.
 * Error: anisette exited with code 1 - check that anisette binary is working. iCloud Not Found (1) - iCloud from the Apple website is not installed.
-* Login error: GSA SRP exception: GSA complete error -27952: Update iCloud for Windows to the latest version to sign in - Advanced Data Protection needs to be disabled via Settings-Account Name-iCloud-Advanced Data Protection.
+* Login error: GSA SRP exception: GSA complete error -27952: Update iCloud for Windows to the latest version to sign in - Advanced Data Protection needs to be disabled via Settings-Account-iCloud-Advanced Data Protection.
 * If the app immediately closes when launched after installation, log in to the App Store using the account from which it was downloaded, and install any free/paid app. After that, launch the problematic app again.
 
 ## If you encounter an issue:
 #### Provide the following information:
-* The system and ipatool version you are using;
-* The full path to the IPA_Downloader folder;
-* A screenshot of the error;
-* The sequence of actions to reproduce the error.
+* The operating system and ipatool version you are using;
+* A screenshot of the error.
 
 ## Tracking new app releases:
 [AppBank Website](https://pwa.appbank.pw/)
