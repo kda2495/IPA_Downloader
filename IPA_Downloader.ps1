@@ -2,7 +2,7 @@
 Set-Location -Path $PSScriptRoot
 
 # Версия скрипта:
-$ScriptVersion = "4.0.0_Beta 2"
+$ScriptVersion = "4.0.0_Beta 3"
 
 # Определение операционной системы:
 $IsWin = [System.Runtime.InteropServices.RuntimeInformation]::IsOSPlatform([System.Runtime.InteropServices.OSPlatform]::Windows)
@@ -1560,7 +1560,7 @@ function Show-ModeBanner {
 		} else {
 			$Filter = if ($IsWin) { "ipatool*.exe" } else { "ipatool*" }
 			$FoundFile = Get-ChildItem -Path $script:BinaryFolderPath -Filter $Filter -File -ErrorAction SilentlyContinue | Select-Object -First 1
-			if ($FoundFile) { $FoundFile.BaseName } else { $script:IpatoolVersion }
+			if ($FoundFile) { $FoundFile.Name } else { $script:IpatoolVersion }
 		}
 		
 		Write-Host "IPA_Downloader $ScriptVersion ($IpatoolFileName)"
@@ -1627,10 +1627,15 @@ if (Test-Path $WarningTempPath) { Remove-Item $WarningTempPath -Force -ErrorActi
 
 # Функция режима IPA_Downloader:
 function Invoke-DownloaderMode {
-	# Запрос keychain-passphrase:
-	Separator
-	$SecureKp = Read-Host "$(Get-Lang 'AskKeychainPassphrase')" -AsSecureString
-	$Kp = [System.Net.NetworkCredential]::new("", $SecureKp).Password
+	# Запрос keychain-passphrase (только для Windows):
+	if ($IsWin) {
+		Separator
+		$SecureKp = Read-Host "$(Get-Lang 'AskKeychainPassphrase')" -AsSecureString
+		$Kp = [System.Net.NetworkCredential]::new("", $SecureKp).Password
+	} else {
+		# Для macOS и Linux оставляем пароль пустым, так как они могут использовать нативные связки ключей:
+		$Kp = ""
+	}
 	
 	# Проверка осуществленного входа с Аккаунтом Apple:
 	if (Test-Path "$LoginFilePath") {
@@ -2023,18 +2028,6 @@ $script:UpdateChecked = $false
 
 # Главный рабочий цикл скрипта:
 while ($true) {
-	# Если режим не задан, то запускаем мастер настройки:
-	if ($null -eq $script:WorkMode) {
-		Invoke-SetupWizard
-	} else {
-		if (-not $script:UpdateChecked) {
-			Check-Update
-			$script:UpdateChecked = $true
-		}
-			
-		Show-ModeBanner
-	}
-		
 	# Проверка наличия файлов под текущую операционную систему:
 	if ($IsWin) {
 		$MissingMainAppFiles = Get-MissingBinaryFiles -FolderPath $script:BinaryFolderPath
@@ -2051,6 +2044,18 @@ while ($true) {
 		if (-not $script:ideviceinstallerFilePath) {
 			Write-Host (Get-Lang "ErrorIdeviceinstallerNotFound") -ForegroundColor DarkRed
 		}
+	}
+	
+	# Если режим не задан, то запускаем мастер настройки:
+	if ($null -eq $script:WorkMode) {
+		Invoke-SetupWizard
+	} else {
+		if (-not $script:UpdateChecked) {
+			Check-Update
+			$script:UpdateChecked = $true
+		}
+		
+		Show-ModeBanner
 	}
 	
 	# Запуск выбранного режима работы:
