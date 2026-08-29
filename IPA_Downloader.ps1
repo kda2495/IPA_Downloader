@@ -1627,13 +1627,13 @@ if (Test-Path $WarningTempPath) { Remove-Item $WarningTempPath -Force -ErrorActi
 
 # Функция режима IPA_Downloader:
 function Invoke-DownloaderMode {
-	# Запрос keychain-passphrase (только для Windows):
-	if ($IsWin) {
+	# Запрос keychain-passphrase (только для ipatool-go на Windows):
+	if ($IsWin -and $script:IpatoolVersion -eq "ipatool-go") {
 		Separator
 		$SecureKp = Read-Host "$(Get-Lang 'AskKeychainPassphrase')" -AsSecureString
 		$Kp = [System.Net.NetworkCredential]::new("", $SecureKp).Password
 	} else {
-		# Для macOS и Linux оставляем пароль пустым, так как они могут использовать нативные связки ключей:
+		# Для macOS, Linux, а также ipatool-cpp не требуется keychain-passphrase:
 		$Kp = ""
 	}
 	
