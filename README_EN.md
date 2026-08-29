@@ -365,8 +365,7 @@ A complete set of the above programs/updates for Windows 7/8.1 is available at t
 * The sequence of actions to reproduce the error.
 
 ## Tracking new app releases:
-[AppBank Website](https://pwa.appbank.pw/)  
-[AppBank Telegram Channel](https://t.me/appbankRu)  
+[AppBank Website](https://pwa.appbank.pw/)
 
 ## Finding an App ID:
 #### Option 1:
