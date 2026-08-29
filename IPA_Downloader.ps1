@@ -88,8 +88,7 @@ $DownloadedIDsFilePath = Join-Path -Path $FilesFolderPath -ChildPath "Downloaded
 $PurchasedIDsFilePath = Join-Path -Path $FilesFolderPath -ChildPath "Purchased_IDs.json"
 $AppsFolderPath = Join-Path -Path $PSScriptRoot -ChildPath "Apps"
 $ipatoolHomePath = Join-Path -Path $HOME -ChildPath ".ipatool"
-$AccountFilePath = Join-Path -Path $ipatoolHomePath -ChildPath "account"
-$CookiesFilePath = Join-Path -Path $ipatoolHomePath -ChildPath "cookies"
+$LoginFilePath = Join-Path -Path $ipatoolHomePath -ChildPath "login"
 $TempFolderPath = [System.IO.Path]::GetTempPath()
 $TempIpaFilePath = Join-Path -Path $TempFolderPath -ChildPath "Temp.ipa"
 $AppsIDListPath = Join-Path -Path $FilesFolderPath -ChildPath "Apps_ID_List.txt"
@@ -155,6 +154,7 @@ $LangStrings = @{
 		"AskAppIdPurchase" = "Введите ID приложений для покупки"
 		"AskAppSearch" = "Введите название приложения для поиска"
 		"AskFileNum" = "Введите № файлов для установки"
+		"AskKeychainPassphrase" = "Придумайте (введите) ключ-пароль для разблокировки"
 		"AskVerCount" = "Введите количество версий для отображения"
 		"AskVerNum" = "Введите № версий для загрузки"
 		"AuthFail" = "Вход в Аккаунт Apple не выполнен."
@@ -243,6 +243,7 @@ $LangStrings = @{
 		"AskAppIdPurchase" = "Enter app IDs to purchase"
 		"AskAppSearch" = "Enter app name to search"
 		"AskFileNum" = "Enter # of files to install"
+		"AskKeychainPassphrase" = "Create (enter) a key-password for unlocking"
 		"AskVerCount" = "Enter quantity of versions to display"
 		"AskVerNum" = "Enter # of versions to download"
 		"AuthFail" = "Not authenticated with Apple Account."
@@ -430,7 +431,7 @@ $script:CurrentAppleAccount = "UnknownAccount"
 
 # Функция получения текущего Аккаунта Apple:
 function Get-Current-AppleAccount {
-	$AuthInfo = & "$script:ipatoolFilePath" auth info 2>&1 | Out-String
+	$AuthInfo = & "$script:ipatoolFilePath" auth info --keychain-passphrase $Kp 2>&1 | Out-String
 	if ($AuthInfo -match 'email=([^\s]+)') {
 		$script:CurrentAppleAccount = $Matches[1].Trim() -replace '\x1b\[[0-9;]*[a-zA-Z]', ''
 	} else {
@@ -512,9 +513,8 @@ function Read-AppList-Json {
 
 # Функция входа в Аккаунт Apple:
 function Connect-AppleAccount {
-	
-	while (!(Test-Path "$AccountFilePath")) {
-		Remove-Item "$CookiesFilePath" -Force -ErrorAction SilentlyContinue
+	while (!(Test-Path "$LoginFilePath")) {
+		Remove-Item -Path $ipatoolHomePath -Recurse -Force -ErrorAction SilentlyContinue
 		Separator
 		Write-Host (Get-Lang "AuthFail")
 		
@@ -522,11 +522,11 @@ function Connect-AppleAccount {
 			& "$script:ipatoolFilePath" auth login
 		} elseif ($script:IpatoolVersion -eq "ipatool-go") {
 			$AppleAccount = Read-Host "Enter email"
-			& "$script:ipatoolFilePath" auth login --email $AppleAccount
+			& "$script:ipatoolFilePath" auth login --email $AppleAccount --keychain-passphrase $Kp
 			
-			# Создание пустого файла account:
+			# Создание пустого файла login:
 			if ($LASTEXITCODE -eq 0) {
-				New-Item -Path $AccountFilePath -ItemType File -Force | Out-Null
+				New-Item -Path $LoginFilePath -ItemType File -Force | Out-Null
 			} else {
 				Remove-Item -Path $ipatoolHomePath -Recurse -Force -ErrorAction SilentlyContinue
 			}
@@ -919,7 +919,7 @@ function IPA-Download {
 	)
 	if (!(Test-NumericInput -InputValue $AppId)) { return }
 	Separator
-	& "$script:ipatoolFilePath" download -i $AppId --purchase
+	& "$script:ipatoolFilePath" download -i $AppId --purchase --keychain-passphrase $Kp
 	Move-IPA-Files -AppId $AppId -AppName $AppName
 }
 
@@ -932,7 +932,7 @@ function IPA-Download-With-Version {
 	if (!(Test-NumericInput -InputValue $AppId)) { return }
 	
 	Separator
-	$RawOutput = & "$script:ipatoolFilePath" list-versions -i $AppId 2>&1
+	$RawOutput = & "$script:ipatoolFilePath" list-versions -i $AppId --keychain-passphrase $Kp 2>&1
 	
 	if ($RawOutput -match "Error:") {
 		Write-Host $RawOutput -ForegroundColor DarkRed
@@ -1009,7 +1009,7 @@ function IPA-Download-With-Version {
 		$VersionId = $RecentVersions[$idx]
 		
 		# Запрос к ipatool:
-		$Meta = & "$script:ipatoolFilePath" get-version-metadata -i $AppId --external-version-id $VersionId 2>$null
+		$Meta = & "$script:ipatoolFilePath" get-version-metadata -i $AppId --external-version-id $VersionId --keychain-passphrase $Kp 2>$null
 		$DisplayVersion = if ($Meta -match 'displayVersion=([^\s,]+)') { $Matches[1] } else { "NA" }
 		
 		# Очистка версии от скрытых ANSI-кодов, которые ломают длину строки:
@@ -1045,7 +1045,7 @@ function IPA-Download-With-Version {
 		Write-Host "$(Get-Lang 'SelectedVer') $($SelectedObject.Version)"
 		Separator
 		$FinalId = $SelectedObject.ID
-		& "$script:ipatoolFilePath" download -i $AppId --external-version-id $FinalId
+		& "$script:ipatoolFilePath" download -i $AppId --external-version-id $FinalId --keychain-passphrase $Kp
 		Move-IPA-Files -AppId $AppId -AppName $AppName
 	}
 }
@@ -1063,7 +1063,7 @@ function Invoke-AppAction {
 	switch ($Action) {
 		"Purchase" {
 			Separator
-			& "$script:ipatoolFilePath" purchase -i $AppId
+			& "$script:ipatoolFilePath" purchase -i $AppId --keychain-passphrase $Kp
 			Save-App-To-List -AppId $AppId -AppNameOnly $AppName -Type "Purchased"
 		}
 		"Download" {
@@ -1105,7 +1105,7 @@ function Search-Apps {
 	}
 	
 	# Поиск в App Store:
-	$SearchOutput = & "$script:ipatoolFilePath" search $AppName --limit 10 --format json --non-interactive 2>$null | Out-String
+	$SearchOutput = & "$script:ipatoolFilePath" search $AppName --limit 10 --format json --non-interactive --keychain-passphrase $Kp 2>$null | Out-String
 	
 	if ($LASTEXITCODE -eq 0 -and ![string]::IsNullOrWhiteSpace($SearchOutput)) {
 		try {
@@ -1560,7 +1560,7 @@ function Show-ModeBanner {
 		} else {
 			$Filter = if ($IsWin) { "ipatool*.exe" } else { "ipatool*" }
 			$FoundFile = Get-ChildItem -Path $script:BinaryFolderPath -Filter $Filter -File -ErrorAction SilentlyContinue | Select-Object -First 1
-			if ($FoundFile) { $FoundFile.Name } else { $script:IpatoolVersion }
+			if ($FoundFile) { $FoundFile.BaseName } else { $script:IpatoolVersion }
 		}
 		
 		Write-Host "IPA_Downloader $ScriptVersion ($IpatoolFileName)"
@@ -1627,11 +1627,16 @@ if (Test-Path $WarningTempPath) { Remove-Item $WarningTempPath -Force -ErrorActi
 
 # Функция режима IPA_Downloader:
 function Invoke-DownloaderMode {
+	# Запрос keychain-passphrase:
+	Separator
+	$SecureKp = Read-Host "$(Get-Lang 'AskKeychainPassphrase')" -AsSecureString
+	$Kp = [System.Net.NetworkCredential]::new("", $SecureKp).Password
+	
 	# Проверка осуществленного входа с Аккаунтом Apple:
-	if (Test-Path "$AccountFilePath") {
+	if (Test-Path "$LoginFilePath") {
 		Separator
 		Write-Host (Get-Lang "AuthSuccess")
-		& "$script:ipatoolFilePath" auth info
+		& "$script:ipatoolFilePath" auth info --keychain-passphrase $Kp
 		Get-Current-AppleAccount
 	}
 	
@@ -1644,7 +1649,7 @@ function Invoke-DownloaderMode {
 	Set-Setting -Key "IpatoolVersion" -Value $script:IpatoolVersion
 	
 	# Основной цикл:
-	while (Test-Path "$AccountFilePath") {
+	while (Test-Path "$LoginFilePath") {
 	
 		Separator
 		$MainMenu = @"
@@ -1925,7 +1930,7 @@ $(Get-Lang 'ClearMenu3')`n
 			"13" {
 				Separator
 				Write-Host (Get-Lang "LoggedOut")
-				& "$script:ipatoolFilePath" auth revoke
+				& "$script:ipatoolFilePath" auth revoke --keychain-passphrase $Kp
 				
 				# Удаление файлов настроек и папки .ipatool:
 				Remove-Item -Path $SettingsFilePath -Force -ErrorAction SilentlyContinue
