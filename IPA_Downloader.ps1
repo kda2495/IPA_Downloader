@@ -2,7 +2,7 @@
 Set-Location -Path $PSScriptRoot
 
 # Версия скрипта:
-$ScriptVersion = "4.0.0_Beta 3"
+$ScriptVersion = "4.0.0_Beta 4"
 
 # Определение операционной системы:
 $IsWin = [System.Runtime.InteropServices.RuntimeInformation]::IsOSPlatform([System.Runtime.InteropServices.OSPlatform]::Windows)
@@ -522,14 +522,16 @@ function Connect-AppleAccount {
 			& "$script:ipatoolFilePath" auth login
 		} elseif ($script:IpatoolVersion -eq "ipatool-go") {
 			$AppleAccount = Read-Host "Enter email"
-			& "$script:ipatoolFilePath" auth login --email $AppleAccount --keychain-passphrase $Kp
-			
-			# Создание пустого файла login:
-			if ($LASTEXITCODE -eq 0) {
-				New-Item -Path $LoginFilePath -ItemType File -Force | Out-Null
-			} else {
-				Remove-Item -Path $ipatoolHomePath -Recurse -Force -ErrorAction SilentlyContinue
-			}
+			$SecurePassword = Read-Host "Enter password" -AsSecureString
+			$Password = [System.Net.NetworkCredential]::new("", $SecurePassword).Password
+			& "$script:ipatoolFilePath" auth login --email $AppleAccount --password $Password --keychain-passphrase $Kp
+		}
+		
+		# Создание пустого файла login для фиксации успешной авторизации:
+		if ($LASTEXITCODE -eq 0) {
+			New-Item -Path $LoginFilePath -ItemType File -Force | Out-Null
+		} else {
+			Remove-Item -Path $ipatoolHomePath -Recurse -Force -ErrorAction SilentlyContinue
 		}
 	}
 	Get-Current-AppleAccount
@@ -767,7 +769,7 @@ function Save-App-To-List {
 function Show-WarningMsg {
 	if (![string]::IsNullOrWhiteSpace($script:WarningText)) {
 		Separator
-		Write-Host $script:WarningText
+		Write-Host $script:WarningText -BackgroundColor Yellow -ForegroundColor Black
 	}
 }
 
