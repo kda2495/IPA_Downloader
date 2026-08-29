@@ -1,4 +1,5 @@
 Предупреждение:
 ipatool-cpp временно недоступен, используйте ipatool-go.
+
 Warning:
-Works only on macOS; there is no fix yet for Windows.
+ipatool-cpp is temporarily unavailable, use ipatool-go.
