@@ -2,7 +2,7 @@
 Set-Location -Path $PSScriptRoot
 
 # Версия скрипта:
-$ScriptVersion = "4.0.0_Test"
+$ScriptVersion = "4.0.0_Beta 2"
 
 # Определение операционной системы:
 $IsWin = [System.Runtime.InteropServices.RuntimeInformation]::IsOSPlatform([System.Runtime.InteropServices.OSPlatform]::Windows)
@@ -316,6 +316,13 @@ function Separator {
 	Write-Host "====================================================================" -ForegroundColor Green
 }
 
+# Скомпилированные регулярные выражения для ускорения рендеринга таблиц:
+$script:reANSI = New-Object System.Text.RegularExpressions.Regex('\x1b\[[0-9;]*[a-zA-Z]', 'Compiled')
+$script:reSpaces = New-Object System.Text.RegularExpressions.Regex('[\u00A0\u2000-\u200A\u202F\u205F\u3000]', 'Compiled')
+$script:reDashes = New-Object System.Text.RegularExpressions.Regex('[\u2010-\u2015]', 'Compiled')
+$script:reHidden = New-Object System.Text.RegularExpressions.Regex('[\u200B-\u200F\u202A-\u202E\u2060\uFEFF\u00AD\p{Cc}\p{Cf}]', 'Compiled')
+$script:reWide = New-Object System.Text.RegularExpressions.Regex('[\u1100-\u115F\u2E80-\uA4CF\uAC00-\uD7A3\uF900-\uFAFF\uFF01-\uFF60]', 'Compiled')
+
 # Функция вывода данных в виде таблицы:
 function Out-Table {
 	param (
@@ -326,25 +333,19 @@ function Out-Table {
 	
 	if (-not $Data -or $Data.Count -eq 0) { return }
 	
-	$reANSI = [regex]'\x1b\[[0-9;]*[a-zA-Z]'
-	$reSpaces = [regex]'[\u00A0\u2000-\u200A\u202F\u205F\u3000]'
-	$reDashes = [regex]'[\u2010-\u2015]'
-	$reHidden = [regex]'[\u200B-\u200F\u202A-\u202E\u2060\uFEFF\u00AD\p{Cc}\p{Cf}]'
-	$reWide = [regex]'[\u1100-\u115F\u2E80-\uA4CF\uAC00-\uD7A3\uF900-\uFAFF\uFF01-\uFF60]'
-	
 	# Очистка и измерение ячеек:
 	function Get-CellInfo([string]$text) {
 		if ([string]::IsNullOrEmpty($text)) { return @{ Text = ""; Width = 0 } }
 		
 		# Замена текста для корректного отображения:
-		$s = $reANSI.Replace($text, '')
-		$s = $reSpaces.Replace($s, ' ')
-		$s = $reDashes.Replace($s, '-')
-		$s = $reHidden.Replace($s, '')
+		$s = $script:reANSI.Replace($text, '')
+		$s = $script:reSpaces.Replace($s, ' ')
+		$s = $script:reDashes.Replace($s, '-')
+		$s = $script:reHidden.Replace($s, '')
 		$s = $s.Normalize([System.Text.NormalizationForm]::FormC)
 		
 		# Расчет ширины:
-		$visualWidth = $s.Length + $reWide.Matches($s).Count
+		$visualWidth = $s.Length + $script:reWide.Matches($s).Count
 		return @{ Text = $s; Width = $visualWidth }
 	}
 	
@@ -596,15 +597,15 @@ function Initialize-GitHub-List {
 		# Парсинг списка:
 		$script:GitHubParsedList = @(
 			$Raw -split "`r?`n" |
-				Where-Object {
-					$_ -match '^(.+?):\s*(\d+)'
-				} |
-				ForEach-Object {
-					[PSCustomObject]@{
-						Name = $Matches[1].Trim()
-						Id = $Matches[2].Trim()
-					}
+			Where-Object {
+				$_ -match '^(.+?):\s*(\d+)'
+			} |
+			ForEach-Object {
+				[PSCustomObject]@{
+					Name = $Matches[1].Trim()
+					Id = $Matches[2].Trim()
 				}
+			}
 		)
 	}
 	catch {
@@ -630,18 +631,18 @@ function Initialize-RemoteFiles {
 	foreach ($RemoteFile in $RemoteFiles) {
 		try {
 			# Загрузка во временный файл:
-			Invoke-RestMethod -Uri $RemoteFile.Url -OutFile $RemoteFile.Temp -TimeoutSec 2 -ErrorAction Stop
+			Invoke-RestMethod -Uri $RemoteFile.Url -OutFile $RemoteFile.Temp -TimeoutSec 3 -ErrorAction Stop
 			
 			# Проверка, что временный файл действительно появился:
 			if (Test-Path $RemoteFile.Temp) {
-				
 				# Замена старого файла только после успешной загрузки:
 				Move-Item -Path $RemoteFile.Temp -Destination $RemoteFile.Final -Force -ErrorAction Stop
 			}
 		}
 		catch {
-			# Получение имени файла и вывод ошибки в консоль:
+			# Получение имени файла и вывод ошибки загрузки в консоль:
 			$FileName = Split-Path -Leaf $RemoteFile.Final
+			Separator
 			Write-Host "$(Get-Lang "ErrorDownloadFiles") $FileName" -ForegroundColor DarkRed
 			
 			# Удаление поврежденного временного файла:
@@ -688,15 +689,8 @@ function Save-App-To-List {
 	if ([string]::IsNullOrWhiteSpace($JsonRaw)) { $JsonRaw = '{}' }
 	
 	$Data = $JsonRaw | ConvertFrom-Json
-	if ($null -eq $Data) {
+	if ($null -eq $Data -or ($Data -is [System.Collections.IEnumerable] -and $Data -isnot [System.Management.Automation.PSCustomObject])) {
 		$Data = New-Object PSCustomObject
-	}
-	
-	# Конвертация старого формата в новый:
-	if ($Data -is [System.Collections.IEnumerable] -and $Data -isnot [System.Management.Automation.PSCustomObject]) {
-		$OldArray = $Data
-		$Data = New-Object PSCustomObject
-		$Data | Add-Member -MemberType NoteProperty -Name "UnknownAccount" -Value $OldArray
 	}
 	
 	# Получение списка приложений для текущего аккаунта:
@@ -762,7 +756,8 @@ function Save-App-To-List {
 # Функция вывода предупреждения:
 function Show-WarningMsg {
 	if (![string]::IsNullOrWhiteSpace($script:WarningText)) {
-		Write-Warning $script:WarningText
+		Separator
+		Write-Host $script:WarningText
 	}
 }
 
@@ -1007,6 +1002,9 @@ function IPA-Download-With-Version {
 		$Meta = & "$script:ipatoolFilePath" get-version-metadata -i $AppId --external-version-id $VersionId 2>$null
 		$DisplayVersion = if ($Meta -match 'displayVersion=([^\s,]+)') { $Matches[1] } else { "NA" }
 		
+		# Очистка версии от скрытых ANSI-кодов, которые ломают длину строки:
+		$DisplayVersion = $DisplayVersion -replace '\x1b\[[0-9;]*[a-zA-Z]', ''
+		
 		$VersionMapping += [PSCustomObject]@{
 			Index = $Counter
 			ID = $VersionId
@@ -1068,7 +1066,7 @@ function Invoke-AppAction {
 }
 
 # Функция поиска приложений:
-function Search-Apps-Menu {
+function Search-Apps {
 	param (
 		[string]$PromptKey = 'AskAppNumDownload'
 	)
@@ -1168,7 +1166,7 @@ function Get-Multiple-AppIds {
 			continue
 		}
 		
-		$RawParts = $InputRaw -split ',' | ForEach-Object { $_.Trim() } | Where-Object { $_ -ne "" }
+		$RawParts = $InputRaw.Split(',', [System.StringSplitOptions]::RemoveEmptyEntries) | ForEach-Object { $_.Trim() }
 		$AppIds = @()
 		$AllValid = $true
 		
@@ -1262,8 +1260,7 @@ $Menu3`n
 	}
 	
 	# Парсинг данных для таблицы:
-	$TableData = @()
-	for ($I = 0; $I -lt $Lines.Count; $I++) {
+	$TableData = foreach ($I in 0..($Lines.Count - 1)) {
 		$SelectedLine = $Lines[$I]
 		$AppId = [System.Text.RegularExpressions.Regex]::Match($SelectedLine, '\b\d{6,}\b').Value
 		$AppName = "Unknown"
@@ -1271,7 +1268,7 @@ $Menu3`n
 			$AppName = $Matches[1].Trim()
 		}
 		
-		$TableData += [PSCustomObject]@{
+		[PSCustomObject]@{
 			Num = $I + 1
 			Name = $AppName
 			ID = $AppId
@@ -1310,18 +1307,17 @@ function Get-iOS-MinVersion {
 	
 	Separator
 	$Counter = 1
-	$TableData = @()
 	
-	foreach ($File in @($FilesToProcess)) { 
+	# Присваиваем вывод цикла напрямую переменной (без +=)
+	$TableData = foreach ($File in @($FilesToProcess)) { 
 		$Meta = Get-IPA-Metadata -IpaPath $File.FullName
 		$MinOs = if ($Meta) { "$($Meta.MinIOS)" } else { "Error" }
 		
-		$TableData += [PSCustomObject]@{
-			Num = $Counter
+		[PSCustomObject]@{
+			Num = $Counter++
 			Name = $File.Name
 			MinOs = $MinOs
 		}
-		$Counter++
 	}
 	
 	Out-Table -Data @($TableData) -Headers (Get-Lang "HeaderNum"), (Get-Lang "FileName"), (Get-Lang "HeaderMinIOS") -Properties "Num", "Name", "MinOs"
@@ -1330,7 +1326,7 @@ function Get-iOS-MinVersion {
 }
 
 # Функция вывода ошибки об отсутствии необходимых файлов:
-function Confirm-RequiredFiles {
+function Check-RequiredFiles {
 	param ([array]$MissingFiles)
 	if ($MissingFiles) {
 		Separator
@@ -1359,19 +1355,26 @@ function Set-IpatoolBinaryPaths {
 	param ([string]$FolderPath)
 	
 	if ($IsWin) {
-		$script:ipatoolFilePath = Join-Path -Path $FolderPath -ChildPath "ipatool.exe"
-		$script:ideviceinstallerFilePath = Join-Path -Path $FolderPath -ChildPath "ideviceinstaller.exe"
+		$ipatoolFile = Get-ChildItem -Path $FolderPath -Filter "ipatool*.exe" -File -ErrorAction SilentlyContinue | Select-Object -First 1
+		$ideviceFile = Get-ChildItem -Path $FolderPath -Filter "ideviceinstaller*.exe" -File -ErrorAction SilentlyContinue | Select-Object -First 1
+		
+		if ($ipatoolFile) { $script:ipatoolFilePath = $ipatoolFile.FullName }
+		if ($ideviceFile) { $script:ideviceinstallerFilePath = $ideviceFile.FullName }
 		
 		# Добавление папки с ipatool в PATH текущего процесса:
 		Update-PathFolder -NewFolder $FolderPath
 	} else {
-		$script:ipatoolFilePath = Join-Path -Path $FolderPath -ChildPath "ipatool"
+		$ipatoolFile = Get-ChildItem -Path $FolderPath -Filter "ipatool*" -File -ErrorAction SilentlyContinue | Select-Object -First 1
 		
-		# Снятие карантина (macOS) и выдача прав на запуск:
-		if ($IsMac) {
-			xattr -cr "$FolderPath" 2>$null
+		if ($ipatoolFile) {
+			$script:ipatoolFilePath = $ipatoolFile.FullName
+			
+			# Снятие карантина (macOS) и выдача прав на запуск:
+			if ($IsMac) {
+				xattr -cr "$FolderPath" 2>$null
+			}
+			chmod +x "$script:ipatoolFilePath" 2>$null
 		}
-		chmod +x "$script:ipatoolFilePath" 2>$null
 	}
 }
 
@@ -1379,25 +1382,24 @@ function Set-IpatoolBinaryPaths {
 function Get-MissingBinaryFiles {
 	param ([string]$FolderPath)
 	
+	$MissingFiles = @()
+	
 	if ($IsWin) {
-		$RequiredFiles = @("ideviceinstaller.exe", "ipatool.exe")
-		$ExistingFiles = @()
-		if (Test-Path -Path $FolderPath) {
-			$ExistingFiles = Get-ChildItem -Path $FolderPath -File -ErrorAction SilentlyContinue | Select-Object -ExpandProperty Name
-		}
-		$MissingFiles = foreach ($File in $RequiredFiles) {
-			if ($File -notin $ExistingFiles) {
-				Join-Path -Path $FolderPath -ChildPath $File
+		$RequiredPatterns = @("ideviceinstaller*.exe", "ipatool*.exe")
+		foreach ($Pattern in $RequiredPatterns) {
+			$Found = Get-ChildItem -Path $FolderPath -Filter $Pattern -File -ErrorAction SilentlyContinue
+			if (-not $Found) {
+				$MissingFiles += $Pattern
 			}
 		}
-		return $MissingFiles
 	} else {
-		$IpatoolPath = Join-Path -Path $FolderPath -ChildPath "ipatool"
-		if (-not (Test-Path $IpatoolPath)) {
-			return @($IpatoolPath)
+		$FoundIpatool = Get-ChildItem -Path $FolderPath -Filter "ipatool*" -File -ErrorAction SilentlyContinue
+		if (-not $FoundIpatool) {
+			$MissingFiles += "ipatool*"
 		}
-		return @()
 	}
+	
+	return $MissingFiles
 }
 
 # Функция установки конкретной версии ipatool:
@@ -1448,7 +1450,7 @@ $(Get-Lang 'IpatoolVersionMenuTitle')
 }
 
 # Функция установки приложений из папки Apps:
-function Invoke-InstallApps {
+function Install-Apps {
 	if ([string]::IsNullOrWhiteSpace($script:ideviceinstallerFilePath)) {
 		Show-Error "ErrorIdeviceinstallerNotFound"
 		return
@@ -1479,7 +1481,7 @@ function Invoke-InstallApps {
 function Check-Update {
 	try {
 		$repoUrl = "https://api.github.com/repos/kda2495/IPA_Downloader/releases/latest"
-		$latestRelease = Invoke-RestMethod -Uri $repoUrl -UseBasicParsing -ErrorAction SilentlyContinue
+		$latestRelease = Invoke-RestMethod -Uri $repoUrl -UseBasicParsing -TimeoutSec 3 -ErrorAction SilentlyContinue
 		
 		if ($latestRelease -and $latestRelease.tag_name) {
 			
@@ -1496,13 +1498,23 @@ function Check-Update {
 			# Проверка, что обе переменные не пустые, чтобы избежать ошибок конвертации:
 			if (![string]::IsNullOrEmpty($latestVerStr) -and ![string]::IsNullOrEmpty($currentVerStr)) {
 				
-				# 1. Если числовая версия на GitHub больше:
+				# Если числовая версия на GitHub больше:
 				if ([version]$latestVerStr -gt [version]$currentVerStr) {
 					$UpdateFound = $true
-				} 
-				# 2. Если числовые версии равны, но у текущей версии есть приписка, а на GitHub чистая версия:
-				elseif (([version]$latestVerStr -eq [version]$currentVerStr) -and $currentHasSuffix -and -not $latestHasSuffix) {
-					$UpdateFound = $true
+				}
+				
+				# Если числовые версии равны:
+				elseif ([version]$latestVerStr -eq [version]$currentVerStr) {
+					
+					# Переход от беты к чистому релизу
+					if ($currentHasSuffix -and -not $latestHasSuffix) {
+						$UpdateFound = $true
+					}
+					
+					# Переход между бетами:
+					elseif ($currentHasSuffix -and $latestHasSuffix -and ($latestRelease.tag_name -gt $ScriptVersion)) {
+						$UpdateFound = $true
+					}
 				}
 			}
 			
@@ -1568,7 +1580,6 @@ Write-Host "$OSVersion"
 
 # Версия PowerShell:
 Write-Host "PowerShell $PSVersion"
-Separator
 
 # Проверка на наличие базовых папок:
 foreach ($Dir in @("$AppsFolderPath", "$FilesFolderPath", "$MainAppFolderPath")) {
@@ -1576,6 +1587,9 @@ foreach ($Dir in @("$AppsFolderPath", "$FilesFolderPath", "$MainAppFolderPath"))
 		$null = New-Item -Path $Dir -ItemType "Directory"
 	}
 }
+
+# Включение TLS 1.2 для совместимости со старыми версиями операционных систем:
+[Net.ServicePointManager]::SecurityProtocol = [Net.ServicePointManager]::SecurityProtocol -bor [Net.SecurityProtocolType]::Tls12
 
 # Предварительная загрузка списка приложений и файлов предупреждений:
 Initialize-RemoteFiles
@@ -1585,10 +1599,9 @@ Show-WarningMsg
 
 # Удаление временных файлов при запуске:
 Get-ChildItem -Path $PSScriptRoot -Filter "*.ipa.tmp" -File -ErrorAction SilentlyContinue | Remove-Item -Force -ErrorAction SilentlyContinue
+Get-ChildItem -Path $PSScriptRoot -Filter "*.ipa" -File -ErrorAction SilentlyContinue | Remove-Item -Force -ErrorAction SilentlyContinue
 if (Test-Path $AppsIDTempListPath) { Remove-Item $AppsIDTempListPath -Force -ErrorAction SilentlyContinue }
-
-# Включение TLS 1.2 для совместимости со старыми версиями Windows:
-[Net.ServicePointManager]::SecurityProtocol = [Net.ServicePointManager]::SecurityProtocol -bor [Net.SecurityProtocolType]::Tls12
+if (Test-Path $WarningTempPath) { Remove-Item $WarningTempPath -Force -ErrorAction SilentlyContinue }
 
 # Функция режима IPA_Downloader:
 function Invoke-DownloaderMode {
@@ -1636,7 +1649,7 @@ $(Get-Lang 'Menu15')`n
 			
 			# 1. Поиск приложения и покупка (без загрузки):
 			"1" {
-				$AppsToProcess = Search-Apps-Menu -PromptKey 'AskAppNumPurchase'
+				$AppsToProcess = Search-Apps -PromptKey 'AskAppNumPurchase'
 				if ($null -ne $AppsToProcess) {
 					foreach ($App in $AppsToProcess) {
 						Invoke-AppAction -AppId $App.Id -AppName $App.Name -DisplayName $App.Name -Action "Purchase"
@@ -1646,7 +1659,7 @@ $(Get-Lang 'Menu15')`n
 			
 			# 2. Поиск приложения и загрузка последней версии:
 			"2" {
-				$AppsToProcess = Search-Apps-Menu -PromptKey 'AskAppNumDownload'
+				$AppsToProcess = Search-Apps -PromptKey 'AskAppNumDownload'
 				if ($null -ne $AppsToProcess) {
 					foreach ($App in $AppsToProcess) {
 						Invoke-AppAction -AppId $App.Id -AppName $App.Name -DisplayName $App.Name -Action "Download"
@@ -1656,7 +1669,7 @@ $(Get-Lang 'Menu15')`n
 			
 			# 3. Поиск приложения и загрузка (с выбором версии):
 			"3" {
-				$AppsToProcess = Search-Apps-Menu -PromptKey 'AskAppNumDownload'
+				$AppsToProcess = Search-Apps -PromptKey 'AskAppNumDownload'
 				if ($null -ne $AppsToProcess) {
 					foreach ($App in $AppsToProcess) {
 						Invoke-AppAction -AppId $App.Id -AppName $App.Name -DisplayName $App.Name -Action "DownloadVersion"
@@ -1737,7 +1750,7 @@ $(Get-Lang 'Menu15')`n
 			
 			# 11. Установка приложений из папки Apps:
 			"11" {
-				Invoke-InstallApps
+				Install-Apps
 			}
 			
 			# 12. Очистка данных скрипта:
@@ -1924,6 +1937,9 @@ $(Get-Lang 'ClearMenu3')`n
 
 # Функция режима IPA_Installer:
 function Invoke-InstallerMode {
+	# Удаление папки .ipatool (в случае неудачной авторизации ранее):
+	Remove-Item -Path $ipatoolHomePath -Recurse -Force -ErrorAction SilentlyContinue
+	
 	while ($true) {
 		Separator
 		$Installer_Menu = @"
@@ -1944,7 +1960,7 @@ $(Get-Lang 'InstallerMenu5')`n
 			
 			# 2. Установка приложений из папки Apps:
 			"2" {
-				Invoke-InstallApps
+				Install-Apps
 			}
 			
 			# 3. Поддержка проекта:
@@ -1983,29 +1999,31 @@ while ($true) {
 	# Если режим не задан, то запускаем мастер настройки:
 	if ($null -eq $script:WorkMode) {
 		Invoke-SetupWizard
-		} else {
-			if (-not $script:UpdateChecked) {
-				Check-Update
-				$script:UpdateChecked = $true
-			}
-			
-			Show-ModeBanner
+	} else {
+		if (-not $script:UpdateChecked) {
+			Check-Update
+			$script:UpdateChecked = $true
 		}
+			
+		Show-ModeBanner
+	}
 		
-	# Проверка наличия файлов под текущую ОС:
+	# Проверка наличия файлов под текущую операционную систему:
 	if ($IsWin) {
 		$MissingMainAppFiles = Get-MissingBinaryFiles -FolderPath $script:BinaryFolderPath
-		Confirm-RequiredFiles -MissingFiles $MissingMainAppFiles
+		Check-RequiredFiles -MissingFiles $MissingMainAppFiles
 		Set-IpatoolBinaryPaths -FolderPath $script:BinaryFolderPath
 	} else {
-		$script:ideviceinstallerFilePath = (Get-Command ideviceinstaller -ErrorAction SilentlyContinue).Source
+		$MissingUnixFiles = Get-MissingBinaryFiles -FolderPath $script:BinaryFolderPath
+		Check-RequiredFiles -MissingFiles $MissingUnixFiles
+		Set-IpatoolBinaryPaths -FolderPath $script:BinaryFolderPath
+		
+		$IdeviceCmd = Get-Command ideviceinstaller* -ErrorAction SilentlyContinue | Select-Object -First 1
+		$script:ideviceinstallerFilePath = if ($IdeviceCmd) { $IdeviceCmd.Source } else { $null }
+		
 		if (-not $script:ideviceinstallerFilePath) {
 			Write-Host (Get-Lang "ErrorIdeviceinstallerNotFound") -ForegroundColor DarkRed
 		}
-		
-		$MissingUnixFiles = Get-MissingBinaryFiles -FolderPath $script:BinaryFolderPath
-		Confirm-RequiredFiles -MissingFiles $MissingUnixFiles
-		Set-IpatoolBinaryPaths -FolderPath $script:BinaryFolderPath
 	}
 	
 	# Запуск выбранного режима работы:
