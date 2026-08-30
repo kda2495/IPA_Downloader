@@ -2,7 +2,7 @@
 Set-Location -Path $PSScriptRoot
 
 # Версия скрипта:
-$ScriptVersion = "4.0.0_Beta 4"
+$ScriptVersion = "4.0.0_Beta 5"
 
 # Определение операционной системы:
 $IsWin = [System.Runtime.InteropServices.RuntimeInformation]::IsOSPlatform([System.Runtime.InteropServices.OSPlatform]::Windows)
@@ -966,75 +966,77 @@ function IPA-Download-With-Version {
 	# Сообщение о загрузке списка версий приложения:
 	Separator
 	Write-Host (Get-Lang "LoadingVersionsList")
-	Separator
 	
 	# Заголовки таблицы:
 	$HeaderNum = Get-Lang "HeaderNum"
 	$HeaderVerID = Get-Lang "HeaderVerID"
 	$HeaderVersion = Get-Lang "HeaderVersion"
 	
-	# Максимальное число параллельных потоков для запроса метаданных версий:
-	$MaxThreads = [Math]::Min(5, [Math]::Max(1, $RecentVersions.Count))
+	# Расчет ширины колонок:
+	$W1 = [Math]::Max($HeaderNum.Length, "$($RecentVersions.Count)".Length)
 	
-	# Запрос метаданных версий:
-	$MetadataScriptBlock = {
-		param($ToolPath, $AppId, $VersionId, $Kp, $Index)
-		
-		$DisplayVersion = "NA"
-		try {
-			$Meta = & "$ToolPath" get-version-metadata -i $AppId --external-version-id $VersionId --keychain-passphrase $Kp 2>$null
-			if ($Meta -match 'displayVersion=([^\s,]+)') {
-				# Очистка версии от скрытых ANSI-кодов, которые ломают длину строки:
-				$DisplayVersion = $Matches[1] -replace '\x1b\[[0-9;]*[a-zA-Z]', ''
-			}
-		} catch {
-			$DisplayVersion = "NA"
+	$MaxIdLen = $HeaderVerID.Length
+	foreach ($id in $RecentVersions) {
+		if ($id.Length -gt $MaxIdLen) { $MaxIdLen = $id.Length }
+	}
+	
+	$W2 = [Math]::Max($HeaderVersion.Length, 15)
+	$W3 = $MaxIdLen
+	
+	$ColWidths = @($W1, $W2, $W3)
+	
+	# Формирование рамок:
+	$TopParts = foreach ($w in $ColWidths) { "─" * ($w + 2) }
+	$SepParts = foreach ($w in $ColWidths) { "─" * ($w + 2) }
+	$BottomParts = foreach ($w in $ColWidths) { "─" * ($w + 2) }
+	$LineTop = "┌" + ($TopParts -join "┬") + "┐"
+	$LineSep = "├" + ($SepParts -join "┼") + "┤"
+	$LineBottom = "└" + ($BottomParts -join "┴") + "┘"
+	
+	# Функция быстрой печати строки:
+	function Print-StreamRow ([string[]]$cells) {
+		$formatted = for ($i = 0; $i -lt $cells.Count; $i++) {
+			$text = "$($cells[$i])"
+			$pad = [Math]::Max(0, $ColWidths[$i] - $text.Length)
+			" " + $text + (" " * $pad) + " "
 		}
+		Write-Host ("│" + ($formatted -join "│") + "│")
+	}
+	
+	Separator
+	# Вывод шапки таблицы:
+	Write-Host $LineTop
+	Print-StreamRow @($HeaderNum, $HeaderVersion, $HeaderVerID)
+	Write-Host $LineSep
+	
+	# Получение данных с выводом строк:
+	$VersionMapping = @()
+	$Counter = 1
+	
+	for ($idx = 0; $idx -lt $RecentVersions.Count; $idx++) {
+		$VersionId = $RecentVersions[$idx]
 		
-		[PSCustomObject]@{
-			Num = $Index
+		# Запрос к ipatool:
+		$Meta = & "$script:ipatoolFilePath" get-version-metadata -i $AppId --external-version-id $VersionId --keychain-passphrase $Kp 2>$null
+		$DisplayVersion = if ($Meta -match 'displayVersion=([^\s,]+)') { $Matches[1] } else { "NA" }
+		
+		# Очистка версии от скрытых ANSI-кодов, которые ломают длину строки:
+		$DisplayVersion = $DisplayVersion -replace '\x1b\[[0-9;]*[a-zA-Z]', ''
+		
+		$VersionMapping += [PSCustomObject]@{
+			Index = $Counter
 			ID = $VersionId
 			Version = $DisplayVersion
 		}
-	}
-	
-	# Создание пула runspace:
-	$RunspacePool = [runspacefactory]::CreateRunspacePool(1, $MaxThreads)
-	$RunspacePool.Open()
-	
-	$Jobs = @()
-	$Results = @()
-	
-	try {
-		# Запуск запросов метаданных параллельно:
-		$Counter = 1
-		foreach ($VersionId in $RecentVersions) {
-			$PS = [powershell]::Create()
-			$PS.RunspacePool = $RunspacePool
-			$null = $PS.AddScript($MetadataScriptBlock.ToString()).AddArgument($script:ipatoolFilePath).AddArgument($AppId).AddArgument($VersionId).AddArgument($Kp).AddArgument($Counter)
-			
-			$Jobs += [PSCustomObject]@{
-				Pipeline = $PS
-				Handle = $PS.BeginInvoke()
-			}
-			$Counter++
-		}
 		
-		# Сбор результатов:
-		foreach ($Job in $Jobs) {
-			$Results += $Job.Pipeline.EndInvoke($Job.Handle)
-		}
-	} finally {
-		# Освобождение ресурсов пулаЖ:
-		foreach ($Job in $Jobs) { $Job.Pipeline.Dispose() }
-		$RunspacePool.Close()
-		$RunspacePool.Dispose()
+		# Печать строки после получения версии:
+		Print-StreamRow @("$Counter", "$DisplayVersion", "$VersionId")
+		
+		$Counter++
 	}
 	
-	# Восстановление исходного порядка версий:
-	$VersionMapping = @($Results | Sort-Object Num)
-	
-	Out-Table -Data $VersionMapping -Headers $HeaderNum, $HeaderVersion, $HeaderVerID -Properties "Num", "Version", "ID"
+	# Нижняя граница:
+	Write-Host $LineBottom
 	Separator
 	
 	# Выбор версий:
