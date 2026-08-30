@@ -1,4 +1,2 @@
-ВНИМАНИЕ!!!
-ipatool-cpp временно недоступен, используйте ipatool-go.
-ATTENTION!!!
-ipatool-cpp is temporarily unavailable, use ipatool-go.
+ВНИМАНИЕ: ipatool-cpp временно недоступен, используйте ipatool-go.
+ATTENTION: ipatool-cpp is temporarily unavailable, use ipatool-go.
