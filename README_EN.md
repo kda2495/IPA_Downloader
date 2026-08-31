@@ -243,8 +243,8 @@ A complete set of the above programs/updates for Windows 7/8.1 is available at t
 * Enter the index numbers of the apps to install on the device (in the format 1, 2, 3-5);
 * Press Enter;
 * The script will install the selected apps on the device.
-#### 3. Project support:
-* The script will navigate to the project page on GitHub.
+#### 3. Tip Jar:
+* The script will navigate to the CloudTips page.
 #### 4. Change Language:
 * The script will change its interface language.
 #### 5. Switch to IPA_Downloader:
@@ -336,8 +336,8 @@ A complete set of the above programs/updates for Windows 7/8.1 is available at t
 * The script will clear the selected data type.
 #### 13. Log out of Apple Account and reset settings:
 * The script will log out of the Apple Account and reset all settings.
-#### 14. Project support:
-* The script will navigate to the project page on GitHub.
+#### 14. Tip Jar:
+* The script will navigate to the CloudTips page.
 #### 15. Change Language:
 * The script will change its interface language.
 
