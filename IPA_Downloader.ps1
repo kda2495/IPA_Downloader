@@ -526,6 +526,13 @@ function Connect-AppleAccount {
 		# Создание пустого файла login для фиксации успешной авторизации:
 		if ($LASTEXITCODE -eq 0) {
 			New-Item -Path $LoginFilePath -ItemType File -Force | Out-Null
+			
+			# Сохранение keychain-passphrase с шифрованием после успешного входа:
+			if ($IsWin -and $script:IpatoolVersion -eq "ipatool-go" -and !([string]::IsNullOrEmpty($Kp))) {
+				$KeychainFilePath = Join-Path -Path $ipatoolHomePath -ChildPath "keychain-passphrase"
+				$SecureKp = ConvertTo-SecureString -String $Kp -AsPlainText -Force
+				$SecureKp | ConvertFrom-SecureString | Set-Content -Path $KeychainFilePath -Force
+			}
 		} else {
 			Remove-Item -Path $ipatoolHomePath -Recurse -Force -ErrorAction SilentlyContinue
 		}
@@ -1685,11 +1692,18 @@ $(Get-Lang 'InstallerMenu5')`n
 
 # Функция режима IPA_Downloader:
 function Invoke-DownloaderMode {
-	# Запрос keychain-passphrase (только для ipatool-go на Windows):
+	# Инициализация keychain-passphrase (только для ipatool-go на Windows):
 	if ($IsWin -and $script:IpatoolVersion -eq "ipatool-go") {
-		Separator
-		$SecureKp = Read-Host "$(Get-Lang 'AskKeychainPassphrase')" -AsSecureString
-		$Kp = [System.Net.NetworkCredential]::new("", $SecureKp).Password
+		$KeychainFilePath = Join-Path -Path $ipatoolHomePath -ChildPath "keychain-passphrase"
+		
+		if (Test-Path $KeychainFilePath) {
+			$EncryptedContent = (Get-Content -Path $KeychainFilePath -Raw).Trim()
+			$SecureKp = $EncryptedContent | ConvertTo-SecureString
+			$Kp = [System.Net.NetworkCredential]::new("", $SecureKp).Password
+		} else {
+			# Генерация нового случайного ключа:
+			$Kp = [guid]::NewGuid().ToString("N")
+		}
 	} else {
 		# Для macOS, Linux, а также ipatool-cpp не требуется keychain-passphrase:
 		$Kp = ""
