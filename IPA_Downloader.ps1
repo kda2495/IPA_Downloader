@@ -2,7 +2,7 @@
 Set-Location -Path $PSScriptRoot
 
 # Версия скрипта:
-$ScriptVersion = "4.0.0_Beta 5"
+$ScriptVersion = "4.0.0_Beta 6"
 
 # Определение операционной системы:
 $IsWin = [System.Runtime.InteropServices.RuntimeInformation]::IsOSPlatform([System.Runtime.InteropServices.OSPlatform]::Windows)
@@ -191,7 +191,7 @@ $LangStrings = @{
 		"InstallApp" = "Установка:"
 		"InstallerMenu1" = "1. Проверка минимальной версии iOS для приложений в папке IPA_Downloader/Apps"
 		"InstallerMenu2" = "2. Установка приложений из папки IPA_Downloader/Apps"
-		"InstallerMenu3" = "3. Поддержка проекта"
+		"InstallerMenu3" = "3. Банка для чаевых"
 		"InstallerMenu4" = "4. Сменить язык (Change Language)"
 		"InstallerMenu5" = "5. Перейти в IPA_Downloader"
 		"IpatoolVersionMenuTitle" = "Выберите версию ipatool:"
@@ -215,13 +215,10 @@ $LangStrings = @{
 		"Menu11" = "11. Установка приложений из папки IPA_Downloader/Apps"
 		"Menu12" = "12. Очистка данных"
 		"Menu13" = "13. Выход из Аккаунта Apple и сброс настроек"
-		"Menu14" = "14. Поддержка проекта"
+		"Menu14" = "14. Банка для чаевых"
 		"Menu15" = "15. Сменить язык (Change Language)"
 		"MenuTitle" = "Введите команду:"
 		"MinIOS" = "Минимальная версия iOS:"
-		"ModeMenu1" = "1. IPA_Downloader"
-		"ModeMenu2" = "2. IPA_Installer"
-		"ModeMenuTitle" = "Выберите режим работы:"
 		"PurchasedListCleared" = "Готово. Список приобретенных приложений очищен."
 		"PurchasedListMenu1" = "1. Полный список приложений (GitHub)"
 		"PurchasedListMenu2" = "2. Список приобретенных приложений"
@@ -281,7 +278,7 @@ $LangStrings = @{
 		"InstallApp" = "Installing:"
 		"InstallerMenu1" = "1. Check minimum iOS version for apps in IPA_Downloader/Apps folder"
 		"InstallerMenu2" = "2. Install apps from IPA_Downloader/Apps folder"
-		"InstallerMenu3" = "3. Project support"
+		"InstallerMenu3" = "3. Tip Jar"
 		"InstallerMenu4" = "4. Change Language (Сменить язык)"
 		"InstallerMenu5" = "5. Switch to IPA_Downloader"
 		"IpatoolVersionMenuTitle" = "Select ipatool version:"
@@ -305,13 +302,10 @@ $LangStrings = @{
 		"Menu11" = "11. Install apps from IPA_Downloader/Apps folder"
 		"Menu12" = "12. Clear data"
 		"Menu13" = "13. Log out of Apple Account and reset settings"
-		"Menu14" = "14. Project support"
+		"Menu14" = "14. Tip Jar"
 		"Menu15" = "15. Change Language (Сменить язык)"
 		"MenuTitle" = "Enter a command:"
 		"MinIOS" = "Minimum iOS version:"
-		"ModeMenu1" = "1. IPA_Downloader"
-		"ModeMenu2" = "2. IPA_Installer"
-		"ModeMenuTitle" = "Select operating mode:"
 		"PurchasedListCleared" = "Done. Purchased apps list cleared."
 		"PurchasedListMenu1" = "1. Full apps list (GitHub)"
 		"PurchasedListMenu2" = "2. List of purchased apps"
@@ -326,7 +320,7 @@ $LangStrings = @{
 
 # Функция разделителя:
 function Separator {
-	Write-Host "====================================================================" -ForegroundColor Green
+	Write-Host "==============================================================================" -ForegroundColor Green
 }
 
 # Скомпилированные регулярные выражения для ускорения рендеринга таблиц:
@@ -1633,6 +1627,62 @@ Get-ChildItem -Path $PSScriptRoot -Filter "*.ipa" -File -ErrorAction SilentlyCon
 if (Test-Path $AppsIDTempListPath) { Remove-Item $AppsIDTempListPath -Force -ErrorAction SilentlyContinue }
 if (Test-Path $WarningTempPath) { Remove-Item $WarningTempPath -Force -ErrorAction SilentlyContinue }
 
+# Функция режима IPA_Installer:
+function Invoke-InstallerMode {
+	# Удаление папки .ipatool (в случае неудачной авторизации ранее):
+	Remove-Item -Path $ipatoolHomePath -Recurse -Force -ErrorAction SilentlyContinue
+	
+	while ($true) {
+		Separator
+		$Installer_Menu = @"
+$(Get-Lang 'MenuTitle')
+$(Get-Lang 'InstallerMenu1')
+$(Get-Lang 'InstallerMenu2')
+$(Get-Lang 'InstallerMenu3')
+$(Get-Lang 'InstallerMenu4')
+$(Get-Lang 'InstallerMenu5')`n
+"@
+		$SwitchValue = Read-Host $Installer_Menu
+		switch ($SwitchValue) {
+			
+			# 1. Проверка минимальной версии iOS для приложений в папке Apps:
+			"1" {
+				$null = Get-iOS-MinVersion
+			}
+			
+			# 2. Установка приложений из папки Apps:
+			"2" {
+				Install-Apps
+			}
+			
+			# 3. Банка для чаевых:
+			"3" {
+				Start-Process "https://pay.cloudtips.ru/p/93c0b094"
+			}
+			
+			# 4. Сменить язык (Change Language):
+			"4" {
+				$script:CurrentLang = if ($script:CurrentLang -eq "RU") { "EN" } else { "RU" }
+				Set-Setting -Key "Language" -Value $script:CurrentLang
+				Separator
+				Write-Host (Get-Lang "LangChanged")
+			}
+			
+			# 5. Перейти в IPA_Downloader:
+			"5" {
+				Invoke-IpatoolVersionPrompt
+				$script:WorkMode = "Downloader"
+				return
+			}
+			
+			# Неверный ввод:
+			default {
+				Show-Error "ErrorInvalidInput"
+			}
+		}
+	}
+}
+
 # Функция режима IPA_Downloader:
 function Invoke-DownloaderMode {
 	# Запрос keychain-passphrase (только для ipatool-go на Windows):
@@ -1954,9 +2004,9 @@ $(Get-Lang 'ClearMenu3')`n
 				return
 			}
 			
-			# 14. Поддержка проекта:
+			# 14. Банка для чаевых:
 			"14" {
-				Start-Process "https://github.com/kda2495/IPA_Downloader#поддержка-проекта"
+				Start-Process "https://pay.cloudtips.ru/p/93c0b094"
 			}
 			
 			# 15. Сменить язык (Change Language):
@@ -1965,62 +2015,6 @@ $(Get-Lang 'ClearMenu3')`n
 				Set-Setting -Key "Language" -Value $script:CurrentLang
 				Separator
 				Write-Host (Get-Lang "LangChanged")
-			}
-			
-			# Неверный ввод:
-			default {
-				Show-Error "ErrorInvalidInput"
-			}
-		}
-	}
-}
-
-# Функция режима IPA_Installer:
-function Invoke-InstallerMode {
-	# Удаление папки .ipatool (в случае неудачной авторизации ранее):
-	Remove-Item -Path $ipatoolHomePath -Recurse -Force -ErrorAction SilentlyContinue
-	
-	while ($true) {
-		Separator
-		$Installer_Menu = @"
-$(Get-Lang 'MenuTitle')
-$(Get-Lang 'InstallerMenu1')
-$(Get-Lang 'InstallerMenu2')
-$(Get-Lang 'InstallerMenu3')
-$(Get-Lang 'InstallerMenu4')
-$(Get-Lang 'InstallerMenu5')`n
-"@
-		$SwitchValue = Read-Host $Installer_Menu
-		switch ($SwitchValue) {
-			
-			# 1. Проверка минимальной версии iOS для приложений в папке Apps:
-			"1" {
-				$null = Get-iOS-MinVersion
-			}
-			
-			# 2. Установка приложений из папки Apps:
-			"2" {
-				Install-Apps
-			}
-			
-			# 3. Поддержка проекта:
-			"3" {
-				Start-Process "https://github.com/kda2495/IPA_Downloader#поддержка-проекта"
-			}
-			
-			# 4. Сменить язык (Change Language):
-			"4" {
-				$script:CurrentLang = if ($script:CurrentLang -eq "RU") { "EN" } else { "RU" }
-				Set-Setting -Key "Language" -Value $script:CurrentLang
-				Separator
-				Write-Host (Get-Lang "LangChanged")
-			}
-			
-			# 5. Перейти в IPA_Downloader:
-			"5" {
-				Invoke-IpatoolVersionPrompt
-				$script:WorkMode = "Downloader"
-				return
 			}
 			
 			# Неверный ввод:
