@@ -90,7 +90,6 @@ A complete set of the above programs/updates for Windows 7/8.1 is available at t
 * To switch to IPA_Downloader mode, enter command 5. Switch to IPA_Downloader.
 #### 5. After switching to IPA_Downloader mode:
 * Select ipatool version (ipatool-cpp or ipatool-go);
-* If ipatool-go version is selected, enter a master key that you must remember, as it will be requested every time the script is launched;
 * Press Enter;
 * Enter Apple Account (Enter email:);
 * Press Enter;
