@@ -2,7 +2,7 @@
 Set-Location -Path $PSScriptRoot
 
 # Версия скрипта:
-$ScriptVersion = "4.0.0_Beta 6"
+$ScriptVersion = "4.0.0_Beta 7"
 
 # Определение операционной системы:
 $IsWin = [System.Runtime.InteropServices.RuntimeInformation]::IsOSPlatform([System.Runtime.InteropServices.OSPlatform]::Windows)
@@ -507,8 +507,19 @@ function Read-AppList-Json {
 
 # Функция входа в Аккаунт Apple:
 function Connect-AppleAccount {
+	# При первой попытке авторизации баннер с текущим режимом работы, версией скрипта и версией ipatool не отображается:
+	$FirstAttempt = $true
+	
 	while (!(Test-Path "$LoginFilePath")) {
 		Remove-Item -Path $ipatoolHomePath -Recurse -Force -ErrorAction SilentlyContinue
+		
+		# При повторных попытках авторизации баннер с текущим режимом работы, версией скрипта и версией ipatool отображается:
+		if (-not $FirstAttempt) {
+			Show-ModeBanner
+		} else {
+			$FirstAttempt = $false
+		}
+		
 		Separator
 		Write-Host (Get-Lang "AuthFail")
 		
@@ -1555,7 +1566,7 @@ $(Get-Lang 'UpdateMenu2')`n
 	}
 }
 
-# Функция вывода баннера с текущим режимом работы, версией скрипта и именем файла:
+# Функция вывода баннера с текущим режимом работы, версией скрипта и версией ipatool:
 function Show-ModeBanner {
 	Separator
 	
@@ -1574,7 +1585,7 @@ function Show-ModeBanner {
 	}
 }
 
-# Функция первоначальной настройки (язык):
+# Функция первоначальной настройки:
 function Invoke-SetupWizard {
 	# Удаление папки .ipatool:
 	Remove-Item -Path $ipatoolHomePath -Recurse -Force -ErrorAction SilentlyContinue
