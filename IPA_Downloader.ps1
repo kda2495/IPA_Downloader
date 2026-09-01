@@ -224,6 +224,7 @@ $LangStrings = @{
 		"PurchasedListMenu3" = "3. Список неприобретенных приложений"
 		"SelectedApp" = "Выбрано приложение:"
 		"SelectedVer" = "Выбрана версия:"
+		"TipJar" = "Спасибо за поддержку!"
 		"UpdateAvailableTitle" = "Доступно обновление (версия {0}). Перейти на страницу GitHub для загрузки обновления?"
 		"UpdateMenu1" = "1. Да"
 		"UpdateMenu2" = "2. Нет"
@@ -310,6 +311,7 @@ $LangStrings = @{
 		"PurchasedListMenu3" = "3. List of non-purchased apps"
 		"SelectedApp" = "Selected app:"
 		"SelectedVer" = "Selected version:"
+		"TipJar" = "Thanks for your support!"
 		"UpdateAvailableTitle" = "Update available (version {0}). Open GitHub page to download the update?"
 		"UpdateMenu1" = "1. Yes"
 		"UpdateMenu2" = "2. No"
@@ -1585,6 +1587,13 @@ function Show-ModeBanner {
 	}
 }
 
+# Функция открытия банки для чаевых:
+function Open-TipJar {
+	Start-Process "https://pay.cloudtips.ru/p/93c0b094"
+	Separator
+	Write-Host (Get-Lang "TipJar")
+}
+
 # Функция первоначальной настройки:
 function Invoke-SetupWizard {
 	# Удаление папки .ipatool:
@@ -1673,7 +1682,7 @@ $(Get-Lang 'InstallerMenu5')`n
 			
 			# 3. Банка для чаевых:
 			"3" {
-				Start-Process "https://pay.cloudtips.ru/p/93c0b094"
+				Open-TipJar
 			}
 			
 			# 4. Сменить язык (Change Language):
@@ -2029,7 +2038,7 @@ $(Get-Lang 'ClearMenu3')`n
 			
 			# 14. Банка для чаевых:
 			"14" {
-				Start-Process "https://pay.cloudtips.ru/p/93c0b094"
+				Open-TipJar
 			}
 			
 			# 15. Сменить язык (Change Language):
