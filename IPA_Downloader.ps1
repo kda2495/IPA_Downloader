@@ -154,7 +154,6 @@ $LangStrings = @{
 		"AskAppIdPurchase" = "Введите ID приложений для покупки"
 		"AskAppSearch" = "Введите название приложения для поиска"
 		"AskFileNum" = "Введите № файлов для установки"
-		"AskVerCount" = "Введите количество версий для отображения"
 		"AskVerNum" = "Введите № версий для загрузки"
 		"AuthFail" = "Вход в Аккаунт Apple не выполнен."
 		"AuthSuccess" = "Вход в Аккаунт Apple выполнен.`nДанные аккаунта:"
@@ -186,7 +185,6 @@ $LangStrings = @{
 		"HeaderMinIOS" = "Мин. версия iOS:"
 		"HeaderNum" = "№"
 		"HeaderVerID" = "ID версии:"
-		"HeaderVersion" = "Версия:"
 		"InstallApp" = "Установка:"
 		"InstallerMenu1" = "1. Проверка минимальной версии iOS для приложений в папке IPA_Downloader/Apps"
 		"InstallerMenu2" = "2. Установка приложений из папки IPA_Downloader/Apps"
@@ -223,7 +221,7 @@ $LangStrings = @{
 		"PurchasedListMenu2" = "2. Список приобретенных приложений"
 		"PurchasedListMenu3" = "3. Список неприобретенных приложений"
 		"SelectedApp" = "Выбрано приложение:"
-		"SelectedVer" = "Выбрана версия:"
+		"SelectedVerID" = "Выбран ID версии:"
 		"TipJar" = "Спасибо за поддержку!"
 		"UpdateAvailableTitle" = "Доступно обновление (версия {0}). Перейти на страницу GitHub для загрузки обновления?"
 		"UpdateMenu1" = "1. Да"
@@ -241,7 +239,6 @@ $LangStrings = @{
 		"AskAppIdPurchase" = "Enter app IDs to purchase"
 		"AskAppSearch" = "Enter app name to search"
 		"AskFileNum" = "Enter # of files to install"
-		"AskVerCount" = "Enter quantity of versions to display"
 		"AskVerNum" = "Enter # of versions to download"
 		"AuthFail" = "Not authenticated with Apple Account."
 		"AuthSuccess" = "Apple Account login successful.`nAccount details:"
@@ -273,7 +270,6 @@ $LangStrings = @{
 		"HeaderMinIOS" = "Min. iOS version:"
 		"HeaderNum" = "#"
 		"HeaderVerID" = "Version ID:"
-		"HeaderVersion" = "Version:"
 		"InstallApp" = "Installing:"
 		"InstallerMenu1" = "1. Check minimum iOS version for apps in IPA_Downloader/Apps folder"
 		"InstallerMenu2" = "2. Install apps from IPA_Downloader/Apps folder"
@@ -310,7 +306,7 @@ $LangStrings = @{
 		"PurchasedListMenu2" = "2. List of purchased apps"
 		"PurchasedListMenu3" = "3. List of non-purchased apps"
 		"SelectedApp" = "Selected app:"
-		"SelectedVer" = "Selected version:"
+		"SelectedVerID" = "Selected version ID:"
 		"TipJar" = "Thanks for your support!"
 		"UpdateAvailableTitle" = "Update available (version {0}). Open GitHub page to download the update?"
 		"UpdateMenu1" = "1. Yes"
@@ -957,101 +953,32 @@ function IPA-Download-With-Version {
 	
 	if ([string]::IsNullOrEmpty($RawOutput)) { return }
 	
+	# Извлекаем все версии и сортируем по убыванию (от новых к старым):
 	$RawVersions = [regex]::Matches($RawOutput, '(?<=")\d+(?=")') | ForEach-Object { $_.Value }
-	
-	$VerQty = 0
-	while ($true) {
-		$VersionsQuantity = Read-Host "$(Get-Lang 'AskVerCount') $(Get-Lang 'CancelStep')`n"
-		
-		if ($VersionsQuantity -eq '0') { return }
-		
-		if ([int]::TryParse($VersionsQuantity, [ref]$VerQty) -and $VerQty -gt 0) {
-			break
-		}
-		
-		Show-Error "ErrorInvalidInput"
-		Separator
-	}
-	
-	$RecentVersions = $RawVersions | Select-Object -Last $VerQty | Sort-Object -Descending
+	$RecentVersions = $RawVersions | Sort-Object -Descending
 	
 	# Сообщение о загрузке списка версий приложения:
 	Separator
 	Write-Host (Get-Lang "LoadingVersionsList")
 	
-	# Заголовки таблицы:
-	$HeaderNum = Get-Lang "HeaderNum"
-	$HeaderVerID = Get-Lang "HeaderVerID"
-	$HeaderVersion = Get-Lang "HeaderVersion"
-	
-	# Расчет ширины колонок:
-	$W1 = [Math]::Max($HeaderNum.Length, "$($RecentVersions.Count)".Length)
-	
-	$MaxIdLen = $HeaderVerID.Length
-	foreach ($id in $RecentVersions) {
-		if ($id.Length -gt $MaxIdLen) { $MaxIdLen = $id.Length }
-	}
-	
-	$W2 = [Math]::Max($HeaderVersion.Length, 15)
-	$W3 = $MaxIdLen
-	
-	$ColWidths = @($W1, $W2, $W3)
-	
-	# Формирование рамок:
-	$TopParts = foreach ($w in $ColWidths) { "─" * ($w + 2) }
-	$SepParts = foreach ($w in $ColWidths) { "─" * ($w + 2) }
-	$BottomParts = foreach ($w in $ColWidths) { "─" * ($w + 2) }
-	$LineTop = "┌" + ($TopParts -join "┬") + "┐"
-	$LineSep = "├" + ($SepParts -join "┼") + "┤"
-	$LineBottom = "└" + ($BottomParts -join "┴") + "┘"
-	
-	# Функция быстрой печати строки:
-	function Print-StreamRow ([string[]]$cells) {
-		$formatted = for ($i = 0; $i -lt $cells.Count; $i++) {
-			$text = "$($cells[$i])"
-			$pad = [Math]::Max(0, $ColWidths[$i] - $text.Length)
-			" " + $text + (" " * $pad) + " "
-		}
-		Write-Host ("│" + ($formatted -join "│") + "│")
-	}
-	
-	Separator
-	# Вывод шапки таблицы:
-	Write-Host $LineTop
-	Print-StreamRow @($HeaderNum, $HeaderVersion, $HeaderVerID)
-	Write-Host $LineSep
-	
-	# Получение данных с выводом строк:
+	# Формирование данных для Out-Table:
 	$VersionMapping = @()
 	$Counter = 1
 	
-	for ($idx = 0; $idx -lt $RecentVersions.Count; $idx++) {
-		$VersionId = $RecentVersions[$idx]
-		
-		# Запрос к ipatool:
-		$Meta = & "$script:ipatoolFilePath" get-version-metadata -i $AppId --external-version-id $VersionId --keychain-passphrase $Kp 2>$null
-		$DisplayVersion = if ($Meta -match 'displayVersion=([^\s,]+)') { $Matches[1] } else { "NA" }
-		
-		# Очистка версии от скрытых ANSI-кодов, которые ломают длину строки:
-		$DisplayVersion = $DisplayVersion -replace '\x1b\[[0-9;]*[a-zA-Z]', ''
-		
+	foreach ($VersionId in $RecentVersions) {
 		$VersionMapping += [PSCustomObject]@{
-			Index = $Counter
-			ID = $VersionId
-			Version = $DisplayVersion
+			Num = $Counter
+			ID  = $VersionId
 		}
-		
-		# Печать строки после получения версии:
-		Print-StreamRow @("$Counter", "$DisplayVersion", "$VersionId")
-		
 		$Counter++
 	}
 	
-	# Нижняя граница:
-	Write-Host $LineBottom
+	# Итоговый вывод таблицы::
+	Separator
+	Out-Table -Data $VersionMapping -Headers (Get-Lang "HeaderNum"), (Get-Lang "HeaderVerID") -Properties "Num", "ID"
 	Separator
 	
-	# Выбор версий:
+	# Выбор версий по порядковому номеру:
 	$SelectedIndices = Read-NumberSelection -PromptKey 'AskVerNum' -MaxCount $VersionMapping.Count
 	if ($null -eq $SelectedIndices) { return }
 	
@@ -1060,9 +987,10 @@ function IPA-Download-With-Version {
 		$SelectedVersions += $VersionMapping[$Idx - 1]
 	}
 	
+	# Загрузка выбранных версий:
 	foreach ($SelectedObject in $SelectedVersions) {
 		Separator
-		Write-Host "$(Get-Lang 'SelectedVer') $($SelectedObject.Version)"
+		Write-Host "$(Get-Lang 'SelectedVerID') $($SelectedObject.ID)"
 		Separator
 		$FinalId = $SelectedObject.ID
 		& "$script:ipatoolFilePath" download -i $AppId --external-version-id $FinalId --keychain-passphrase $Kp

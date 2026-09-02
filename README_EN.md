@@ -30,7 +30,8 @@ A script for purchasing/downloading any available App Store apps, as well as res
 
 #### Note:
 * To purchase or download apps, they must be previously acquired in the App Store;
-* Apps are downloaded directly from the App Store.
+* Apps are downloaded directly from the App Store;
+* It is recommended to disable security keys and switch to standard two-factor authentication.
 
 ## General requirements for use:
 * Windows 7, 8.1, 10, 11 (x64);
@@ -41,9 +42,9 @@ A script for purchasing/downloading any available App Store apps, as well as res
 
 ## To run on Windows:
 ### Windows requirements:
-* Installed iTunes from the Apple website (to support app installation via script):  
+* Installed AppleMobileDeviceSupport64 driver for supporting app installation via script (included in iTunes):  
 [Link to download iTunes from the Apple website](https://www.apple.com/itunes/download/win64)
-* Instead of a full iTunes installation, you can extract the iTunes installer with any archiver and selectively install AppleMobileDeviceSupport64.msi.
+* Instead of a full iTunes installation, you can extract the iTunes installer with any archiver (7-Zip, WinRAR) and selectively install AppleMobileDeviceSupport64.msi.
 
 ### Requirements for Windows 7 and 8.1:
 #### All steps must be performed strictly in the following order:
@@ -268,12 +269,10 @@ A complete set of the above programs/updates for Windows 7/8.1 is available at t
 * Enter the app name to search;
 * Press Enter;
 * A list of found apps will be displayed;
-* Enter the index numbers of the apps to display versions (in the format 1, 2, 3-5);
+* Enter the index numbers of the apps to display app version IDs (in the format 1, 2, 3-5);
 * Press Enter;
-* Enter the number of app versions to display;
-* Press Enter;
-* A list of app versions will be displayed;
-* Enter the index numbers of the app versions to download (in the format 1, 2, 3-5);
+* A list of app version IDs will be displayed;
+* Enter the index numbers of the app version IDs to download (in the format 1, 2, 3-5);
 * Press Enter;
 * The script will download the selected app versions.
 #### 4. Enter app IDs and purchase (without downloading):
@@ -287,35 +286,33 @@ A complete set of the above programs/updates for Windows 7/8.1 is available at t
 #### 6. Enter app IDs and download (with version selection):
 * Enter the app IDs to download (in the format 1, 2, 3);
 * Press Enter;
-* Enter the number of app versions to display;
+* Enter the index numbers of the apps to download (in the format 1, 2, 3-5);
 * Press Enter;
-* A list of app versions will be displayed;
-* Enter the index numbers of the app versions to download (in the format 1, 2, 3-5);
+* A list of app version IDs will be displayed;
+* Enter the index numbers of the app version IDs to download (in the format 1, 2, 3-5);
 * Press Enter;
 * The script will download the selected app versions.
 #### 7. Show list of apps and purchase (without downloading):
-* Enter the list of apps to display (ready-made apps list, purchased apps list, not purchased apps list);
+* Enter the list of apps to display (full apps list (GitHub), list of purchased apps, list of non-purchased apps);
 * Press Enter;
 * The selected list will be displayed;
 * Enter the index numbers of the apps to purchase (in the format 1, 2, 3-5);
 * Press Enter;
 * The script will purchase the selected apps.
 #### 8. Show list of apps and download latest version:
-* Enter the list of apps to display (ready-made apps list, purchased apps list, not purchased apps list);
+* Enter the list of apps to display (full apps list (GitHub), list of purchased apps, list of non-purchased apps);
 * Press Enter;
 * The selected list will be displayed;
 * Enter the index numbers of the apps to download (in the format 1, 2, 3-5);
 * Press Enter;
 * The script will download the selected apps.
 #### 9. Show list of apps and download (with version selection):
-* Enter the list of apps to display (ready-made apps list, purchased apps list, not purchased apps list);
+* Enter the list of apps to display (full apps list (GitHub), list of purchased apps, list of non-purchased apps);
 * Press Enter;
 * Enter the index numbers of the apps to download (in the format 1, 2, 3-5);
 * Press Enter;
-* Enter the number of app versions to display;
-* Press Enter;
-* A list of app versions will be displayed;
-* Enter the index numbers of the app versions to download (in the format 1, 2, 3-5);
+* A list of app version IDs will be displayed;
+* Enter the index numbers of the app version IDs to download (in the format 1, 2, 3-5);
 * Press Enter;
 * The script will download the selected app versions.
 #### 10. Check minimum iOS version for apps in the IPA_Downloader/Apps folder:
