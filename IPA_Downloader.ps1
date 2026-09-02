@@ -176,6 +176,7 @@ $LangStrings = @{
 		"ErrorMissingFiles" = "Ошибка. Следующие файлы не найдены:"
 		"ErrorNoApps" = "Ошибка: В папке IPA_Downloader/Apps отсутствуют приложения."
 		"ErrorNoAppsFound" = "Ошибка: Приложения не найдены."
+		"ErrorNoVersionsFound" = "Ошибка: Версии приложения не найдены."
 		"ErrorPurchasedEmpty" = "Ошибка: История покупок пуста."
 		"ErrorUpdateCheck" = "Ошибка: Не удалось проверить наличие обновлений."
 		"FileName" = "Имя файла:"
@@ -261,6 +262,7 @@ $LangStrings = @{
 		"ErrorMissingFiles" = "Error. Following files were not found:"
 		"ErrorNoApps" = "Error: No apps found in IPA_Downloader/Apps folder."
 		"ErrorNoAppsFound" = "Error: No apps found."
+		"ErrorNoVersionsFound" = "Error: No app versions found."
 		"ErrorPurchasedEmpty" = "Error: Purchase history is empty."
 		"ErrorUpdateCheck" = "Error: Failed to check for updates."
 		"FileName" = "File name:"
@@ -329,7 +331,7 @@ $script:reWide = New-Object System.Text.RegularExpressions.Regex('[\u1100-\u115F
 # Функция вывода данных в виде таблицы:
 function Out-Table {
 	param (
-		[Parameter(Mandatory = $true)][array]$Data,
+		[array]$Data,
 		[Parameter(Mandatory = $true)][string[]]$Headers,
 		[Parameter(Mandatory = $true)][string[]]$Properties
 	)
@@ -958,7 +960,6 @@ function IPA-Download-With-Version {
 	$RecentVersions = $RawVersions | Sort-Object -Descending
 	
 	# Сообщение о загрузке списка версий приложения:
-	Separator
 	Write-Host (Get-Lang "LoadingVersionsList")
 	
 	# Формирование данных для Out-Table:
@@ -971,6 +972,12 @@ function IPA-Download-With-Version {
 			ID  = $VersionId
 		}
 		$Counter++
+	}
+	
+	# Проверка на пустой результат:
+	if ($VersionMapping.Count -eq 0) {
+		Show-Error "ErrorNoVersionsFound"
+		return
 	}
 	
 	# Итоговый вывод таблицы::
