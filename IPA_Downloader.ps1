@@ -2,7 +2,7 @@
 Set-Location -Path $PSScriptRoot
 
 # Версия скрипта:
-$ScriptVersion = "4.0.0_Beta 7"
+$ScriptVersion = "4.0.0_Beta 8"
 
 # Определение операционной системы:
 $IsWin = [System.Runtime.InteropServices.RuntimeInformation]::IsOSPlatform([System.Runtime.InteropServices.OSPlatform]::Windows)
@@ -61,7 +61,12 @@ if (-not $IsWin) {
 function Get-ArchSubFolder {
 	param ([ValidateSet("ipatool-cpp", "ipatool-go")][string]$Version)
 	if ($IsWin) {
-		if ($Version -eq "ipatool-cpp") { return "windows_amd64_ipatool-cpp" } else { return "windows_amd64_ipatool-go" }
+		if ($Version -eq "ipatool-cpp") { return "windows_amd64_ipatool-cpp" }
+		else {
+			$WindowsVersion = [Environment]::OSVersion
+			if ($WindowsVersion.Version.Major -eq 6 -and $WindowsVersion.Version.Minor -in 1, 2, 3) { return "windows_7_amd64_ipatool-go" }
+		return "windows_amd64_ipatool-go" 
+		}
 	} elseif ($IsLin) {
 		if ($script:Arch -eq "arm64") {
 			if ($Version -eq "ipatool-cpp") { return "linux_arm64_ipatool-cpp" } else { return "linux_arm64_ipatool-go" }
@@ -148,16 +153,18 @@ $LangStrings = @{
 		"AddedToPurchasedList" = "Добавлено в список покупок: {0} - {1}"
 		"AlreadyInList" = "Уже есть в списке: {0} - {1}"
 		"AppsCleared" = "Готово. Приложения в папке IPA_Downloader/Apps удалены."
-		"AskAppNumDownload" = "Введите № приложений для загрузки"
-		"AskAppNumPurchase" = "Введите № приложений для покупки"
+		"AskAppNumDownload" = "Введите порядковые № приложений для загрузки"
+		"AskAppNumPurchase" = "Введите порядковые № приложений для покупки"
 		"AskAppIdDownload" = "Введите ID приложений для загрузки"
 		"AskAppIdPurchase" = "Введите ID приложений для покупки"
 		"AskAppSearch" = "Введите название приложения для поиска"
-		"AskFileNum" = "Введите № файлов для установки"
-		"AskVerNum" = "Введите № версий для загрузки"
+		"AskFileNum" = "Введите порядковые № файлов для установки"
+		"AskVerDownloadNum" = "Введите порядковые № версий для загрузки"
+		"AskVerListNum" = "Введите порядковые № ID версий для отображения списка версий"
 		"AuthFail" = "Вход в Аккаунт Apple не выполнен."
 		"AuthSuccess" = "Вход в Аккаунт Apple выполнен.`nДанные аккаунта:"
 		"CancelStep" = "(0: Возврат в главное меню):"
+		"CancelStepVerID" = "(0: Возврат к вводу порядкового № ID версий):"
 		"ClearAccountMenuTitle" = "Выберите аккаунты Apple для очистки"
 		"ClearAllAccounts" = "Все аккаунты Apple"
 		"ClearMenu1" = "1. Список приобретенных приложений"
@@ -172,7 +179,7 @@ $LangStrings = @{
 		"ErrorDownloadFiles" = "Ошибка: Не удалось загрузить файл:"
 		"ErrorIdeviceinstallerNotFound" = "Ошибка: ideviceinstaller не найден. Установка приложений по USB невозможна (только по AirDrop на macOS)"
 		"ErrorInvalidInput" = "Ошибка: Неверный ввод."
-		"ErrorListLoadError" = "Ошибка загрузки списка приложений."
+		"ErrorListLoad" = "Ошибка загрузки списка приложений."
 		"ErrorMissingFiles" = "Ошибка. Следующие файлы не найдены:"
 		"ErrorNoApps" = "Ошибка: В папке IPA_Downloader/Apps отсутствуют приложения."
 		"ErrorNoAppsFound" = "Ошибка: Приложения не найдены."
@@ -186,6 +193,7 @@ $LangStrings = @{
 		"HeaderMinIOS" = "Мин. версия iOS:"
 		"HeaderNum" = "№"
 		"HeaderVerID" = "ID версии:"
+		"HeaderVersion" = "Версия:"
 		"InstallApp" = "Установка:"
 		"InstallerMenu1" = "1. Проверка минимальной версии iOS для приложений в папке IPA_Downloader/Apps"
 		"InstallerMenu2" = "2. Установка приложений из папки IPA_Downloader/Apps"
@@ -198,7 +206,7 @@ $LangStrings = @{
 		"LanguageMenu2" = "2. English"
 		"LanguageMenuTitle" = "Выберите язык (Select language):"
 		"ListMenuTitle" = "Выберите список для отображения"
-		"LoadingVersionsList" = "Загрузка списка версий приложения..."
+		"LoadingVersionsIDList" = "Загрузка списка ID версий приложения..."
 		"LoggedOut" = "Выполнен выход из Аккаунта Apple."
 		"Menu1" = "1. Поиск приложения и покупка (без загрузки)"
 		"Menu2" = "2. Поиск приложения и загрузка последней версии"
@@ -222,7 +230,8 @@ $LangStrings = @{
 		"PurchasedListMenu2" = "2. Список приобретенных приложений"
 		"PurchasedListMenu3" = "3. Список неприобретенных приложений"
 		"SelectedApp" = "Выбрано приложение:"
-		"SelectedVerID" = "Выбран ID версии:"
+		"SelectedVer" = "Выбрана версия:"
+		"SelectedVersList" = "Выбраны следующие версии:"
 		"TipJar" = "Спасибо за поддержку!"
 		"UpdateAvailableTitle" = "Доступно обновление (версия {0}). Перейти на страницу GitHub для загрузки обновления?"
 		"UpdateMenu1" = "1. Да"
@@ -234,16 +243,18 @@ $LangStrings = @{
 		"AddedToPurchasedList" = "Added to purchased list: {0} - {1}"
 		"AlreadyInList" = "Already in list: {0} - {1}"
 		"AppsCleared" = "Done. IPA_Downloader/Apps folder has been cleared."
-		"AskAppNumDownload" = "Enter # of apps to download"
-		"AskAppNumPurchase" = "Enter # of apps to purchase"
+		"AskAppNumDownload" = "Enter sequence # of apps to download"
+		"AskAppNumPurchase" = "Enter sequence # of apps to purchase"
 		"AskAppIdDownload" = "Enter app IDs to download"
 		"AskAppIdPurchase" = "Enter app IDs to purchase"
 		"AskAppSearch" = "Enter app name to search"
-		"AskFileNum" = "Enter # of files to install"
-		"AskVerNum" = "Enter # of versions to download"
+		"AskFileNum" = "Enter sequence # of files to install"
+		"AskVerDownloadNum" = "Enter sequence # of app versions to download"
+		"AskVerListNum" = "Enter sequence # of version IDs to display app versions"
 		"AuthFail" = "Not authenticated with Apple Account."
 		"AuthSuccess" = "Apple Account login successful.`nAccount details:"
 		"CancelStep" = "(0: Return to main menu):"
+		"CancelStepVerID" = "(0: Return to entering sequence # of version IDs):"
 		"ClearAccountMenuTitle" = "Select Apple accounts to clear"
 		"ClearAllAccounts" = "All Apple accounts"
 		"ClearMenu1" = "1. Purchased apps list"
@@ -258,7 +269,7 @@ $LangStrings = @{
 		"ErrorDownloadFiles" = "Error: Failed to download file:"
 		"ErrorIdeviceinstallerNotFound" = "Error: ideviceinstaller not found. Apps installation via USB is impossible (only via AirDrop on macOS)"
 		"ErrorInvalidInput" = "Error: Invalid input."
-		"ErrorListLoadError" = "Failed to load apps list."
+		"ErrorListLoad" = "Error: Failed to load apps list."
 		"ErrorMissingFiles" = "Error. Following files were not found:"
 		"ErrorNoApps" = "Error: No apps found in IPA_Downloader/Apps folder."
 		"ErrorNoAppsFound" = "Error: No apps found."
@@ -272,6 +283,7 @@ $LangStrings = @{
 		"HeaderMinIOS" = "Min. iOS version:"
 		"HeaderNum" = "#"
 		"HeaderVerID" = "Version ID:"
+		"HeaderVersion" = "Version:"
 		"InstallApp" = "Installing:"
 		"InstallerMenu1" = "1. Check minimum iOS version for apps in IPA_Downloader/Apps folder"
 		"InstallerMenu2" = "2. Install apps from IPA_Downloader/Apps folder"
@@ -284,7 +296,7 @@ $LangStrings = @{
 		"LanguageMenu2" = "2. English"
 		"LanguageMenuTitle" = "Выберите язык (Select language):"
 		"ListMenuTitle" = "Select list to display"
-		"LoadingVersionsList" = "Loading list of app versions..."
+		"LoadingVersionsIDList" = "Loading list of app version IDs..."
 		"LoggedOut" = "Successfully logged out of Apple Account."
 		"Menu1" = "1. Search for app and purchase (without downloading)"
 		"Menu2" = "2. Search for app and download latest version"
@@ -308,7 +320,8 @@ $LangStrings = @{
 		"PurchasedListMenu2" = "2. List of purchased apps"
 		"PurchasedListMenu3" = "3. List of non-purchased apps"
 		"SelectedApp" = "Selected app:"
-		"SelectedVerID" = "Selected version ID:"
+		"SelectedVer" = "Selected version:"
+		"SelectedVersList" = "Selected versions:"
 		"TipJar" = "Thanks for your support!"
 		"UpdateAvailableTitle" = "Update available (version {0}). Open GitHub page to download the update?"
 		"UpdateMenu1" = "1. Yes"
@@ -318,7 +331,7 @@ $LangStrings = @{
 
 # Функция разделителя:
 function Separator {
-	Write-Host "==============================================================================" -ForegroundColor Green
+	Write-Host "=================================================================================" -ForegroundColor Green
 }
 
 # Скомпилированные регулярные выражения для ускорения рендеринга таблиц:
@@ -945,7 +958,6 @@ function IPA-Download-With-Version {
 	)
 	if (!(Test-NumericInput -InputValue $AppId)) { return }
 	
-	Separator
 	$RawOutput = & "$script:ipatoolFilePath" list-versions -i $AppId --keychain-passphrase $Kp 2>&1
 	
 	if ($RawOutput -match "Error:") {
@@ -953,19 +965,27 @@ function IPA-Download-With-Version {
 		return
 	}
 	
-	if ([string]::IsNullOrEmpty($RawOutput)) { return }
+	# Проверка на пустой ответ:
+	if ([string]::IsNullOrEmpty($RawOutput)) {
+		Show-Error "ErrorNoVersionsFound"
+		return
+	}
 	
-	# Извлекаем все версии и сортируем по убыванию (от новых к старым):
+	# Извлечение всех версий и сортировка по убыванию:
 	$RawVersions = [regex]::Matches($RawOutput, '(?<=")\d+(?=")') | ForEach-Object { $_.Value }
 	$RecentVersions = $RawVersions | Sort-Object -Descending
 	
-	# Сообщение о загрузке списка версий приложения:
-	Write-Host (Get-Lang "LoadingVersionsList")
+	# Если версии приложения не найдены:
+	if ($RecentVersions.Count -eq 0) {
+		Show-Error "ErrorNoVersionsFound"
+		return
+	}
 	
-	# Формирование данных для Out-Table:
+	Separator
+	Write-Host (Get-Lang "LoadingVersionsIDList")
+	
 	$VersionMapping = @()
 	$Counter = 1
-	
 	foreach ($VersionId in $RecentVersions) {
 		$VersionMapping += [PSCustomObject]@{
 			Num = $Counter
@@ -974,34 +994,135 @@ function IPA-Download-With-Version {
 		$Counter++
 	}
 	
-	# Проверка на пустой результат:
-	if ($VersionMapping.Count -eq 0) {
-		Show-Error "ErrorNoVersionsFound"
-		return
-	}
-	
-	# Итоговый вывод таблицы::
-	Separator
-	Out-Table -Data $VersionMapping -Headers (Get-Lang "HeaderNum"), (Get-Lang "HeaderVerID") -Properties "Num", "ID"
-	Separator
-	
-	# Выбор версий по порядковому номеру:
-	$SelectedIndices = Read-NumberSelection -PromptKey 'AskVerNum' -MaxCount $VersionMapping.Count
-	if ($null -eq $SelectedIndices) { return }
-	
-	$SelectedVersions = @()
-	foreach ($Idx in $SelectedIndices) {
-		$SelectedVersions += $VersionMapping[$Idx - 1]
-	}
-	
-	# Загрузка выбранных версий:
-	foreach ($SelectedObject in $SelectedVersions) {
+	# Внешний цикл:
+	while ($true) {
 		Separator
-		Write-Host "$(Get-Lang 'SelectedVerID') $($SelectedObject.ID)"
+		Out-Table -Data @($VersionMapping) -Headers (Get-Lang "HeaderNum"), (Get-Lang "HeaderVerID") -Properties "Num", "ID"
 		Separator
-		$FinalId = $SelectedObject.ID
-		& "$script:ipatoolFilePath" download -i $AppId --external-version-id $FinalId --keychain-passphrase $Kp
-		Move-IPA-Files -AppId $AppId -AppName $AppName
+		
+		# Запрос порядкового № для вычисления и отображения версий:
+		$PreSelectedIndices = Read-NumberSelection -PromptKey 'AskVerListNum' -MaxCount $VersionMapping.Count
+		
+		# Если пользователь ввел 0 (возврат в главное меню):
+		if ($null -eq $PreSelectedIndices) { return } 
+		
+		$PreSelectedVersions = @()
+		foreach ($Idx in $PreSelectedIndices) {
+			$PreSelectedVersions += $VersionMapping[$Idx - 1]
+		}
+		
+		Separator
+		Write-Host (Get-Lang "SelectedVersList")
+		Separator
+		
+		# Подготовка таблицы Print-StreamRow для отображения версий:
+		$HeaderNum = Get-Lang "HeaderNum"
+		$HeaderVerID = Get-Lang "HeaderVerID"
+		$HeaderVersion = Get-Lang "HeaderVersion"
+		
+		$W1 = [Math]::Max($HeaderNum.Length, "$($PreSelectedVersions.Count)".Length)
+		$MaxIdLen = $HeaderVerID.Length
+		foreach ($v in $PreSelectedVersions) {
+			if ($v.ID.Length -gt $MaxIdLen) { $MaxIdLen = $v.ID.Length }
+		}
+		$W2 = [Math]::Max($HeaderVersion.Length, 15)
+		$W3 = $MaxIdLen
+		
+		$ColWidths = @($W1, $W2, $W3)
+		
+		$TopParts = foreach ($w in $ColWidths) { "─" * ($w + 2) }
+		$SepParts = foreach ($w in $ColWidths) { "─" * ($w + 2) }
+		$BottomParts = foreach ($w in $ColWidths) { "─" * ($w + 2) }
+		$LineTop = "┌" + ($TopParts -join "┬") + "┐"
+		$LineSep = "├" + ($SepParts -join "┼") + "┤"
+		$LineBottom = "└" + ($BottomParts -join "┴") + "┘"
+		
+		function Print-StreamRow ([string[]]$cells) {
+			$formatted = for ($i = 0; $i -lt $cells.Count; $i++) {
+				$text = "$($cells[$i])"
+				$pad = [Math]::Max(0, $ColWidths[$i] - $text.Length)
+				" " + $text + (" " * $pad) + " "
+			}
+			Write-Host ("│" + ($formatted -join "│") + "│")
+		}
+		
+		Write-Host $LineTop
+		Print-StreamRow @($HeaderNum, $HeaderVersion, $HeaderVerID)
+		Write-Host $LineSep
+		
+		$DetailedMapping = @()
+		$DetailCounter = 1
+		
+		# Запрос метаданных для выбранных ID:
+		foreach ($SelectedObject in $PreSelectedVersions) {
+			$VersionId = $SelectedObject.ID
+			$Meta = & "$script:ipatoolFilePath" get-version-metadata -i $AppId --external-version-id $VersionId --keychain-passphrase $Kp 2>$null
+			$DisplayVersion = if ($Meta -match 'displayVersion=([^\s,]+)') { $Matches[1] } else { "NA" }
+			$DisplayVersion = $DisplayVersion -replace '\x1b\[[0-9;]*[a-zA-Z]', ''
+			
+			$DetailedMapping += [PSCustomObject]@{
+				Index = $DetailCounter
+				ID = $VersionId
+				Version = $DisplayVersion
+			}
+			
+			Print-StreamRow @("$DetailCounter", "$DisplayVersion", "$VersionId")
+			$DetailCounter++
+		}
+		
+		Write-Host $LineBottom
+		Separator
+		
+		# Запрос порядковых № версий для загрузки:
+		$GoBack = $false
+		$FinalIndices = $null
+		
+		while ($true) {
+			$Selection = Read-Host "$(Get-Lang 'AskVerDownloadNum') (1-$($DetailedMapping.Count)) $(Get-Lang 'CancelStepVerID')`n"
+			
+			# Возврат к предыдущему списку:
+			if ($Selection -eq '0') {
+				$GoBack = $true
+				break
+			}
+			
+			if ([string]::IsNullOrWhiteSpace($Selection)) {
+				Show-Error "ErrorInvalidInput"
+				Separator
+				continue
+			}
+			
+			$FinalIndices = Parse-NumberSelection -Selection $Selection -MaxCount $DetailedMapping.Count
+			
+			if ($null -eq $FinalIndices) {
+				Show-Error "ErrorInvalidInput"
+				Separator
+				continue
+			}
+			
+			break
+		}
+		
+		# Если пользователь выбрал 0, цикл начинается заново с основной таблицы:
+		if ($GoBack) {
+			continue 
+		}
+		
+		# Загрузка выбранных финальных версий:
+		foreach ($Idx in $FinalIndices) {
+			$SelectedToDownload = $DetailedMapping[$Idx - 1]
+			Separator
+			
+			# Вывод выбранной версии приложения:
+			Write-Host "$(Get-Lang 'SelectedVer') $($SelectedToDownload.Version)"
+			Separator
+			$FinalId = $SelectedToDownload.ID
+			& "$script:ipatoolFilePath" download -i $AppId --external-version-id $FinalId --keychain-passphrase $Kp
+			Move-IPA-Files -AppId $AppId -AppName $AppName
+		}
+		
+		# Выход из цикла после успешной загрузки:
+		break 
 	}
 }
 
@@ -1179,7 +1300,7 @@ $Menu3`n
 		"1" {
 			Initialize-GitHub-List
 			if ($script:GitHubParsedList.Count -eq 0) {
-				Show-Error "ErrorListLoadError"
+				Show-Error "ErrorListLoad"
 				return $null
 			}
 			foreach ($App in $script:GitHubParsedList) {
@@ -1199,7 +1320,7 @@ $Menu3`n
 		"3" {
 			Initialize-GitHub-List
 			if ($script:GitHubParsedList.Count -eq 0) {
-				Show-Error "ErrorListLoadError"
+				Show-Error "ErrorListLoad"
 				return $null
 			}
 			
