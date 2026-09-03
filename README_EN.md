@@ -33,7 +33,7 @@ A script for purchasing/downloading any available App Store apps, as well as res
 * To purchase or download apps, they must be previously acquired in the App Store;
 * Apps are downloaded directly from the App Store;
 * It is recommended to disable security keys and switch to standard two-factor authentication;
-* The script supports bulk purchasing/downloading of apps. Simply enter the index numbers of the apps/versions from the tables, separated by commas or hyphens. For example, entering 1, 2, 3-5 will purchase/download the apps with index numbers 1, 2, 3, 4, and 5.
+* The script supports bulk purchasing/downloading of apps. Simply enter the index numbers (#) of the apps/versions from the tables, separated by commas or hyphens. For example, entering 1, 2, 3-5 will purchase/download the apps with index numbers (#) 1, 2, 3, 4, and 5.
 
 ## General requirements for use:
 * Windows 7, 8.1, 10, 11 (x64);
@@ -246,7 +246,7 @@ Download the complete set of programs/updates for Windows 7/8.1 via the link:
 #### 2. Install apps from the IPA_Downloader/Apps folder:
 * Connect the device using a cable;
 * Apps must be located in the IPA_Downloader/Apps path;
-* Enter the index numbers of the apps to install on the device;
+* Enter the index numbers (#) of the apps to install on the device;
 * Press Enter;
 * The script will install the selected apps on the device.
 #### 3. Tip Jar:
@@ -261,24 +261,24 @@ Download the complete set of programs/updates for Windows 7/8.1 via the link:
 * Enter the app name to search;
 * Press Enter;
 * A list of found apps will be displayed;
-* Enter the index numbers of the apps to purchase;
+* Enter the index numbers (#) of the apps to purchase;
 * Press Enter;
 * The script will purchase the selected apps.
 #### 2. Search for app and download latest version:
 * Enter the app name to search;
 * Press Enter;
 * A list of found apps will be displayed;
-* Enter the index numbers of the apps to download;
+* Enter the index numbers (#) of the apps to download;
 * Press Enter;
 * The script will download the selected apps.
 #### 3. Search for app and download (with version selection):
 * Enter the app name to search;
 * Press Enter;
 * A list of found apps will be displayed;
-* Enter the index numbers of the apps to display app version IDs;
+* Enter the index numbers (#) of the apps to display app version IDs;
 * Press Enter;
 * A list of app version IDs will be displayed;
-* Enter the index numbers of the app version IDs to download;
+* Enter the index numbers (#) of the app version IDs to download;
 * Press Enter;
 * The script will download the selected app versions.
 #### 4. Enter app IDs and purchase (without downloading):
@@ -292,33 +292,33 @@ Download the complete set of programs/updates for Windows 7/8.1 via the link:
 #### 6. Enter app IDs and download (with version selection):
 * Enter the app IDs to download (in the format 1, 2, 3);
 * Press Enter;
-* Enter the index numbers of the apps to download;
+* Enter the index numbers (#) of the apps to download;
 * Press Enter;
 * A list of app version IDs will be displayed;
-* Enter the index numbers of the app version IDs to download;
+* Enter the index numbers (#) of the app version IDs to download;
 * Press Enter;
 * The script will download the selected app versions.
 #### 7. Show list of apps and purchase (without downloading):
 * Enter the list of apps to display (full apps list (GitHub), list of purchased apps, list of non-purchased apps);
 * Press Enter;
 * The selected list will be displayed;
-* Enter the index numbers of the apps to purchase;
+* Enter the index numbers (#) of the apps to purchase;
 * Press Enter;
 * The script will purchase the selected apps.
 #### 8. Show list of apps and download latest version:
 * Enter the list of apps to display (full apps list (GitHub), list of purchased apps, list of non-purchased apps);
 * Press Enter;
 * The selected list will be displayed;
-* Enter the index numbers of the apps to download;
+* Enter the index numbers (#) of the apps to download;
 * Press Enter;
 * The script will download the selected apps.
 #### 9. Show list of apps and download (with version selection):
 * Enter the list of apps to display (full apps list (GitHub), list of purchased apps, list of non-purchased apps);
 * Press Enter;
-* Enter the index numbers of the apps to download;
+* Enter the index numbers (#) of the apps to download;
 * Press Enter;
 * A list of app version IDs will be displayed;
-* Enter the index numbers of the app version IDs to download;
+* Enter the index numbers (#) of the app version IDs to download;
 * Press Enter;
 * The script will download the selected app versions.
 #### 10. Check minimum iOS version for apps in the IPA_Downloader/Apps folder:
@@ -327,7 +327,7 @@ Download the complete set of programs/updates for Windows 7/8.1 via the link:
 #### 11. Install apps from the IPA_Downloader/Apps folder:
 * Connect the device using a cable;
 * Apps must be located in the IPA_Downloader/Apps path;
-* Enter the index numbers of the apps to install on the device;
+* Enter the index numbers (#) of the apps to install on the device;
 * Press Enter;
 * The script will install the selected apps on the device.
 #### 12. Clear data:

@@ -153,18 +153,18 @@ $LangStrings = @{
 		"AddedToPurchasedList" = "Добавлено в список покупок: {0} - {1}"
 		"AlreadyInList" = "Уже есть в списке: {0} - {1}"
 		"AppsCleared" = "Готово. Приложения в папке IPA_Downloader/Apps удалены."
-		"AskAppNumDownload" = "Введите порядковые № приложений для загрузки"
-		"AskAppNumPurchase" = "Введите порядковые № приложений для покупки"
+		"AskAppNumDownload" = "Введите порядковые номера (№) приложений для загрузки"
+		"AskAppNumPurchase" = "Введите порядковые номера (№) приложений для покупки"
 		"AskAppIdDownload" = "Введите ID приложений для загрузки"
 		"AskAppIdPurchase" = "Введите ID приложений для покупки"
 		"AskAppSearch" = "Введите название приложения для поиска"
-		"AskFileNum" = "Введите порядковые № файлов для установки"
-		"AskVerDownloadNum" = "Введите порядковые № версий для загрузки"
-		"AskVerListNum" = "Введите порядковые № ID версий для отображения списка версий"
+		"AskFileNum" = "Введите порядковые номера (№) файлов для установки"
+		"AskVerDownloadNum" = "Введите порядковые номера (№) версий для загрузки"
+		"AskVerListNum" = "Введите порядковые номера (№) ID версий для отображения списка версий"
 		"AuthFail" = "Вход в Аккаунт Apple не выполнен."
 		"AuthSuccess" = "Вход в Аккаунт Apple выполнен.`nДанные аккаунта:"
 		"CancelStep" = "(0: Возврат в главное меню):"
-		"CancelStepVerID" = "(0: Возврат к вводу порядкового № ID версий):"
+		"CancelStepVerID" = "(0: Возврат к вводу порядкового номера (№) ID версий):"
 		"ClearAccountMenuTitle" = "Выберите аккаунты Apple для очистки"
 		"ClearAllAccounts" = "Все аккаунты Apple"
 		"ClearMenu1" = "1. Список приобретенных приложений"
@@ -243,18 +243,18 @@ $LangStrings = @{
 		"AddedToPurchasedList" = "Added to purchased list: {0} - {1}"
 		"AlreadyInList" = "Already in list: {0} - {1}"
 		"AppsCleared" = "Done. IPA_Downloader/Apps folder has been cleared."
-		"AskAppNumDownload" = "Enter sequence # of apps to download"
-		"AskAppNumPurchase" = "Enter sequence # of apps to purchase"
+		"AskAppNumDownload" = "Enter index numbers (#) of apps to download"
+		"AskAppNumPurchase" = "Enter index numbers (#) of apps to purchase"
 		"AskAppIdDownload" = "Enter app IDs to download"
 		"AskAppIdPurchase" = "Enter app IDs to purchase"
 		"AskAppSearch" = "Enter app name to search"
-		"AskFileNum" = "Enter sequence # of files to install"
-		"AskVerDownloadNum" = "Enter sequence # of app versions to download"
-		"AskVerListNum" = "Enter sequence # of version IDs to display app versions"
+		"AskFileNum" = "Enter index numbers (#) of files to install"
+		"AskVerDownloadNum" = "index numbers (#) of app versions to download"
+		"AskVerListNum" = "Enter index numbers (#) of version IDs to display app versions"
 		"AuthFail" = "Not authenticated with Apple Account."
 		"AuthSuccess" = "Apple Account login successful.`nAccount details:"
 		"CancelStep" = "(0: Return to main menu):"
-		"CancelStepVerID" = "(0: Return to entering sequence # of version IDs):"
+		"CancelStepVerID" = "(0: Return to entering index numbers (#) of version IDs):"
 		"ClearAccountMenuTitle" = "Select Apple accounts to clear"
 		"ClearAllAccounts" = "All Apple accounts"
 		"ClearMenu1" = "1. Purchased apps list"
@@ -989,7 +989,7 @@ function IPA-Download-With-Version {
 	foreach ($VersionId in $RecentVersions) {
 		$VersionMapping += [PSCustomObject]@{
 			Num = $Counter
-			ID  = $VersionId
+			ID = $VersionId
 		}
 		$Counter++
 	}
@@ -1000,7 +1000,7 @@ function IPA-Download-With-Version {
 		Out-Table -Data @($VersionMapping) -Headers (Get-Lang "HeaderNum"), (Get-Lang "HeaderVerID") -Properties "Num", "ID"
 		Separator
 		
-		# Запрос порядкового № для вычисления и отображения версий:
+		# Запрос порядкового номера (№) для вычисления и отображения версий:
 		$PreSelectedIndices = Read-NumberSelection -PromptKey 'AskVerListNum' -MaxCount $VersionMapping.Count
 		
 		# Если пользователь ввел 0 (возврат в главное меню):
@@ -1073,7 +1073,7 @@ function IPA-Download-With-Version {
 		Write-Host $LineBottom
 		Separator
 		
-		# Запрос порядковых № версий для загрузки:
+		# Запрос порядковых номеров (№) версий для загрузки:
 		$GoBack = $false
 		$FinalIndices = $null
 		
