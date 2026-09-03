@@ -32,7 +32,8 @@ A script for purchasing/downloading any available App Store apps, as well as res
 #### Note:
 * To purchase or download apps, they must be previously acquired in the App Store;
 * Apps are downloaded directly from the App Store;
-* It is recommended to disable security keys and switch to standard two-factor authentication.
+* It is recommended to disable security keys and switch to standard two-factor authentication;
+* The script supports bulk purchasing/downloading of apps. Simply enter the index numbers of the apps/versions from the tables, separated by commas or hyphens. For example, entering 1, 2, 3-5 will purchase/download the apps with index numbers 1, 2, 3, 4, and 5.
 
 ## General requirements for use:
 * Windows 7, 8.1, 10, 11 (x64);
@@ -341,9 +342,6 @@ Download the complete set of programs/updates for Windows 7/8.1 via the link:
 * The script will navigate to the CloudTips page.
 #### 15. Change Language:
 * The script will change its interface language.
-
-#### Note:
-* The script supports bulk purchasing/downloading of apps. Simply enter the index numbers of the apps/versions from the tables, separated by commas or hyphens. For example, entering 1, 2, 3-5 will purchase/download the apps with index numbers 1, 2, 3, 4, and 5.
 
 ## Troubleshooting errors:
 * Download error: HTTP request failed: Timeout was reached - Failed to connect to Apple servers, check your internet connection.
