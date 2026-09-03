@@ -1,8 +1,8 @@
 [![GitHub release](https://img.shields.io/github/v/release/kda2495/IPA_Downloader.svg?label=Release)](https://github.com/kda2495/IPA_Downloader/releases)
 [![License](https://img.shields.io/github/license/kda2495/IPA_Downloader.svg?label=License&color=blue)](https://github.com/kda2495/IPA_Downloader/blob/main/LICENSE)
 [![Downloads](https://img.shields.io/github/downloads/kda2495/IPA_Downloader/total?label=Downloads&color=blue)](https://github.com/kda2495/IPA_Downloader/releases)
-[![Downloads](https://img.shields.io/github/downloads/kda2495/IPA_Downloader/latest/total?label=Downloads%20(latest)&color=blue)](https://github.com/kda2495/IPA_Downloader/releases)
-
+[![Downloads](https://img.shields.io/github/downloads/kda2495/IPA_Downloader/latest/total?label=Downloads%20(latest)&color=blue)](https://github.com/kda2495/IPA_Downloader/releases)  
+[![CloudTips](https://img.shields.io/badge/Банка_для_чаевых_на-CloudTips-blue?style=flat)](https://pay.cloudtips.ru/p/93c0b094)
 # IPA_Downloader
 [![English README](https://img.shields.io/badge/README-English-blue.svg)](README_EN.md)  
 Скрипт для покупки/загрузки любых доступных в App Store приложений, а также восстановления удалённых - при условии, что они были приобретены ранее с вашим Аккаунтом Apple (работает на базе [ipatool-cpp](https://github.com/Sorvigolova/ipatool) и [ipatool-go](https://github.com/majd/ipatool).
