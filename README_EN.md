@@ -49,6 +49,9 @@ A script for purchasing/downloading any available App Store apps, as well as res
 
 ### Requirements for Windows 7 and 8.1:
 #### All steps must be performed strictly in the following order:
+Download the complete set of programs/updates for Windows 7/8.1 via the link:  
+[Link for the complete set of programs/updates](https://disk.yandex.ru/d/Fft0whzAz-C7Jg)
+
 #### 1. Update system certificates via UpdRootsCert:
 * Follow the link to download UpdRootsCert:  
 [Link to download UpdRootsCert](https://disk.yandex.ru/d/SdHMgwJ55MTQRg)  
@@ -75,8 +78,9 @@ A script for purchasing/downloading any available App Store apps, as well as res
 * Run the files: Win7AndW2K8R2-KB3191566-x64.msu (for Windows 7) or Win8.1AndW2K12R2-KB3191564-x64.msu (for Windows 8.1);  
 * Install the KB3191566 update following the installation wizard instructions.
 
-A complete set of the above programs/updates for Windows 7/8.1 is available at the link:  
-[Link for the complete set of programs/updates](https://disk.yandex.ru/d/Fft0whzAz-C7Jg)  
+#### 4. Install the KB2999226 update:
+* Run the files: Windows7-KB2999226-x64 (for Windows 7) or Windows8.1-KB2999226-x64 (for Windows 8.1);
+* Install the KB2999226 update following the installation wizard instructions.
 
 ### How to use (Windows):
 #### 1. Extract the IPA_Downloader.zip archive using any archiver;
@@ -241,7 +245,7 @@ A complete set of the above programs/updates for Windows 7/8.1 is available at t
 #### 2. Install apps from the IPA_Downloader/Apps folder:
 * Connect the device using a cable;
 * Apps must be located in the IPA_Downloader/Apps path;
-* Enter the index numbers of the apps to install on the device (in the format 1, 2, 3-5);
+* Enter the index numbers of the apps to install on the device;
 * Press Enter;
 * The script will install the selected apps on the device.
 #### 3. Tip Jar:
@@ -256,24 +260,24 @@ A complete set of the above programs/updates for Windows 7/8.1 is available at t
 * Enter the app name to search;
 * Press Enter;
 * A list of found apps will be displayed;
-* Enter the index numbers of the apps to purchase (in the format 1, 2, 3-5);
+* Enter the index numbers of the apps to purchase;
 * Press Enter;
 * The script will purchase the selected apps.
 #### 2. Search for app and download latest version:
 * Enter the app name to search;
 * Press Enter;
 * A list of found apps will be displayed;
-* Enter the index numbers of the apps to download (in the format 1, 2, 3-5);
+* Enter the index numbers of the apps to download;
 * Press Enter;
 * The script will download the selected apps.
 #### 3. Search for app and download (with version selection):
 * Enter the app name to search;
 * Press Enter;
 * A list of found apps will be displayed;
-* Enter the index numbers of the apps to display app version IDs (in the format 1, 2, 3-5);
+* Enter the index numbers of the apps to display app version IDs;
 * Press Enter;
 * A list of app version IDs will be displayed;
-* Enter the index numbers of the app version IDs to download (in the format 1, 2, 3-5);
+* Enter the index numbers of the app version IDs to download;
 * Press Enter;
 * The script will download the selected app versions.
 #### 4. Enter app IDs and purchase (without downloading):
@@ -287,33 +291,33 @@ A complete set of the above programs/updates for Windows 7/8.1 is available at t
 #### 6. Enter app IDs and download (with version selection):
 * Enter the app IDs to download (in the format 1, 2, 3);
 * Press Enter;
-* Enter the index numbers of the apps to download (in the format 1, 2, 3-5);
+* Enter the index numbers of the apps to download;
 * Press Enter;
 * A list of app version IDs will be displayed;
-* Enter the index numbers of the app version IDs to download (in the format 1, 2, 3-5);
+* Enter the index numbers of the app version IDs to download;
 * Press Enter;
 * The script will download the selected app versions.
 #### 7. Show list of apps and purchase (without downloading):
 * Enter the list of apps to display (full apps list (GitHub), list of purchased apps, list of non-purchased apps);
 * Press Enter;
 * The selected list will be displayed;
-* Enter the index numbers of the apps to purchase (in the format 1, 2, 3-5);
+* Enter the index numbers of the apps to purchase;
 * Press Enter;
 * The script will purchase the selected apps.
 #### 8. Show list of apps and download latest version:
 * Enter the list of apps to display (full apps list (GitHub), list of purchased apps, list of non-purchased apps);
 * Press Enter;
 * The selected list will be displayed;
-* Enter the index numbers of the apps to download (in the format 1, 2, 3-5);
+* Enter the index numbers of the apps to download;
 * Press Enter;
 * The script will download the selected apps.
 #### 9. Show list of apps and download (with version selection):
 * Enter the list of apps to display (full apps list (GitHub), list of purchased apps, list of non-purchased apps);
 * Press Enter;
-* Enter the index numbers of the apps to download (in the format 1, 2, 3-5);
+* Enter the index numbers of the apps to download;
 * Press Enter;
 * A list of app version IDs will be displayed;
-* Enter the index numbers of the app version IDs to download (in the format 1, 2, 3-5);
+* Enter the index numbers of the app version IDs to download;
 * Press Enter;
 * The script will download the selected app versions.
 #### 10. Check minimum iOS version for apps in the IPA_Downloader/Apps folder:
@@ -322,7 +326,7 @@ A complete set of the above programs/updates for Windows 7/8.1 is available at t
 #### 11. Install apps from the IPA_Downloader/Apps folder:
 * Connect the device using a cable;
 * Apps must be located in the IPA_Downloader/Apps path;
-* Enter the index numbers of the apps to install on the device (in the format 1, 2, 3-5);
+* Enter the index numbers of the apps to install on the device;
 * Press Enter;
 * The script will install the selected apps on the device.
 #### 12. Clear data:
@@ -337,6 +341,9 @@ A complete set of the above programs/updates for Windows 7/8.1 is available at t
 * The script will navigate to the CloudTips page.
 #### 15. Change Language:
 * The script will change its interface language.
+
+#### Note:
+* The script supports bulk purchasing/downloading of apps. Simply enter the index numbers of the apps/versions from the tables, separated by commas or hyphens. For example, entering 1, 2, 3-5 will purchase/download the apps with index numbers 1, 2, 3, 4, and 5.
 
 ## Troubleshooting errors:
 * Download error: HTTP request failed: Timeout was reached - Failed to connect to Apple servers, check your internet connection.
