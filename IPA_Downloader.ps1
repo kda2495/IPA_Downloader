@@ -2,14 +2,14 @@
 Set-Location -Path $PSScriptRoot
 
 # Версия скрипта:
-$ScriptVersion = "4.0.0_Beta 8"
+$ScriptVersion = "4.0.1"
 
 # Определение операционной системы:
 $IsWin = [System.Runtime.InteropServices.RuntimeInformation]::IsOSPlatform([System.Runtime.InteropServices.OSPlatform]::Windows)
 $IsMac = [System.Runtime.InteropServices.RuntimeInformation]::IsOSPlatform([System.Runtime.InteropServices.OSPlatform]::OSX)
 $IsLin = [System.Runtime.InteropServices.RuntimeInformation]::IsOSPlatform([System.Runtime.InteropServices.OSPlatform]::Linux)
 
-# Папка MainApp и файл настроек (язык, режим работы, версия ipatool):
+# Папка MainApp и файл настроек (язык, режим работы):
 $MainAppFolderPath = Join-Path -Path $PSScriptRoot -ChildPath "MainApp"
 $FilesFolderPath = Join-Path -Path $PSScriptRoot -ChildPath "Files"
 $SettingsFilePath = Join-Path -Path $FilesFolderPath -ChildPath "Settings.txt"
@@ -46,44 +46,33 @@ function Set-Setting {
 	Set-Content -Path $SettingsFilePath -Value $Lines -Force
 }
 
-# Загрузка сохраненных настроек (язык, режим работы, версия ipatool) или значений по умолчанию:
+# Загрузка сохраненных настроек (язык, режим работы) или значений по умолчанию:
 $SavedSettings = Get-Settings
 $script:CurrentLang = if ($SavedSettings['Language'] -match '^(RU|EN)$') { $SavedSettings['Language'] } else { "RU" }
 $script:WorkMode = if ($SavedSettings['Mode'] -in @('Downloader', 'Installer')) { $SavedSettings['Mode'] } else { $null }
-$script:IpatoolVersion = if ($SavedSettings['IpatoolVersion'] -eq 'ipatool-cpp') { 'ipatool-cpp' } else { 'ipatool-go' }
 
 # Определение архитектуры macOS и Linux:
 if (-not $IsWin) {
 	$script:Arch = [System.Runtime.InteropServices.RuntimeInformation]::OSArchitecture.ToString().ToLower()
 }
 
-# Функция вычисления имени папки с ipatool под текущую систему/архитектуру:
+# Функция вычисления папки с ipatool под текущую систему и архитектуру:
 function Get-ArchSubFolder {
-	param ([ValidateSet("ipatool-cpp", "ipatool-go")][string]$Version)
 	if ($IsWin) {
-		if ($Version -eq "ipatool-cpp") { return "windows_amd64_ipatool-cpp" }
-		else {
-			$WindowsVersion = [Environment]::OSVersion
-			if ($WindowsVersion.Version.Major -eq 6 -and $WindowsVersion.Version.Minor -in 1, 2, 3) { return "windows_7_amd64_ipatool-go" }
-		return "windows_amd64_ipatool-go" 
-		}
+		return "windows_amd64_ipatool-cpp"
 	} elseif ($IsLin) {
+		return "linux_amd64_ipatool-cpp"
+	} elseif ($IsMac) {
 		if ($script:Arch -eq "arm64") {
-			if ($Version -eq "ipatool-cpp") { return "linux_arm64_ipatool-cpp" } else { return "linux_arm64_ipatool-go" }
+			return "macOS_arm64_ipatool-cpp"
 		} else {
-			if ($Version -eq "ipatool-cpp") { return "linux_amd64_ipatool-cpp" } else { return "linux_amd64_ipatool-go" }
-		}
-	} else {
-		if ($script:Arch -eq "arm64") {
-			if ($Version -eq "ipatool-cpp") { return "macOS_arm64_ipatool-cpp" } else { return "macOS_arm64_ipatool-go" }
-		} else {
-			if ($Version -eq "ipatool-cpp") { return "macOS_amd64_ipatool-cpp" } else { return "macOS_amd64_ipatool-go" }
+			return "macOS_amd64_ipatool-cpp"
 		}
 	}
 }
 
 # Определение системы и архитектуры:
-$script:ArchSubFolder = Get-ArchSubFolder -Version $script:IpatoolVersion
+$script:ArchSubFolder = Get-ArchSubFolder
 
 # Определение основных папок и переменных:
 $OSVersion = [System.Environment]::OSVersion
@@ -142,10 +131,10 @@ public class ConsoleFont {
 # Подключение системных сборок для работы с Zip-архивами:
 Add-Type -AssemblyName System.IO.Compression.FileSystem
 
-# Глобальная переменная для кэширования списка с GitHub:
+# Переменная для кэширования списка с GitHub:
 $script:GitHubParsedList = $null
 
-# Перевод:
+# Локализация:
 $LangStrings = @{
 	"RU" = @{
 		"AccountCleared" = "Готово. Данные аккаунта {0} удалены."
@@ -200,7 +189,6 @@ $LangStrings = @{
 		"InstallerMenu3" = "3. Банка для чаевых"
 		"InstallerMenu4" = "4. Сменить язык (Change Language)"
 		"InstallerMenu5" = "5. Перейти в IPA_Downloader"
-		"IpatoolVersionMenuTitle" = "Выберите версию ipatool:"
 		"LangChanged" = "Язык успешно изменен на русский."
 		"LanguageMenu1" = "1. Русский"
 		"LanguageMenu2" = "2. English"
@@ -290,7 +278,6 @@ $LangStrings = @{
 		"InstallerMenu3" = "3. Tip Jar"
 		"InstallerMenu4" = "4. Change Language (Сменить язык)"
 		"InstallerMenu5" = "5. Switch to IPA_Downloader"
-		"IpatoolVersionMenuTitle" = "Select ipatool version:"
 		"LangChanged" = "Language successfully changed to English."
 		"LanguageMenu1" = "1. Русский"
 		"LanguageMenu2" = "2. English"
@@ -433,12 +420,12 @@ function Show-Error {
 	Write-Host (Get-Lang $Key) -ForegroundColor DarkRed
 }
 
-# Глобальная переменная для хранения текущего Аккаунта Apple:
+# Переменная для хранения текущего Аккаунта Apple:
 $script:CurrentAppleAccount = "UnknownAccount"
 
 # Функция получения текущего Аккаунта Apple:
 function Get-Current-AppleAccount {
-	$AuthInfo = & "$script:ipatoolFilePath" auth info --keychain-passphrase $Kp 2>&1 | Out-String
+	$AuthInfo = & "$script:ipatoolFilePath" auth info 2>&1 | Out-String
 	if ($AuthInfo -match 'email=([^\s]+)') {
 		$script:CurrentAppleAccount = $Matches[1].Trim() -replace '\x1b\[[0-9;]*[a-zA-Z]', ''
 	} else {
@@ -520,13 +507,13 @@ function Read-AppList-Json {
 
 # Функция входа в Аккаунт Apple:
 function Connect-AppleAccount {
-	# При первой попытке авторизации баннер с текущим режимом работы, версией скрипта и версией ipatool не отображается:
+	# При первой попытке авторизации баннер с текущим режимом работы и версией скрипта не отображается:
 	$FirstAttempt = $true
 	
 	while (!(Test-Path "$LoginFilePath")) {
 		Remove-Item -Path $ipatoolHomePath -Recurse -Force -ErrorAction SilentlyContinue
 		
-		# При повторных попытках авторизации баннер с текущим режимом работы, версией скрипта и версией ipatool отображается:
+		# При повторных попытках авторизации баннер с текущим режимом работы и версией скрипта отображается:
 		if (-not $FirstAttempt) {
 			Show-ModeBanner
 		} else {
@@ -536,25 +523,11 @@ function Connect-AppleAccount {
 		Separator
 		Write-Host (Get-Lang "AuthFail")
 		
-		if ($script:IpatoolVersion -eq "ipatool-cpp") {
-			& "$script:ipatoolFilePath" auth login
-		} elseif ($script:IpatoolVersion -eq "ipatool-go") {
-			$AppleAccount = Read-Host "Enter email"
-			$SecurePassword = Read-Host "Enter password" -AsSecureString
-			$Password = [System.Net.NetworkCredential]::new("", $SecurePassword).Password
-			& "$script:ipatoolFilePath" auth login --email $AppleAccount --password $Password --keychain-passphrase $Kp
-		}
+		& "$script:ipatoolFilePath" auth login
 		
 		# Создание пустого файла login для фиксации успешной авторизации:
 		if ($LASTEXITCODE -eq 0) {
 			New-Item -Path $LoginFilePath -ItemType File -Force | Out-Null
-			
-			# Сохранение keychain-passphrase с шифрованием после успешного входа:
-			if ($IsWin -and $script:IpatoolVersion -eq "ipatool-go" -and !([string]::IsNullOrEmpty($Kp))) {
-				$KeychainFilePath = Join-Path -Path $ipatoolHomePath -ChildPath "keychain-passphrase"
-				$SecureKp = ConvertTo-SecureString -String $Kp -AsPlainText -Force
-				$SecureKp | ConvertFrom-SecureString | Set-Content -Path $KeychainFilePath -Force
-			}
 		} else {
 			Remove-Item -Path $ipatoolHomePath -Recurse -Force -ErrorAction SilentlyContinue
 		}
@@ -946,7 +919,7 @@ function IPA-Download {
 	)
 	if (!(Test-NumericInput -InputValue $AppId)) { return }
 	Separator
-	& "$script:ipatoolFilePath" download -i $AppId --purchase --keychain-passphrase $Kp
+	& "$script:ipatoolFilePath" download -i $AppId --purchase
 	Move-IPA-Files -AppId $AppId -AppName $AppName
 }
 
@@ -958,7 +931,7 @@ function IPA-Download-With-Version {
 	)
 	if (!(Test-NumericInput -InputValue $AppId)) { return }
 	
-	$RawOutput = & "$script:ipatoolFilePath" list-versions -i $AppId --keychain-passphrase $Kp 2>&1
+	$RawOutput = & "$script:ipatoolFilePath" list-versions -i $AppId 2>&1
 	
 	if ($RawOutput -match "Error:") {
 		Write-Host $RawOutput -ForegroundColor DarkRed
@@ -971,9 +944,9 @@ function IPA-Download-With-Version {
 		return
 	}
 	
-	# Извлечение всех версий и сортировка по убыванию:
+	# Извлечение всех версий:
 	$RawVersions = [regex]::Matches($RawOutput, '(?<=")\d+(?=")') | ForEach-Object { $_.Value }
-	$RecentVersions = $RawVersions | Sort-Object -Descending
+	$RecentVersions = $RawVersions | Sort-Object
 	
 	# Если версии приложения не найдены:
 	if ($RecentVersions.Count -eq 0) {
@@ -1056,7 +1029,7 @@ function IPA-Download-With-Version {
 		# Запрос метаданных для выбранных ID:
 		foreach ($SelectedObject in $PreSelectedVersions) {
 			$VersionId = $SelectedObject.ID
-			$Meta = & "$script:ipatoolFilePath" get-version-metadata -i $AppId --external-version-id $VersionId --keychain-passphrase $Kp 2>$null
+			$Meta = & "$script:ipatoolFilePath" get-version-metadata -i $AppId --external-version-id $VersionId 2>$null
 			$DisplayVersion = if ($Meta -match 'displayVersion=([^\s,]+)') { $Matches[1] } else { "NA" }
 			$DisplayVersion = $DisplayVersion -replace '\x1b\[[0-9;]*[a-zA-Z]', ''
 			
@@ -1117,7 +1090,7 @@ function IPA-Download-With-Version {
 			Write-Host "$(Get-Lang 'SelectedVer') $($SelectedToDownload.Version)"
 			Separator
 			$FinalId = $SelectedToDownload.ID
-			& "$script:ipatoolFilePath" download -i $AppId --external-version-id $FinalId --keychain-passphrase $Kp
+			& "$script:ipatoolFilePath" download -i $AppId --external-version-id $FinalId
 			Move-IPA-Files -AppId $AppId -AppName $AppName
 		}
 		
@@ -1135,11 +1108,11 @@ function Invoke-AppAction {
 		[ValidateSet("Purchase", "Download", "DownloadVersion")][string]$Action
 	)
 	Separator
-	Write-Host "$(Get-Lang 'SelectedApp') $DisplayName"
+	Write-Host "$(Get-Lang 'SelectedApp') $DisplayName (ID: $AppId)"
 	switch ($Action) {
 		"Purchase" {
 			Separator
-			& "$script:ipatoolFilePath" purchase -i $AppId --keychain-passphrase $Kp
+			& "$script:ipatoolFilePath" purchase -i $AppId
 			Save-App-To-List -AppId $AppId -AppNameOnly $AppName -Type "Purchased"
 		}
 		"Download" {
@@ -1181,7 +1154,7 @@ function Search-Apps {
 	}
 	
 	# Поиск в App Store:
-	$SearchOutput = & "$script:ipatoolFilePath" search $AppName --limit 10 --format json --non-interactive --keychain-passphrase $Kp 2>$null | Out-String
+	$SearchOutput = & "$script:ipatoolFilePath" search $AppName --limit 10 --format json --non-interactive 2>$null | Out-String
 	
 	if ($LASTEXITCODE -eq 0 -and ![string]::IsNullOrWhiteSpace($SearchOutput)) {
 		try {
@@ -1394,7 +1367,7 @@ function Get-iOS-MinVersion {
 	Separator
 	$Counter = 1
 	
-	# Присваиваем вывод цикла напрямую переменной (без +=)
+	# Присваивание вывода цикла напрямую переменной:
 	$TableData = foreach ($File in @($FilesToProcess)) { 
 		$Meta = Get-IPA-Metadata -IpaPath $File.FullName
 		$MinOs = if ($Meta) { "$($Meta.MinIOS)" } else { "Error" }
@@ -1488,53 +1461,6 @@ function Get-MissingBinaryFiles {
 	return $MissingFiles
 }
 
-# Функция установки конкретной версии ipatool:
-function Set-IpatoolVersion {
-	param ([ValidateSet("ipatool-cpp", "ipatool-go")][string]$Version)
-	
-	$NewArchSubFolder = Get-ArchSubFolder -Version $Version
-	$NewBinaryFolderPath = Join-Path -Path $MainAppFolderPath -ChildPath $NewArchSubFolder
-	
-	# Проверка наличия необходимых файлов в папке выбранной версии:
-	$MissingVersionFiles = Get-MissingBinaryFiles -FolderPath $NewBinaryFolderPath
-	if ($MissingVersionFiles) {
-		Separator
-		Write-Host (Get-Lang "ErrorMissingFiles") -ForegroundColor DarkRed
-		$MissingVersionFiles | ForEach-Object { Write-Host "$_" -ForegroundColor DarkRed }
-		return $false
-	}
-	
-	# Применение выбранной версии ipatool:
-	$script:IpatoolVersion = $Version
-	$script:ArchSubFolder = $NewArchSubFolder
-	$script:BinaryFolderPath = $NewBinaryFolderPath
-	
-	Set-IpatoolBinaryPaths -FolderPath $script:BinaryFolderPath
-	
-	return $true
-}
-
-# Функция запроса версии ipatool с проверкой наличия файлов:
-function Invoke-IpatoolVersionPrompt {
-	$IpatoolCppLabel = "$(Get-ArchSubFolder -Version 'ipatool-cpp')"
-	$IpatoolGoLabel = "$(Get-ArchSubFolder -Version 'ipatool-go')"
-	
-	while ($true) {
-		Separator
-		$Version_Menu = @"
-$(Get-Lang 'IpatoolVersionMenuTitle')
-1. $IpatoolCppLabel
-2. $IpatoolGoLabel`n
-"@
-		$VersionChoice = Read-MenuChoice -MenuText $Version_Menu -OptionsCount 2
-		$SelectedVersion = if ($VersionChoice -eq '2') { 'ipatool-go' } else { 'ipatool-cpp' }
-		
-		if (Set-IpatoolVersion -Version $SelectedVersion) {
-			return
-		}
-	}
-}
-
 # Функция установки приложений из папки Apps:
 function Install-Apps {
 	if ([string]::IsNullOrWhiteSpace($script:ideviceinstallerFilePath)) {
@@ -1592,7 +1518,7 @@ function Check-Update {
 				# Если числовые версии равны:
 				elseif ([version]$latestVerStr -eq [version]$currentVerStr) {
 					
-					# Переход от беты к чистому релизу
+					# Переход от беты к релизу:
 					if ($currentHasSuffix -and -not $latestHasSuffix) {
 						$UpdateFound = $true
 					}
@@ -1624,7 +1550,7 @@ $(Get-Lang 'UpdateMenu2')`n
 	}
 }
 
-# Функция вывода баннера с текущим режимом работы, версией скрипта и версией ipatool:
+# Функция вывода баннера с текущим режимом работы и версией скрипта:
 function Show-ModeBanner {
 	Separator
 	
@@ -1636,7 +1562,7 @@ function Show-ModeBanner {
 		} else {
 			$Filter = if ($IsWin) { "ipatool*.exe" } else { "ipatool*" }
 			$FoundFile = Get-ChildItem -Path $script:BinaryFolderPath -Filter $Filter -File -ErrorAction SilentlyContinue | Select-Object -First 1
-			if ($FoundFile) { $FoundFile.Name } else { $script:IpatoolVersion }
+			if ($FoundFile) { $FoundFile.Name } else { "ipatool-cpp" }
 		}
 		
 		Write-Host "IPA_Downloader $ScriptVersion ($IpatoolFileName)"
@@ -1652,10 +1578,15 @@ function Open-TipJar {
 
 # Функция первоначальной настройки:
 function Invoke-SetupWizard {
-	# Удаление папки .ipatool:
-	Remove-Item -Path $ipatoolHomePath -Recurse -Force -ErrorAction SilentlyContinue
+	# Проверка авторизации (наличие файла login):
+	$IsLoggedIn = Test-Path $LoginFilePath
 	
-	# Запрос на выбор языка:
+	# Очистка папки .ipatool, если авторизация не произведена:
+	if (-not $IsLoggedIn) {
+		Remove-Item -Path $ipatoolHomePath -Recurse -Force -ErrorAction SilentlyContinue
+	}
+	
+	# Запрос выбора языка:
 	Separator
 	$Language_Menu = @"
 $(Get-Lang 'LanguageMenuTitle')
@@ -1671,11 +1602,18 @@ $(Get-Lang 'LanguageMenu2')`n
 		$script:UpdateChecked = $true
 	}
 	
-	# Установка режима IPA_Installer по умолчанию:
+	# Сохранение выбранного языка:
 	Set-Setting -Key "Language" -Value $script:CurrentLang
-	$script:WorkMode = "Installer"
-	Set-Setting -Key "Mode" -Value $script:WorkMode
 	
+	# Выбор режима работы в зависимости от наличия авторизации:
+	if ($IsLoggedIn) {
+		$script:WorkMode = "Downloader"
+	} else {
+		$script:WorkMode = "Installer"
+	}
+	
+	# Сохранение режима работы и вывод баннера:
+	Set-Setting -Key "Mode" -Value $script:WorkMode
 	Show-ModeBanner
 }
 
@@ -1726,12 +1664,12 @@ $(Get-Lang 'InstallerMenu5')`n
 		$SwitchValue = Read-Host $Installer_Menu
 		switch ($SwitchValue) {
 			
-			# 1. Проверка минимальной версии iOS для приложений в папке Apps:
+			# 1. Проверка минимальной версии iOS для приложений в папке IPA_Downloader/Apps:
 			"1" {
 				$null = Get-iOS-MinVersion
 			}
 			
-			# 2. Установка приложений из папки Apps:
+			# 2. Установка приложений из папки IPA_Downloader/Apps:
 			"2" {
 				Install-Apps
 			}
@@ -1751,7 +1689,6 @@ $(Get-Lang 'InstallerMenu5')`n
 			
 			# 5. Перейти в IPA_Downloader:
 			"5" {
-				Invoke-IpatoolVersionPrompt
 				$script:WorkMode = "Downloader"
 				return
 			}
@@ -1766,28 +1703,12 @@ $(Get-Lang 'InstallerMenu5')`n
 
 # Функция режима IPA_Downloader:
 function Invoke-DownloaderMode {
-	# Инициализация keychain-passphrase (только для ipatool-go на Windows):
-	if ($IsWin -and $script:IpatoolVersion -eq "ipatool-go") {
-		$KeychainFilePath = Join-Path -Path $ipatoolHomePath -ChildPath "keychain-passphrase"
-		
-		if (Test-Path $KeychainFilePath) {
-			$EncryptedContent = (Get-Content -Path $KeychainFilePath -Raw).Trim()
-			$SecureKp = $EncryptedContent | ConvertTo-SecureString
-			$Kp = [System.Net.NetworkCredential]::new("", $SecureKp).Password
-		} else {
-			# Генерация нового случайного ключа:
-			$Kp = [guid]::NewGuid().ToString("N")
-		}
-	} else {
-		# Для macOS, Linux, а также ipatool-cpp не требуется keychain-passphrase:
-		$Kp = ""
-	}
 	
 	# Проверка осуществленного входа с Аккаунтом Apple:
 	if (Test-Path "$LoginFilePath") {
 		Separator
 		Write-Host (Get-Lang "AuthSuccess")
-		& "$script:ipatoolFilePath" auth info --keychain-passphrase $Kp
+		& "$script:ipatoolFilePath" auth info
 		Get-Current-AppleAccount
 	}
 	
@@ -1797,7 +1718,6 @@ function Invoke-DownloaderMode {
 	# Сохранение настроек режима IPA_Downloader только после успешной авторизации с Аккаунтом Apple:
 	Set-Setting -Key "Language" -Value $script:CurrentLang
 	Set-Setting -Key "Mode" -Value "Downloader"
-	Set-Setting -Key "IpatoolVersion" -Value $script:IpatoolVersion
 	
 	# Основной цикл:
 	while (Test-Path "$LoginFilePath") {
@@ -1921,12 +1841,12 @@ $(Get-Lang 'Menu15')`n
 				}
 			}
 			
-			# 10. Проверка минимальной версии iOS для приложений в папке Apps:
+			# 10. Проверка минимальной версии iOS для приложений в папке IPA_Downloader/Apps:
 			"10" {
 				$null = Get-iOS-MinVersion
 			}
 			
-			# 11. Установка приложений из папки Apps:
+			# 11. Установка приложений из папки IPA_Downloader/Apps:
 			"11" {
 				Install-Apps
 			}
@@ -2081,7 +2001,7 @@ $(Get-Lang 'ClearMenu3')`n
 			"13" {
 				Separator
 				Write-Host (Get-Lang "LoggedOut")
-				& "$script:ipatoolFilePath" auth revoke --keychain-passphrase $Kp
+				& "$script:ipatoolFilePath" auth revoke
 				
 				# Удаление файлов настроек и папки .ipatool:
 				Remove-Item -Path $SettingsFilePath -Force -ErrorAction SilentlyContinue

@@ -6,7 +6,7 @@
 
 # IPA_Downloader
 [![Russian README](https://img.shields.io/badge/README-Russian-blue.svg)](README.md)  
-A script for purchasing/downloading any available App Store apps, as well as restoring removed ones - provided they were previously purchased via your Apple Account (powered by [ipatool-cpp](https://github.com/Sorvigolova/ipatool) and [ipatool-go](https://github.com/majd/ipatool)).
+A script for purchasing/downloading any available App Store apps, as well as restoring removed ones - provided they were previously purchased via your Apple Account (powered by [ipatool-cpp](https://github.com/Sorvigolova/ipatool).
 
 ## Script Features:
 #### IPA_Installer:
@@ -96,8 +96,6 @@ Download the complete set of programs/updates for Windows 7/8.1 via the link:
 * Press Enter.
 * To switch to IPA_Downloader mode, enter command 5. Switch to IPA_Downloader.
 #### 5. After switching to IPA_Downloader mode:
-* Select ipatool version (ipatool-cpp or ipatool-go);
-* Press Enter;
 * Enter Apple Account (Enter email:);
 * Press Enter;
 * Enter password (Enter password:);
@@ -174,8 +172,6 @@ Download the complete set of programs/updates for Windows 7/8.1 via the link:
 * Press Enter.
 * To switch to IPA_Downloader mode, enter command 5. Switch to IPA_Downloader.
 #### 5. After switching to IPA_Downloader mode:
-* Select ipatool version (ipatool-cpp or ipatool-go);
-* Press Enter;
 * Enter Apple Account (Enter email:);
 * Press Enter;
 * Enter password (Enter password:);
@@ -226,8 +222,6 @@ Download the complete set of programs/updates for Windows 7/8.1 via the link:
 * Press Enter.
 * To switch to IPA_Downloader mode, enter command 5. Switch to IPA_Downloader.
 #### 6. After switching to IPA_Downloader mode:
-* Select ipatool version (ipatool-cpp or ipatool-go);
-* Press Enter;
 * Enter Apple Account (Enter email:);
 * Press Enter;
 * Enter password (Enter password:);
@@ -277,7 +271,7 @@ Download the complete set of programs/updates for Windows 7/8.1 via the link:
 * A list of found apps will be displayed;
 * Enter the index numbers (#) of the apps to display app version IDs;
 * Press Enter;
-* A list of app version IDs will be displayed;
+* A list of app version IDs will be displayed (from the first to the latest);
 * Enter the index numbers (#) of the app version IDs to download;
 * Press Enter;
 * The script will download the selected app versions.
@@ -294,7 +288,7 @@ Download the complete set of programs/updates for Windows 7/8.1 via the link:
 * Press Enter;
 * Enter the index numbers (#) of the apps to download;
 * Press Enter;
-* A list of app version IDs will be displayed;
+* A list of app version IDs will be displayed (from the first to the latest);
 * Enter the index numbers (#) of the app version IDs to download;
 * Press Enter;
 * The script will download the selected app versions.
@@ -317,7 +311,7 @@ Download the complete set of programs/updates for Windows 7/8.1 via the link:
 * Press Enter;
 * Enter the index numbers (#) of the apps to download;
 * Press Enter;
-* A list of app version IDs will be displayed;
+* A list of app version IDs will be displayed (from the first to the latest);
 * Enter the index numbers (#) of the app version IDs to download;
 * Press Enter;
 * The script will download the selected app versions.
@@ -350,14 +344,12 @@ Download the complete set of programs/updates for Windows 7/8.1 via the link:
 * Purchase error: item is temporarily unavailable - The app was not previously purchased on this Apple Account, the purchase failed because the app has been removed from the App Store.
 * No device found - Device not found. Make sure the AppleMobileDeviceSupport64 driver is installed (relevant for Windows).
 * WARNING: could not locate Payload/App.app/SC_Info/App.sinf in archive! - App signature not found in the installed ipa file.
-* Error: anisette exited with code 1 - check that anisette binary is working. iTunes Not Found (0) - iTunes from the Apple website is not installed.
-* Error: anisette exited with code 1 - check that anisette binary is working. iCloud Not Found (1) - iCloud from the Apple website is not installed.
 * Login error: GSA SRP exception: GSA complete error -27952: Update iCloud for Windows to the latest version to sign in - Advanced Data Protection needs to be disabled via Settings-Account-iCloud-Advanced Data Protection.
 * If the app immediately closes when launched after installation, log in to the App Store using the account from which it was downloaded, and install any free/paid app. After that, launch the problematic app again.
 
 ## If you encounter an issue:
 #### Provide the following information:
-* The operating system and ipatool version you are using;
+* The operating system and IPA_Downloader version;
 * A screenshot of the error.
 
 ## Tracking new app releases:
@@ -376,7 +368,7 @@ If the app is installed on your device, press and hold the app icon:
 <img width="389" height="36" alt="AppStore_Link" src="https://github.com/user-attachments/assets/e73fd860-ed11-4293-8600-aef61fe3dc7f" />
 </details>
 
-## Project support:
+## Tip Jar:
 IPA_Downloader is completely free, however, if you want to support the project voluntarily, you can do so via the link below or using the QR code:  
 [Support via CloudTips](https://pay.cloudtips.ru/p/93c0b094)  
 
