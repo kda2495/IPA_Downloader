@@ -2,7 +2,7 @@
 Set-Location -Path $PSScriptRoot
 
 # Версия скрипта:
-$ScriptVersion = "4.0.1"
+$ScriptVersion = "4.0.2"
 
 # Определение операционной системы:
 $IsWin = [System.Runtime.InteropServices.RuntimeInformation]::IsOSPlatform([System.Runtime.InteropServices.OSPlatform]::Windows)
@@ -318,7 +318,7 @@ $LangStrings = @{
 
 # Функция разделителя:
 function Separator {
-	Write-Host "=================================================================================" -ForegroundColor Green
+	Write-Host "==============================================================================" -ForegroundColor Green
 }
 
 # Скомпилированные регулярные выражения для ускорения рендеринга таблиц:
