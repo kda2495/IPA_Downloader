@@ -325,7 +325,7 @@ Download the complete set of programs/updates for Windows 7/8.1 via the link:
 * Press Enter;
 * The script will install the selected apps on the device.
 #### 12. Clear data:
-* Enter the data list to clear (downloaded apps list, purchased apps list, apps in the Apps folder);
+* Enter the data list to clear (downloaded apps list, purchased apps list, apps in the IPA_Downloader/Apps folder);
 * Press Enter;
 * When choosing to clear either the downloaded apps list or the purchased apps list, select the specific account you want to clear;
 * Press Enter;
