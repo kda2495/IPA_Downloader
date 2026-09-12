@@ -63,6 +63,7 @@ Grok: 6670324846
 Happ-Proxy Utility: 6504287215
 Happ-Proxy Utility Plus: 6746188973
 Happ-Proxy Utility+: 6783623643
+Happ Lite: 6799917773
 Haraba: 1477603193
 HeadHunter: 502838820
 HippoparkingRu (Tagapp Auto): 6754330991
