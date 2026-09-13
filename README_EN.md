@@ -8,7 +8,8 @@
 [![Russian README](https://img.shields.io/badge/README-Russian-blue.svg)](README.md)  
 A script for purchasing/downloading any available App Store apps, as well as restoring removed ones - provided they were previously purchased via your Apple Account (powered by [ipatool-cpp](https://github.com/Sorvigolova/ipatool).
 
-## Script Features:
+## Information about the script:
+### Script Features:
 #### IPA_Installer:
 * Check minimum iOS version for apps in the IPA_Downloader/Apps folder;
 * Install apps from the IPA_Downloader/Apps folder.
@@ -35,14 +36,14 @@ A script for purchasing/downloading any available App Store apps, as well as res
 * It is recommended to disable security keys and switch to standard two-factor authentication;
 * The script supports bulk purchasing/downloading of apps. Simply enter the index numbers (#) of the apps/versions from the tables, separated by commas or hyphens. For example, entering 1, 2, 3-5 will purchase/download the apps with index numbers (#) 1, 2, 3, 4, and 5.
 
-## General requirements for use:
+### General requirements for use:
 * Windows 7, 8.1, 10, 11 (x64);
 * macOS starting from 10.15 Catalina (both Apple Silicon and Intel are supported);
 * Linux (x64 and ARM64: Arch Linux, Ubuntu, Debian, Fedora, etc.);
 * Stable internet connection;
 * An Apple Account with previously downloaded apps.
 
-## To run on Windows:
+## Using on Windows:
 ### Windows requirements:
 * Installed AppleMobileDeviceSupport64 driver for supporting app installation via script (included in iTunes):  
 [Link to download iTunes from the Apple website](https://www.apple.com/itunes/download/win64)
@@ -107,7 +108,7 @@ Download the complete set of programs/updates for Windows 7/8.1 via the link:
 * Enter the required command;
 * Press Enter.
 
-## To run on macOS:
+## Using on macOS:
 ### macOS requirements:
 #### All steps must be performed strictly in the following order:
 #### 1. Install the Homebrew package manager:
@@ -188,7 +189,7 @@ Download the complete set of programs/updates for Windows 7/8.1 via the link:
 #### Note:
 * You can use AirDrop to install the app: simply transfer the file to your iPhone, and the app will be installed automatically.
 
-## To run on Linux:
+## Using on Linux:
 ### Linux requirements:
 #### Install the required packages:
 #### Arch Linux / Manjaro:
@@ -233,7 +234,8 @@ Download the complete set of programs/updates for Windows 7/8.1 via the link:
 * Enter the required command;
 * Press Enter.
 
-## IPA_Installer commands description:
+## Script commands description:
+### IPA_Installer:
 #### 1. Check minimum iOS version for apps in the IPA_Downloader/Apps folder:
 * Apps must be located in the IPA_Downloader/Apps path;
 * The script will check the minimum iOS version required for the app to work.
@@ -250,7 +252,7 @@ Download the complete set of programs/updates for Windows 7/8.1 via the link:
 #### 5. Switch to IPA_Downloader:
 * The script will switch the mode to IPA_Downloader.
 
-## IPA_Downloader commands description:
+### IPA_Downloader:
 #### 1. Search for app and purchase (without downloading):
 * Enter the app name to search;
 * Press Enter;
@@ -337,7 +339,8 @@ Download the complete set of programs/updates for Windows 7/8.1 via the link:
 #### 15. Change Language:
 * The script will change its interface language.
 
-## Troubleshooting errors:
+## Possible errors and solution:
+### Troubleshooting errors:
 * Download error: HTTP request failed: Timeout was reached - Failed to connect to Apple servers, check your internet connection.
 * Error: license is required - The app was not previously purchased on this Apple Account.
 * Purchase error: app not found - App purchase failed because the app has been removed from the App Store.
@@ -347,26 +350,28 @@ Download the complete set of programs/updates for Windows 7/8.1 via the link:
 * Login error: GSA SRP exception: GSA complete error -27952: Update iCloud for Windows to the latest version to sign in - Advanced Data Protection needs to be disabled via Settings-Account-iCloud-Advanced Data Protection.
 * If the app immediately closes when launched after installation, log in to the App Store using the account from which it was downloaded, and install any free/paid app. After that, launch the problematic app again.
 
-## If you encounter an issue:
+### If you encounter an issue:
 #### Provide the following information:
 * The operating system and IPA_Downloader version;
 * A screenshot of the error.
 
-## Tracking new app releases:
-[AppBank Website](https://pwa.appbank.pw/)
-
-## Finding an App ID:
+## Useful information:
+### Finding an App ID:
 #### Option 1:
 Find the app link in the App Store and copy the numeric identifier (the value after "id" in the URL).
+<details>
+ <summary>Screenshot (click to view)</summary>
+<img width="389" height="36" alt="AppStore_Link" src="https://github.com/user-attachments/assets/e73fd860-ed11-4293-8600-aef61fe3dc7f" />
+</details>
+
 #### Option 2:
 If the app is installed on your device, press and hold the app icon:
 * The Share App option will appear;
 * Copy the link and paste it into a browser;
 * Copy the numeric identifier (the value after id in the URL).
-<details>
- <summary>Screenshot (click to view)</summary>
-<img width="389" height="36" alt="AppStore_Link" src="https://github.com/user-attachments/assets/e73fd860-ed11-4293-8600-aef61fe3dc7f" />
-</details>
+### Tracking new app releases:
+[The topic on the 4PDA](https://4pda.to/forum/index.php?showtopic=1046078)  
+[AppBank Website](https://pwa.appbank.pw/)
 
 ## Tip Jar:
 IPA_Downloader is completely free, however, if you want to support the project voluntarily, you can do so via the link below or using the QR code:  
