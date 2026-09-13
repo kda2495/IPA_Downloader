@@ -9,6 +9,8 @@
 A script for purchasing/downloading any available App Store apps, as well as restoring removed ones - provided they were previously purchased via your Apple Account (powered by [ipatool-cpp](https://github.com/Sorvigolova/ipatool).
 
 ## Information about the script:
+### Important:
+ipatool is an unofficial tool; therefore, using the script is only at your own risk.
 ### Script Features:
 #### IPA_Installer:
 * Check minimum iOS version for apps in the IPA_Downloader/Apps folder;
