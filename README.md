@@ -139,8 +139,6 @@ ipatool является неофициальным инструментом; с
 
 ### Как использовать (macOS):
 #### 1. Распаковываем архив IPA_Downloader.zip любым архиватором;
-* Вводим в Терминал: `chmod +x ` (с пробелом после x) и перетаскиваем файл Start_IPA_Downloader.command на Терминал;
-* Нажимаем Enter.
 #### 2. Дважды кликаем по файлу Start_IPA_Downloader.command;
 * В первый раз macOS заблокирует запуск Start_IPA_Downloader.command;
 * В появившемся окне "Файл "Start_IPA_Downloader.command" нажимаем "Готово";

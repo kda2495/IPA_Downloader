@@ -153,8 +153,6 @@ Download the complete set of programs/updates for Windows 7/8.1 via the link:
 
 ### How to use (macOS):
 #### 1. Extract the IPA_Downloader.zip archive using any archiver;
-* Type in Terminal: `chmod +x ` (including the trailing space after x) and drag and drop the Start_IPA_Downloader.command file into Terminal;
-* Press Enter.
 #### 2. Double-click the Start_IPA_Downloader.command file;
 * The first time, macOS will block Start_IPA_Downloader.command from running;
 * Click "Done" in the prompt that appears;
