@@ -2,12 +2,12 @@
 Set-Location -Path $PSScriptRoot
 
 # Версия скрипта:
-$ScriptVersion = "4.0.3 Beta 1"
+$ScriptVersion = "4.0.2"
 
 # Определение операционной системы:
 $IsWin = [System.Runtime.InteropServices.RuntimeInformation]::IsOSPlatform([System.Runtime.InteropServices.OSPlatform]::Windows)
-$IsLin = [System.Runtime.InteropServices.RuntimeInformation]::IsOSPlatform([System.Runtime.InteropServices.OSPlatform]::Linux)
 $IsMac = [System.Runtime.InteropServices.RuntimeInformation]::IsOSPlatform([System.Runtime.InteropServices.OSPlatform]::OSX)
+$IsLin = [System.Runtime.InteropServices.RuntimeInformation]::IsOSPlatform([System.Runtime.InteropServices.OSPlatform]::Linux)
 
 # Папка MainApp и файл настроек (язык, режим работы):
 $MainAppFolderPath = Join-Path -Path $PSScriptRoot -ChildPath "MainApp"
@@ -59,14 +59,14 @@ if (-not $IsWin) {
 # Функция вычисления папки с ipatool под текущую систему и архитектуру:
 function Get-ArchSubFolder {
 	if ($IsWin) {
-		return "windows_amd64_ipatool"
+		return "windows_amd64_ipatool-cpp"
 	} elseif ($IsLin) {
-		return "linux_amd64_ipatool"
+		return "linux_amd64_ipatool-cpp"
 	} elseif ($IsMac) {
 		if ($script:Arch -eq "arm64") {
-			return "macOS_arm64_ipatool"
-		} elseif ($script:Arch -eq "amd64") {
-			return "macOS_amd64_ipatool"
+			return "macOS_arm64_ipatool-cpp"
+		} else {
+			return "macOS_amd64_ipatool-cpp"
 		}
 	}
 }
@@ -425,7 +425,7 @@ $script:CurrentAppleAccount = "UnknownAccount"
 
 # Функция получения текущего Аккаунта Apple:
 function Get-Current-AppleAccount {
-	$AuthInfo = & "$script:ipatoolFilePath" auth info --keychain-passphrase $script:Kp | Out-String
+	$AuthInfo = & "$script:ipatoolFilePath" auth info 2>&1 | Out-String
 	if ($AuthInfo -match 'email=([^\s]+)') {
 		$script:CurrentAppleAccount = $Matches[1].Trim() -replace '\x1b\[[0-9;]*[a-zA-Z]', ''
 	} else {
@@ -523,28 +523,16 @@ function Connect-AppleAccount {
 		Separator
 		Write-Host (Get-Lang "AuthFail")
 		
-		# Авторизация:
-		& "$script:ipatoolFilePath" auth login --keychain-passphrase $script:Kp
-			
+		& "$script:ipatoolFilePath" auth login
+		
+		# Создание пустого файла login для фиксации успешной авторизации:
 		if ($LASTEXITCODE -eq 0) {
-			# Создание пустого файла login для фиксации успешной авторизации:
 			New-Item -Path $LoginFilePath -ItemType File -Force | Out-Null
-			
-			# Вывод данных аккаунта:
-			Separator
-			Write-Host (Get-Lang "AuthSuccess")
-			Get-Current-AppleAccount
-			
-			# Сохранение данных в файл keychain-passphrase с шифрованием после успешного входа (только для Windows):
-			if ($IsWin -and !([string]::IsNullOrEmpty($script:Kp))) {
-				$KeychainFilePath = Join-Path -Path $ipatoolHomePath -ChildPath "keychain-passphrase"
-				$SecureKp = ConvertTo-SecureString -String $script:Kp -AsPlainText -Force
-				$SecureKp | ConvertFrom-SecureString | Set-Content -Path $KeychainFilePath -Force
-			}
 		} else {
 			Remove-Item -Path $ipatoolHomePath -Recurse -Force -ErrorAction SilentlyContinue
 		}
 	}
+	Get-Current-AppleAccount
 }
 
 # Функция извлечения метаданных из ipa:
@@ -931,7 +919,7 @@ function IPA-Download {
 	)
 	if (!(Test-NumericInput -InputValue $AppId)) { return }
 	Separator
-	& "$script:ipatoolFilePath" download -i $AppId --purchase --keychain-passphrase $script:Kp
+	& "$script:ipatoolFilePath" download -i $AppId --purchase
 	Move-IPA-Files -AppId $AppId -AppName $AppName
 }
 
@@ -943,7 +931,7 @@ function IPA-Download-With-Version {
 	)
 	if (!(Test-NumericInput -InputValue $AppId)) { return }
 	
-	$RawOutput = & "$script:ipatoolFilePath" list-versions -i $AppId --keychain-passphrase $script:Kp
+	$RawOutput = & "$script:ipatoolFilePath" list-versions -i $AppId 2>&1
 	
 	if ($RawOutput -match "Error:") {
 		Write-Host $RawOutput -ForegroundColor DarkRed
@@ -1041,7 +1029,7 @@ function IPA-Download-With-Version {
 		# Запрос метаданных для выбранных ID:
 		foreach ($SelectedObject in $PreSelectedVersions) {
 			$VersionId = $SelectedObject.ID
-			$Meta = & "$script:ipatoolFilePath" get-version-metadata -i $AppId --external-version-id $VersionId --keychain-passphrase $script:Kp 2>$null
+			$Meta = & "$script:ipatoolFilePath" get-version-metadata -i $AppId --external-version-id $VersionId 2>$null
 			$DisplayVersion = if ($Meta -match 'displayVersion=([^\s,]+)') { $Matches[1] } else { "NA" }
 			$DisplayVersion = $DisplayVersion -replace '\x1b\[[0-9;]*[a-zA-Z]', ''
 			
@@ -1102,7 +1090,7 @@ function IPA-Download-With-Version {
 			Write-Host "$(Get-Lang 'SelectedVer') $($SelectedToDownload.Version)"
 			Separator
 			$FinalId = $SelectedToDownload.ID
-			& "$script:ipatoolFilePath" download -i $AppId --external-version-id $FinalId --keychain-passphrase $script:Kp
+			& "$script:ipatoolFilePath" download -i $AppId --external-version-id $FinalId
 			Move-IPA-Files -AppId $AppId -AppName $AppName
 		}
 		
@@ -1124,7 +1112,7 @@ function Invoke-AppAction {
 	switch ($Action) {
 		"Purchase" {
 			Separator
-			& "$script:ipatoolFilePath" purchase -i $AppId --keychain-passphrase $script:Kp
+			& "$script:ipatoolFilePath" purchase -i $AppId
 			Save-App-To-List -AppId $AppId -AppNameOnly $AppName -Type "Purchased"
 		}
 		"Download" {
@@ -1166,7 +1154,7 @@ function Search-Apps {
 	}
 	
 	# Поиск в App Store:
-	$SearchOutput = & "$script:ipatoolFilePath" search $AppName --limit 10 --format json --non-interactive --keychain-passphrase $script:Kp 2>$null | Out-String
+	$SearchOutput = & "$script:ipatoolFilePath" search $AppName --limit 10 --format json --non-interactive 2>$null | Out-String
 	
 	if ($LASTEXITCODE -eq 0 -and ![string]::IsNullOrWhiteSpace($SearchOutput)) {
 		try {
@@ -1574,7 +1562,7 @@ function Show-ModeBanner {
 		} else {
 			$Filter = if ($IsWin) { "ipatool*.exe" } else { "ipatool*" }
 			$FoundFile = Get-ChildItem -Path $script:BinaryFolderPath -Filter $Filter -File -ErrorAction SilentlyContinue | Select-Object -First 1
-			if ($FoundFile) { $FoundFile.Name } else { "ipatool" }
+			if ($FoundFile) { $FoundFile.Name } else { "ipatool-cpp" }
 		}
 		
 		Write-Host "IPA_Downloader $ScriptVersion ($IpatoolFileName)"
@@ -1716,28 +1704,11 @@ $(Get-Lang 'InstallerMenu5')`n
 # Функция режима IPA_Downloader:
 function Invoke-DownloaderMode {
 	
-	# Инициализация keychain-passphrase (только для Windows):
-	if ($IsWin) {
-		$KeychainFilePath = Join-Path -Path $ipatoolHomePath -ChildPath "keychain-passphrase"
-		
-		if (Test-Path $KeychainFilePath) {
-			$EncryptedContent = (Get-Content -Path $KeychainFilePath -Raw).Trim()
-			$SecureKp = $EncryptedContent | ConvertTo-SecureString
-			$script:Kp = [System.Net.NetworkCredential]::new("", $SecureKp).Password
-		} else {
-			# Генерация нового случайного ключа:
-			$script:Kp = [guid]::NewGuid().ToString("N")
-		}
-	} else {
-		# Для macOS не требуется keychain-passphrase:
-		$script:Kp = ""
-	}
-	
 	# Проверка осуществленного входа с Аккаунтом Apple:
 	if (Test-Path "$LoginFilePath") {
 		Separator
 		Write-Host (Get-Lang "AuthSuccess")
-		& "$script:ipatoolFilePath" auth info --keychain-passphrase $script:Kp
+		& "$script:ipatoolFilePath" auth info
 		Get-Current-AppleAccount
 	}
 	
@@ -2030,7 +2001,7 @@ $(Get-Lang 'ClearMenu3')`n
 			"13" {
 				Separator
 				Write-Host (Get-Lang "LoggedOut")
-				& "$script:ipatoolFilePath" auth revoke --keychain-passphrase $script:Kp
+				& "$script:ipatoolFilePath" auth revoke
 				
 				# Удаление файлов настроек и папки .ipatool:
 				Remove-Item -Path $SettingsFilePath -Force -ErrorAction SilentlyContinue
