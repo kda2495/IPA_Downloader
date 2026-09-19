@@ -2,7 +2,7 @@
 Set-Location -Path $PSScriptRoot
 
 # Версия скрипта:
-$ScriptVersion = "4.0.2"
+$ScriptVersion = "4.0.3"
 
 # Определение операционной системы:
 $IsWin = [System.Runtime.InteropServices.RuntimeInformation]::IsOSPlatform([System.Runtime.InteropServices.OSPlatform]::Windows)
@@ -89,6 +89,7 @@ $AppsIDListPath = Join-Path -Path $FilesFolderPath -ChildPath "Apps_ID_List.txt"
 $AppsIDTempListPath = Join-Path -Path $MainAppFolderPath -ChildPath "Apps_ID_List_tmp.txt"
 $WarningPath = Join-Path -Path $FilesFolderPath -ChildPath "Warning.txt"
 $WarningTempPath = Join-Path -Path $MainAppFolderPath -ChildPath "Warning_tmp.txt"
+$script:IsDebugEnabled = $false
 
 # Настройка консоли (для Windows):
 if ($IsWin) {
@@ -160,6 +161,8 @@ $LangStrings = @{
 		"ClearMenu2" = "2. Список загруженных приложений"
 		"ClearMenu3" = "3. Приложения в папке IPA_Downloader/Apps"
 		"ClearMenuTitle" = "Выберите данные для очистки"
+		"DebugEnabled" = "Режим отладки включен."
+		"DebugDisabled" = "Режим отладки отключен."
 		"DownloadedListCleared" = "Готово. Список загруженных приложений очищен."
 		"DownloadedListMenu1" = "1. Полный список приложений (GitHub)"
 		"DownloadedListMenu2" = "2. Список загруженных приложений"
@@ -249,6 +252,8 @@ $LangStrings = @{
 		"ClearMenu2" = "2. Downloaded apps list"
 		"ClearMenu3" = "3. Apps in IPA_Downloader/Apps folder"
 		"ClearMenuTitle" = "Select data to clear"
+		"DebugEnabled" = "Debug mode enabled."
+		"DebugDisabled" = "Debug mode disabled"
 		"DownloadedListCleared" = "Done. Downloaded apps list cleared."
 		"DownloadedListMenu1" = "1. Full apps list (GitHub)"
 		"DownloadedListMenu2" = "2. List of downloaded apps"
@@ -425,7 +430,7 @@ $script:CurrentAppleAccount = "UnknownAccount"
 
 # Функция получения текущего Аккаунта Apple:
 function Get-Current-AppleAccount {
-	$AuthInfo = & "$script:ipatoolFilePath" auth info 2>&1 | Out-String
+	$AuthInfo = Invoke-Ipatool auth info | Out-String
 	if ($AuthInfo -match 'email=([^\s]+)') {
 		$script:CurrentAppleAccount = $Matches[1].Trim() -replace '\x1b\[[0-9;]*[a-zA-Z]', ''
 	} else {
@@ -523,7 +528,7 @@ function Connect-AppleAccount {
 		Separator
 		Write-Host (Get-Lang "AuthFail")
 		
-		& "$script:ipatoolFilePath" auth login
+		Invoke-Ipatool auth login
 		
 		# Создание пустого файла login для фиксации успешной авторизации:
 		if ($LASTEXITCODE -eq 0) {
@@ -919,7 +924,7 @@ function IPA-Download {
 	)
 	if (!(Test-NumericInput -InputValue $AppId)) { return }
 	Separator
-	& "$script:ipatoolFilePath" download -i $AppId --purchase
+	Invoke-Ipatool download -i $AppId --purchase
 	Move-IPA-Files -AppId $AppId -AppName $AppName
 }
 
@@ -931,7 +936,7 @@ function IPA-Download-With-Version {
 	)
 	if (!(Test-NumericInput -InputValue $AppId)) { return }
 	
-	$RawOutput = & "$script:ipatoolFilePath" list-versions -i $AppId 2>&1
+	$RawOutput = Invoke-Ipatool list-versions -i $AppId
 	
 	if ($RawOutput -match "Error:") {
 		Write-Host $RawOutput -ForegroundColor DarkRed
@@ -1029,7 +1034,7 @@ function IPA-Download-With-Version {
 		# Запрос метаданных для выбранных ID:
 		foreach ($SelectedObject in $PreSelectedVersions) {
 			$VersionId = $SelectedObject.ID
-			$Meta = & "$script:ipatoolFilePath" get-version-metadata -i $AppId --external-version-id $VersionId 2>$null
+			$Meta = Invoke-Ipatool get-version-metadata -i $AppId --external-version-id $VersionId 2>$null
 			$DisplayVersion = if ($Meta -match 'displayVersion=([^\s,]+)') { $Matches[1] } else { "NA" }
 			$DisplayVersion = $DisplayVersion -replace '\x1b\[[0-9;]*[a-zA-Z]', ''
 			
@@ -1090,7 +1095,7 @@ function IPA-Download-With-Version {
 			Write-Host "$(Get-Lang 'SelectedVer') $($SelectedToDownload.Version)"
 			Separator
 			$FinalId = $SelectedToDownload.ID
-			& "$script:ipatoolFilePath" download -i $AppId --external-version-id $FinalId
+			Invoke-Ipatool download -i $AppId --external-version-id $FinalId
 			Move-IPA-Files -AppId $AppId -AppName $AppName
 		}
 		
@@ -1112,7 +1117,7 @@ function Invoke-AppAction {
 	switch ($Action) {
 		"Purchase" {
 			Separator
-			& "$script:ipatoolFilePath" purchase -i $AppId
+			Invoke-Ipatool purchase -i $AppId
 			Save-App-To-List -AppId $AppId -AppNameOnly $AppName -Type "Purchased"
 		}
 		"Download" {
@@ -1154,7 +1159,7 @@ function Search-Apps {
 	}
 	
 	# Поиск в App Store:
-	$SearchOutput = & "$script:ipatoolFilePath" search $AppName --limit 10 --format json --non-interactive 2>$null | Out-String
+	$SearchOutput = Invoke-Ipatool search $AppName --limit 10 --format json --non-interactive 2>$null | Out-String
 	
 	if ($LASTEXITCODE -eq 0 -and ![string]::IsNullOrWhiteSpace($SearchOutput)) {
 		try {
@@ -1701,6 +1706,18 @@ $(Get-Lang 'InstallerMenu5')`n
 	}
 }
 
+# Функция запуска ipatool:
+function Invoke-Ipatool {
+	$IpatoolArgs = @($args)
+	
+	# Добавление флага --debug при включении режима отладки:
+	if ($script:IsDebugEnabled) {
+		$IpatoolArgs += "--debug"
+	}
+	
+	& "$script:ipatoolFilePath" @IpatoolArgs
+}
+
 # Функция режима IPA_Downloader:
 function Invoke-DownloaderMode {
 	
@@ -1708,7 +1725,7 @@ function Invoke-DownloaderMode {
 	if (Test-Path "$LoginFilePath") {
 		Separator
 		Write-Host (Get-Lang "AuthSuccess")
-		& "$script:ipatoolFilePath" auth info
+		Invoke-Ipatool auth info
 		Get-Current-AppleAccount
 	}
 	
@@ -2001,7 +2018,7 @@ $(Get-Lang 'ClearMenu3')`n
 			"13" {
 				Separator
 				Write-Host (Get-Lang "LoggedOut")
-				& "$script:ipatoolFilePath" auth revoke
+				Invoke-Ipatool auth revoke
 				
 				# Удаление файлов настроек и папки .ipatool:
 				Remove-Item -Path $SettingsFilePath -Force -ErrorAction SilentlyContinue
@@ -2023,6 +2040,18 @@ $(Get-Lang 'ClearMenu3')`n
 				Set-Setting -Key "Language" -Value $script:CurrentLang
 				Separator
 				Write-Host (Get-Lang "LangChanged")
+			}
+			
+			# Режим отладки:
+			"debug" {
+				$script:IsDebugEnabled = -not $script:IsDebugEnabled
+				Separator
+				if ($script:IsDebugEnabled) {
+					Write-Host (Get-Lang "DebugEnabled")
+				} else {
+					Write-Host (Get-Lang "DebugDisabled")
+				}
+				continue
 			}
 			
 			# Неверный ввод:
