@@ -2,7 +2,7 @@
 Set-Location -Path $PSScriptRoot
 
 # Версия скрипта:
-$ScriptVersion = "4.0.3"
+$ScriptVersion = "4.0.3 Beta 1"
 
 # Определение операционной системы:
 $IsWin = [System.Runtime.InteropServices.RuntimeInformation]::IsOSPlatform([System.Runtime.InteropServices.OSPlatform]::Windows)
@@ -431,7 +431,6 @@ function Get-Current-AppleAccount {
 	} else {
 		$script:CurrentAppleAccount = "UnknownAccount"
 	}
-	& "$script:ipatoolFilePath" auth info --keychain-passphrase $script:Kp
 }
 
 # Функция запроса пункта меню:
@@ -524,90 +523,28 @@ function Connect-AppleAccount {
 		Separator
 		Write-Host (Get-Lang "AuthFail")
 		
-		# Авторизация на macOS arm64 (исправление из-за проблем с PowerShell на macOS 27):
-		if ($IsMac -and $script:Arch -eq "arm64") {
-			$LocalTempPath = [System.IO.Path]::GetTempPath()
-			$ExitCodeFile = Join-Path -Path $LocalTempPath -ChildPath "ipatool_auth_exit.txt"
+		# Авторизация:
+		& "$script:ipatoolFilePath" auth login --keychain-passphrase $script:Kp
 			
-			if (Test-Path $ExitCodeFile) {
-				Remove-Item -Path $ExitCodeFile -Force -ErrorAction SilentlyContinue
-			}
+		if ($LASTEXITCODE -eq 0) {
+			# Создание пустого файла login для фиксации успешной авторизации:
+			New-Item -Path $LoginFilePath -ItemType File -Force | Out-Null
 			
-			# Запоминаем приложение, из которого запущен скрипт:
-			$HostApp = (osascript -e 'tell application "System Events" to get name of first application process whose frontmost is true').Trim()
+			# Вывод данных аккаунта:
+			Separator
+			Write-Host (Get-Lang "AuthSuccess")
+			Get-Current-AppleAccount
 			
-			$CurrentHome = $env:HOME
-			
-			$appleScript = @"
-tell application "Terminal"
-    activate
-    set theTab to do script "export HOME=\"$CurrentHome\"; \"$script:ipatoolFilePath\" auth login; echo `$? > \"$ExitCodeFile\""
-    set theWindow to first window whose tabs contains theTab
-    
-    repeat
-        try
-            do shell script "test -f \"$ExitCodeFile\""
-            try
-                close theWindow
-            end try
-            exit repeat
-        end try
-        
-        if not (exists theTab) then
-            do shell script "echo 1 > \"$ExitCodeFile\""
-            exit repeat
-        end if
-        
-        delay 0.5
-    end repeat
-end tell
-
-try
-    tell application "$HostApp" to activate
-end try
-"@
-			
-			osascript -e $appleScript | Out-Null
-			
-			$AuthExitCode = "1"
-			
-			if (Test-Path $ExitCodeFile) {
-				$AuthExitCode = (Get-Content -Path $ExitCodeFile -Raw).Trim()
-				Remove-Item -Path $ExitCodeFile -Force -ErrorAction SilentlyContinue
-			}
-			
-			if ($AuthExitCode -eq "0") {
-				if (!(Test-Path $ipatoolHomePath)) {
-					New-Item -Path $ipatoolHomePath -ItemType Directory -Force | Out-Null
-				}
-				
-				New-Item -Path $LoginFilePath -ItemType File -Force | Out-Null
-			} else {
-				Remove-Item -Path $ipatoolHomePath -Recurse -Force -ErrorAction SilentlyContinue
+			# Сохранение данных в файл keychain-passphrase с шифрованием после успешного входа (только для Windows):
+			if ($IsWin -and !([string]::IsNullOrEmpty($script:Kp))) {
+				$KeychainFilePath = Join-Path -Path $ipatoolHomePath -ChildPath "keychain-passphrase"
+				$SecureKp = ConvertTo-SecureString -String $script:Kp -AsPlainText -Force
+				$SecureKp | ConvertFrom-SecureString | Set-Content -Path $KeychainFilePath -Force
 			}
 		} else {
-			# Стандартная авторизация:
-			& "$script:ipatoolFilePath" auth login --keychain-passphrase $script:Kp
-			
-			if ($LASTEXITCODE -eq 0) {
-				# Создание пустого файла login для фиксации успешной авторизации:
-				New-Item -Path $LoginFilePath -ItemType File -Force | Out-Null
-				
-				# Сохранение keychain-passphrase с шифрованием после успешного входа (только для Windows):
-				if ($IsWin -and !([string]::IsNullOrEmpty($script:Kp))) {
-					$KeychainFilePath = Join-Path -Path $ipatoolHomePath -ChildPath "keychain-passphrase"
-					$SecureKp = ConvertTo-SecureString -String $script:Kp -AsPlainText -Force
-					$SecureKp | ConvertFrom-SecureString | Set-Content -Path $KeychainFilePath -Force
-				}
-			} else {
-				Remove-Item -Path $ipatoolHomePath -Recurse -Force -ErrorAction SilentlyContinue
-			}
+			Remove-Item -Path $ipatoolHomePath -Recurse -Force -ErrorAction SilentlyContinue
 		}
 	}
-	
-	Separator
-	Write-Host (Get-Lang "AuthSuccess")
-	Get-Current-AppleAccount
 }
 
 # Функция извлечения метаданных из ipa:
@@ -1794,6 +1731,14 @@ function Invoke-DownloaderMode {
 	} else {
 		# Для macOS не требуется keychain-passphrase:
 		$script:Kp = ""
+	}
+	
+	# Проверка осуществленного входа с Аккаунтом Apple:
+	if (Test-Path "$LoginFilePath") {
+		Separator
+		Write-Host (Get-Lang "AuthSuccess")
+		& "$script:ipatoolFilePath" auth info --keychain-passphrase $script:Kp
+		Get-Current-AppleAccount
 	}
 	
 	# Вход с Аккаунтом Apple:
