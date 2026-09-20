@@ -6,7 +6,7 @@
 
 # IPA_Downloader
 [![English README](https://img.shields.io/badge/README-English-blue.svg)](README_EN.md)  
-Скрипт для покупки/загрузки любых доступных в App Store приложений, а также восстановления удалённых - при условии, что они были приобретены ранее с вашим Аккаунтом Apple (работает на базе [ipatool-cpp](https://github.com/Sorvigolova/ipatool)
+Скрипт для покупки/загрузки любых доступных в App Store приложений, а также восстановления удалённых - при условии, что они были приобретены ранее с вашим Аккаунтом Apple (работает на базе [ipatool](https://github.com/majd/ipatool))
 
 ## Информация о скрипте:
 ### Важно:
