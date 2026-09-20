@@ -59,14 +59,14 @@ if (-not $IsWin) {
 # Функция вычисления папки с ipatool под текущую систему и архитектуру:
 function Get-ArchSubFolder {
 	if ($IsWin) {
-		return "windows_amd64_ipatool-cpp"
+		return "windows_amd64_ipatool"
 	} elseif ($IsLin) {
-		return "linux_amd64_ipatool-cpp"
+		return "linux_amd64_ipatool"
 	} elseif ($IsMac) {
 		if ($script:Arch -eq "arm64") {
-			return "macOS_arm64_ipatool-cpp"
+			return "macOS_arm64_ipatool"
 		} else {
-			return "macOS_amd64_ipatool-cpp"
+			return "macOS_amd64_ipatool"
 		}
 	}
 }
@@ -533,6 +533,13 @@ function Connect-AppleAccount {
 		# Создание пустого файла login для фиксации успешной авторизации:
 		if ($LASTEXITCODE -eq 0) {
 			New-Item -Path $LoginFilePath -ItemType File -Force | Out-Null
+			
+			# Сохранение keychain-passphrase с шифрованием после успешного входа:
+			if ($IsWin -and !([string]::IsNullOrEmpty($script:Kp))) {
+				$KeychainFilePath = Join-Path -Path $ipatoolHomePath -ChildPath "keychain-passphrase"
+				$SecureKp = ConvertTo-SecureString -String $script:Kp -AsPlainText -Force
+				$SecureKp | ConvertFrom-SecureString | Set-Content -Path $KeychainFilePath -Force
+			}
 		} else {
 			Remove-Item -Path $ipatoolHomePath -Recurse -Force -ErrorAction SilentlyContinue
 		}
@@ -1034,7 +1041,7 @@ function IPA-Download-With-Version {
 		# Запрос метаданных для выбранных ID:
 		foreach ($SelectedObject in $PreSelectedVersions) {
 			$VersionId = $SelectedObject.ID
-			$Meta = Invoke-Ipatool get-version-metadata -i $AppId --external-version-id $VersionId 2>$null
+			$Meta = Invoke-Ipatool get-version-metadata -i $AppId --external-version-id $VersionId
 			$DisplayVersion = if ($Meta -match 'displayVersion=([^\s,]+)') { $Matches[1] } else { "NA" }
 			$DisplayVersion = $DisplayVersion -replace '\x1b\[[0-9;]*[a-zA-Z]', ''
 			
@@ -1159,7 +1166,7 @@ function Search-Apps {
 	}
 	
 	# Поиск в App Store:
-	$SearchOutput = Invoke-Ipatool search $AppName --limit 10 --format json --non-interactive 2>$null | Out-String
+	$SearchOutput = Invoke-Ipatool search $AppName --limit 10 --format json --non-interactive | Out-String
 	
 	if ($LASTEXITCODE -eq 0 -and ![string]::IsNullOrWhiteSpace($SearchOutput)) {
 		try {
@@ -1567,7 +1574,7 @@ function Show-ModeBanner {
 		} else {
 			$Filter = if ($IsWin) { "ipatool*.exe" } else { "ipatool*" }
 			$FoundFile = Get-ChildItem -Path $script:BinaryFolderPath -Filter $Filter -File -ErrorAction SilentlyContinue | Select-Object -First 1
-			if ($FoundFile) { $FoundFile.Name } else { "ipatool-cpp" }
+			if ($FoundFile) { $FoundFile.Name } else { "ipatool" }
 		}
 		
 		Write-Host "IPA_Downloader $ScriptVersion ($IpatoolFileName)"
@@ -1698,6 +1705,18 @@ $(Get-Lang 'InstallerMenu5')`n
 				return
 			}
 			
+			# Режим отладки:
+			"debug" {
+				$script:IsDebugEnabled = -not $script:IsDebugEnabled
+				Separator
+				if ($script:IsDebugEnabled) {
+					Write-Host (Get-Lang "DebugEnabled")
+				} else {
+					Write-Host (Get-Lang "DebugDisabled")
+				}
+				continue
+			}
+			
 			# Неверный ввод:
 			default {
 				Show-Error "ErrorInvalidInput"
@@ -1710,9 +1729,11 @@ $(Get-Lang 'InstallerMenu5')`n
 function Invoke-Ipatool {
 	$IpatoolArgs = @($args)
 	
-	# Добавление флага --debug при включении режима отладки:
+	$IpatoolArgs += "--keychain-passphrase", $script:Kp
+	
+	# Добавление флага --verbose при включении режима отладки:
 	if ($script:IsDebugEnabled) {
-		$IpatoolArgs += "--debug"
+		$IpatoolArgs += "--verbose"
 	}
 	
 	& "$script:ipatoolFilePath" @IpatoolArgs
@@ -1720,6 +1741,23 @@ function Invoke-Ipatool {
 
 # Функция режима IPA_Downloader:
 function Invoke-DownloaderMode {
+	
+	# Инициализация keychain-passphrase (только на Windows):
+	if ($IsWin) {
+		$KeychainFilePath = Join-Path -Path $ipatoolHomePath -ChildPath "keychain-passphrase"
+		
+		if (Test-Path $KeychainFilePath) {
+			$EncryptedContent = (Get-Content -Path $KeychainFilePath -Raw).Trim()
+			$SecureKp = $EncryptedContent | ConvertTo-SecureString
+			$script:Kp = [System.Net.NetworkCredential]::new("", $SecureKp).Password
+		} else {
+			# Генерация нового случайного ключа:
+			$script:Kp = [guid]::NewGuid().ToString("N")
+		}
+	} else {
+		# Для macOS, Linux не требуется keychain-passphrase:
+		$script:Kp = ""
+	}
 	
 	# Проверка осуществленного входа с Аккаунтом Apple:
 	if (Test-Path "$LoginFilePath") {
