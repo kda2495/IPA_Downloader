@@ -1,2 +1,0 @@
-Внимание! На macOS 27 авторизация не работает и приводит к блокировке аккаунта! Будьте осторожны!
-Attention! On macOS 27, authorization does not work and leads to account blocking! Be careful!

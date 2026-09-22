@@ -2,7 +2,7 @@
 Set-Location -Path $PSScriptRoot
 
 # Версия скрипта:
-$ScriptVersion = "4.0.3"
+$ScriptVersion = "4.0.3 Beta 1"
 
 # Определение операционной системы:
 $IsWin = [System.Runtime.InteropServices.RuntimeInformation]::IsOSPlatform([System.Runtime.InteropServices.OSPlatform]::Windows)
@@ -46,10 +46,11 @@ function Set-Setting {
 	Set-Content -Path $SettingsFilePath -Value $Lines -Force
 }
 
-# Загрузка сохраненных настроек (язык, режим работы) или значений по умолчанию:
+# Загрузка сохраненных настроек (язык, режим работы, отладка) или значений по умолчанию:
 $SavedSettings = Get-Settings
 $script:CurrentLang = if ($SavedSettings['Language'] -match '^(RU|EN)$') { $SavedSettings['Language'] } else { "RU" }
 $script:WorkMode = if ($SavedSettings['Mode'] -in @('Downloader', 'Installer')) { $SavedSettings['Mode'] } else { $null }
+$script:IsDebugEnabled = if ($SavedSettings['DebugEnabled'] -eq 'True') { $true } else { $false }
 
 # Определение архитектуры macOS и Linux:
 if (-not $IsWin) {
@@ -89,7 +90,6 @@ $AppsIDListPath = Join-Path -Path $FilesFolderPath -ChildPath "Apps_ID_List.txt"
 $AppsIDTempListPath = Join-Path -Path $MainAppFolderPath -ChildPath "Apps_ID_List_tmp.txt"
 $WarningPath = Join-Path -Path $FilesFolderPath -ChildPath "Warning.txt"
 $WarningTempPath = Join-Path -Path $MainAppFolderPath -ChildPath "Warning_tmp.txt"
-$script:IsDebugEnabled = $false
 
 # Настройка консоли (для Windows):
 if ($IsWin) {
@@ -138,6 +138,7 @@ $script:GitHubParsedList = $null
 # Локализация:
 $LangStrings = @{
 	"RU" = @{
+		"ErrorMac27NotSupported" = "Ошибка: Запуск скрипта на macOS 27 временно не поддерживается."
 		"AccountCleared" = "Готово. Данные аккаунта {0} удалены."
 		"AddedToDownloadedList" = "Добавлено в список: {0} - {1}"
 		"AddedToPurchasedList" = "Добавлено в список покупок: {0} - {1}"
@@ -229,6 +230,7 @@ $LangStrings = @{
 		"UpdateMenu2" = "2. Нет"
 	}
 	"EN" = @{
+		"ErrorMac27NotSupported" = "Error: Running this script on macOS 27 is temporary not supported."
 		"AccountCleared" = "Done. Account {0} data cleared."
 		"AddedToDownloadedList" = "Added to list: {0} - {1}"
 		"AddedToPurchasedList" = "Added to purchased list: {0} - {1}"
@@ -1636,6 +1638,17 @@ Write-Host "$OSVersion"
 # Версия PowerShell:
 Write-Host "PowerShell $PSVersion"
 
+# Проверка и блокировка macOS 27:
+if ($IsMac) {
+    $MacVersion = (sw_vers -productVersion 2>$null)
+    if ($MacVersion -match '^27(\.|$)') {
+        Separator
+        Write-Host (Get-Lang "ErrorMac27NotSupported") -ForegroundColor DarkRed
+        Separator
+        exit
+    }
+}
+
 # Проверка на наличие базовых папок:
 foreach ($Dir in @("$AppsFolderPath", "$FilesFolderPath", "$MainAppFolderPath")) {
 	if (!(Test-Path $Dir)) {
@@ -1708,6 +1721,7 @@ $(Get-Lang 'InstallerMenu5')`n
 			# Режим отладки:
 			"debug" {
 				$script:IsDebugEnabled = -not $script:IsDebugEnabled
+				Set-Setting -Key "DebugEnabled" -Value $script:IsDebugEnabled # <-- Сохраняем состояние в файл
 				Separator
 				if ($script:IsDebugEnabled) {
 					Write-Host (Get-Lang "DebugEnabled")
@@ -1725,10 +1739,11 @@ $(Get-Lang 'InstallerMenu5')`n
 	}
 }
 
-# Функция запуска ipatool:
+# Функция запуска ipatool c флагами:
 function Invoke-Ipatool {
 	$IpatoolArgs = @($args)
 	
+	# Добавление флага --keychain-passphrase:
 	$IpatoolArgs += "--keychain-passphrase", $script:Kp
 	
 	# Добавление флага --verbose при включении режима отладки:
@@ -1736,6 +1751,7 @@ function Invoke-Ipatool {
 		$IpatoolArgs += "--verbose"
 	}
 	
+	# Запуск ipatool:
 	& "$script:ipatoolFilePath" @IpatoolArgs
 }
 
@@ -2083,6 +2099,7 @@ $(Get-Lang 'ClearMenu3')`n
 			# Режим отладки:
 			"debug" {
 				$script:IsDebugEnabled = -not $script:IsDebugEnabled
+				Set-Setting -Key "DebugEnabled" -Value $script:IsDebugEnabled # <-- Сохраняем состояние в файл
 				Separator
 				if ($script:IsDebugEnabled) {
 					Write-Host (Get-Lang "DebugEnabled")
