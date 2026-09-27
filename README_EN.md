@@ -6,7 +6,7 @@
 
 # IPA_Downloader
 [![Russian README](https://img.shields.io/badge/README-Russian-blue.svg)](README.md)  
-A script for purchasing/downloading any available App Store apps, as well as restoring removed ones - provided they were previously purchased via your Apple Account (powered by [ipatool](https://github.com/majd/ipatool)).
+A script for purchasing/downloading any available App Store apps, as well as restoring removed ones - provided they were previously purchased via your Apple account (powered by [ipatool-cpp](https://github.com/Sorvigolova/ipatool))
 
 ## Information about the script:
 ### Important:
@@ -43,7 +43,7 @@ ipatool is an unofficial tool; therefore, using the script is only at your own r
 * macOS starting from 10.15 Catalina (both Apple Silicon and Intel are supported);
 * Linux (x64 and ARM64: Arch Linux, Ubuntu, Debian, Fedora, etc.);
 * Stable internet connection;
-* An Apple Account with previously downloaded apps.
+* An Apple account with previously downloaded apps.
 
 ## Using on Windows:
 ### Windows requirements:
@@ -99,7 +99,7 @@ Download the complete set of programs/updates for Windows 7/8.1 via the link:
 * Press Enter.
 * To switch to IPA_Downloader mode, enter command 5. Switch to IPA_Downloader.
 #### 5. After switching to IPA_Downloader mode:
-* Enter Apple Account (Enter email:);
+* Enter Apple account (Enter email:);
 * Press Enter;
 * Enter password (Enter password:);
 * Press Enter;
@@ -120,18 +120,20 @@ Download the complete set of programs/updates for Windows 7/8.1 via the link:
 * During the Homebrew installation, you may be prompted to enter your password;
 * After Homebrew is installed, the text ==> Next steps will appear at the bottom of the Terminal.
 #### 2. When installing on a Mac with Intel processors:
-* Type in Terminal: `echo >> ~/.zprofile`
-* Press Enter;
-* Type in Terminal: `echo 'eval "$(/usr/local/bin/brew shellenv zsh)"' >> ~/.zprofile`
-* Press Enter;
-* Type in Terminal: `eval "$(/usr/local/bin/brew shellenv zsh)"`
+* Type in Terminal:
+```
+echo >> ~/.zprofile
+echo 'eval "$(/usr/local/bin/brew shellenv zsh)"' >> ~/.zprofile
+eval "$(/usr/local/bin/brew shellenv zsh)"
+```
 * Press Enter.
 #### 2.1. When installing on a Mac with Apple Silicon processors:
-* Type in Terminal: `echo >> ~/.zprofile`
-* Press Enter;
-* Type in Terminal: `echo 'eval "$(/opt/homebrew/bin/brew shellenv zsh)"' >> ~/.zprofile`
-* Press Enter;
-* Type in Terminal: `eval "$(/opt/homebrew/bin/brew shellenv zsh)"`
+* Type in Terminal:
+```
+echo >> ~/.zprofile
+echo 'eval "$(/opt/homebrew/bin/brew shellenv zsh)"' >> ~/.zprofile
+eval "$(/opt/homebrew/bin/brew shellenv zsh)"
+```
 * Press Enter.
 #### 3. Install ideviceinstaller, minizip and powershell packages:
 * Type in Terminal: `brew install ideviceinstaller minizip powershell`
@@ -147,7 +149,7 @@ Download the complete set of programs/updates for Windows 7/8.1 via the link:
 * Type in Terminal: `brew install ideviceinstaller minizip`
 * Press Enter.
 #### Note:
-* On macOS Big Sur/Catalina, you need to install PowerShell 7.3.12:  
+* On macOS Catalina/Big Sur, you need to install PowerShell 7.3.12:  
 [Link to download PowerShell 7.3.12](https://github.com/PowerShell/PowerShell/releases/tag/v7.3.12)
 * To update Homebrew and all its components, type in Terminal: `brew update && brew upgrade && brew cleanup` and press Enter.
 
@@ -173,7 +175,7 @@ Download the complete set of programs/updates for Windows 7/8.1 via the link:
 * Press Enter.
 * To switch to IPA_Downloader mode, enter command 5. Switch to IPA_Downloader.
 #### 5. After switching to IPA_Downloader mode:
-* Enter Apple Account (Enter email:);
+* Enter Apple account (Enter email:);
 * Press Enter;
 * Enter password (Enter password:);
 * Press Enter;
@@ -223,7 +225,7 @@ Download the complete set of programs/updates for Windows 7/8.1 via the link:
 * Press Enter.
 * To switch to IPA_Downloader mode, enter command 5. Switch to IPA_Downloader.
 #### 6. After switching to IPA_Downloader mode:
-* Enter Apple Account (Enter email:);
+* Enter Apple account (Enter email:);
 * Press Enter;
 * Enter password (Enter password:);
 * Press Enter;
@@ -251,6 +253,8 @@ Download the complete set of programs/updates for Windows 7/8.1 via the link:
 * The script will change its interface language.
 #### 5. Switch to IPA_Downloader:
 * The script will switch the mode to IPA_Downloader.
+#### debug
+* Enable/disable debug mode.
 
 ### IPA_Downloader:
 #### 1. Search for app and purchase (without downloading):
@@ -332,27 +336,32 @@ Download the complete set of programs/updates for Windows 7/8.1 via the link:
 * When choosing to clear either the downloaded apps list or the purchased apps list, select the specific account you want to clear;
 * Press Enter;
 * The script will clear the selected data type.
-#### 13. Log out of Apple Account and reset settings:
-* The script will log out of the Apple Account and reset all settings.
+#### 13. Log out of Apple account and reset settings:
+* The script will log out of the Apple account and reset all settings.
 #### 14. Tip Jar:
 * The script will navigate to the CloudTips page.
 #### 15. Change Language:
 * The script will change its interface language.
+#### debug
+* Enable/disable debug mode.
 
 ## Possible errors and solution:
 ### Troubleshooting errors:
 * Download error: HTTP request failed: Timeout was reached - Failed to connect to Apple servers, check your internet connection.
-* Error: license is required - The app was not previously purchased on this Apple Account.
+* Error: license is required - The app was not previously purchased on this Apple account.
 * Purchase error: app not found - App purchase failed because the app has been removed from the App Store.
-* Purchase error: item is temporarily unavailable - The app was not previously purchased on this Apple Account, the purchase failed because the app has been removed from the App Store.
+* Purchase error: item is temporarily unavailable - The app was not previously purchased on this Apple account, the purchase failed because the app has been removed from the App Store.
+* Download error: app is not available for download in your region/storefront (license was granted but download was blocked) - Apps released after 01.09.2026 and removed from the App Store cannot be downloaded at this moment.
 * No device found - Device not found. Make sure the AppleMobileDeviceSupport64 driver is installed (relevant for Windows).
 * WARNING: could not locate Payload/App.app/SC_Info/App.sinf in archive! - App signature not found in the installed ipa file.
-* Login error: GSA SRP exception: GSA complete error -27952: Update iCloud for Windows to the latest version to sign in - Advanced Data Protection needs to be disabled via Settings-Account-iCloud-Advanced Data Protection.
+* Login error: GSA SRP exception: GSA complete error -27952: Update iCloud for Windows to the latest version to sign in - Advanced Data Protection needs to be disabled via Settings - Apple Account - iCloud - Advanced Data Protection.
+* Login error: something went wrong (status=403) - Connection error, check the system’s use of a proxy server by entering the following into the Windows command line (cmd): `netsh winhttp show proxy` and press Enter. If necessary, remove the unused proxy server by entering the following into the Windows command line (run as an administrator): `netsh winhttp reset proxy` and press Enter.
 * If the app immediately closes when launched after installation, log in to the App Store using the account from which it was downloaded, and install any free/paid app. After that, launch the problematic app again.
 
 ### If you encounter an issue:
-#### Provide the following information:
-* The operating system and IPA_Downloader version;
+#### Please provide the following information:
+* The operating system and version of IPA_Downloader being used;
+* Enter the debug command in the script’s main menu, reproduce the action that leads to the error, and send the result;
 * A screenshot of the error.
 
 ## Useful information:

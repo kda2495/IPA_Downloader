@@ -2,7 +2,7 @@
 Set-Location -Path $PSScriptRoot
 
 # Версия скрипта:
-$ScriptVersion = "4.0.5"
+$ScriptVersion = "4.0.6"
 
 # Определение операционной системы:
 $IsWin = [System.Runtime.InteropServices.RuntimeInformation]::IsOSPlatform([System.Runtime.InteropServices.OSPlatform]::Windows)
@@ -151,8 +151,8 @@ $LangStrings = @{
 		"AskFileNum" = "Введите порядковые номера (№) файлов для установки"
 		"AskVerDownloadNum" = "Введите порядковые номера (№) версий для загрузки"
 		"AskVerListNum" = "Введите порядковые номера (№) ID версий для отображения списка версий"
-		"AuthFail" = "Вход в Аккаунт Apple не выполнен."
-		"AuthSuccess" = "Вход в Аккаунт Apple выполнен.`nДанные аккаунта:"
+		"AuthFail" = "Вход в аккаунт Apple не выполнен."
+		"AuthSuccess" = "Вход в аккаунт Apple выполнен.`nДанные аккаунта:"
 		"CancelStep" = "(0: Возврат в главное меню):"
 		"CancelStepVerID" = "(0: Возврат к вводу порядкового номера (№) ID версий):"
 		"ClearAccountMenuTitle" = "Выберите аккаунты Apple для очистки"
@@ -198,7 +198,7 @@ $LangStrings = @{
 		"LanguageMenuTitle" = "Выберите язык (Select language):"
 		"ListMenuTitle" = "Выберите список для отображения"
 		"LoadingVersionsIDList" = "Загрузка списка ID версий приложения..."
-		"LoggedOut" = "Выполнен выход из Аккаунта Apple."
+		"LoggedOut" = "Выполнен выход из аккаунта Apple."
 		"Menu1" = "1. Поиск приложения и покупка (без загрузки)"
 		"Menu2" = "2. Поиск приложения и загрузка последней версии"
 		"Menu3" = "3. Поиск приложения и загрузка (с выбором версии)"
@@ -211,7 +211,7 @@ $LangStrings = @{
 		"Menu10" = "10. Проверка минимальной версии iOS для приложений в папке IPA_Downloader/Apps"
 		"Menu11" = "11. Установка приложений из папки IPA_Downloader/Apps"
 		"Menu12" = "12. Очистка данных"
-		"Menu13" = "13. Выход из Аккаунта Apple и сброс настроек"
+		"Menu13" = "13. Выход из аккаунта Apple и сброс настроек"
 		"Menu14" = "14. Банка для чаевых"
 		"Menu15" = "15. Сменить язык (Change Language)"
 		"MenuTitle" = "Введите команду:"
@@ -242,8 +242,8 @@ $LangStrings = @{
 		"AskFileNum" = "Enter index numbers (#) of files to install"
 		"AskVerDownloadNum" = "index numbers (#) of app versions to download"
 		"AskVerListNum" = "Enter index numbers (#) of version IDs to display app versions"
-		"AuthFail" = "Not authenticated with Apple Account."
-		"AuthSuccess" = "Apple Account login successful.`nAccount details:"
+		"AuthFail" = "Not authenticated with Apple account."
+		"AuthSuccess" = "Apple account login successful.`nAccount details:"
 		"CancelStep" = "(0: Return to main menu):"
 		"CancelStepVerID" = "(0: Return to entering index numbers (#) of version IDs):"
 		"ClearAccountMenuTitle" = "Select Apple accounts to clear"
@@ -289,7 +289,7 @@ $LangStrings = @{
 		"LanguageMenuTitle" = "Выберите язык (Select language):"
 		"ListMenuTitle" = "Select list to display"
 		"LoadingVersionsIDList" = "Loading list of app version IDs..."
-		"LoggedOut" = "Successfully logged out of Apple Account."
+		"LoggedOut" = "Successfully logged out of Apple account."
 		"Menu1" = "1. Search for app and purchase (without downloading)"
 		"Menu2" = "2. Search for app and download latest version"
 		"Menu3" = "3. Search for app and download (with version selection)"
@@ -302,7 +302,7 @@ $LangStrings = @{
 		"Menu10" = "10. Check minimum iOS version for apps in IPA_Downloader/Apps folder"
 		"Menu11" = "11. Install apps from IPA_Downloader/Apps folder"
 		"Menu12" = "12. Clear data"
-		"Menu13" = "13. Log out of Apple Account and reset settings"
+		"Menu13" = "13. Log out of Apple account and reset settings"
 		"Menu14" = "14. Tip Jar"
 		"Menu15" = "15. Change Language (Сменить язык)"
 		"MenuTitle" = "Enter a command:"
@@ -425,10 +425,10 @@ function Show-Error {
 	Write-Host (Get-Lang $Key) -ForegroundColor DarkRed
 }
 
-# Переменная для хранения текущего Аккаунта Apple:
+# Переменная для хранения текущего аккаунта Apple:
 $script:CurrentAppleAccount = "UnknownAccount"
 
-# Функция получения текущего Аккаунта Apple:
+# Функция получения текущего аккаунта Apple:
 function Get-Current-AppleAccount {
 	$AuthInfo = Invoke-Ipatool auth info | Out-String
 	if ($AuthInfo -match 'email=([^\s]+)') {
@@ -510,7 +510,7 @@ function Read-AppList-Json {
 	}
 }
 
-# Функция входа в Аккаунт Apple:
+# Функция входа в аккаунт Apple:
 function Connect-AppleAccount {
 	# При первой попытке авторизации баннер с текущим режимом работы и версией скрипта не отображается:
 	$FirstAttempt = $true
@@ -1762,7 +1762,7 @@ function Invoke-DownloaderMode {
 		$script:Kp = ""
 	}
 	
-	# Проверка осуществленного входа с Аккаунтом Apple:
+	# Проверка осуществленного входа с аккаунтом Apple:
 	if (Test-Path "$LoginFilePath") {
 		Separator
 		Write-Host (Get-Lang "AuthSuccess")
@@ -1770,10 +1770,10 @@ function Invoke-DownloaderMode {
 		Get-Current-AppleAccount
 	}
 	
-	# Вход с Аккаунтом Apple:
+	# Вход с аккаунтом Apple:
 	Connect-AppleAccount
 	
-	# Сохранение настроек режима IPA_Downloader только после успешной авторизации с Аккаунтом Apple:
+	# Сохранение настроек режима IPA_Downloader только после успешной авторизации с аккаунтом Apple:
 	Set-Setting -Key "Language" -Value $script:CurrentLang
 	Set-Setting -Key "Mode" -Value "Downloader"
 	
@@ -2055,7 +2055,7 @@ $(Get-Lang 'ClearMenu3')`n
 				}
 			}
 			
-			# 13. Выход из Аккаунта Apple и сброс настроек:
+			# 13. Выход из аккаунта Apple и сброс настроек:
 			"13" {
 				Separator
 				Write-Host (Get-Lang "LoggedOut")
