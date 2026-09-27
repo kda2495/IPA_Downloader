@@ -2,7 +2,7 @@
 Set-Location -Path $PSScriptRoot
 
 # Версия скрипта:
-$ScriptVersion = "4.0.6"
+$ScriptVersion = "4.0.7"
 
 # Определение операционной системы:
 $IsWin = [System.Runtime.InteropServices.RuntimeInformation]::IsOSPlatform([System.Runtime.InteropServices.OSPlatform]::Windows)
@@ -170,6 +170,7 @@ $LangStrings = @{
 		"ErrorDownloadedEmpty" = "Ошибка: История загрузок пуста."
 		"ErrorDownloadFiles" = "Ошибка: Не удалось загрузить файл:"
 		"ErrorIdeviceinstallerNotFound" = "Ошибка: ideviceinstaller не найден. Установка приложений по USB невозможна (только по AirDrop на macOS)"
+		"ErrorInstallIpa" = "Ошибка: Не удалось установить/обновить приложение"
 		"ErrorInvalidInput" = "Ошибка: Неверный ввод."
 		"ErrorListLoad" = "Ошибка загрузки списка приложений."
 		"ErrorMissingFiles" = "Ошибка. Следующие файлы не найдены:"
@@ -261,6 +262,7 @@ $LangStrings = @{
 		"ErrorDownloadedEmpty" = "Error: Download history is empty."
 		"ErrorDownloadFiles" = "Error: Failed to download file:"
 		"ErrorIdeviceinstallerNotFound" = "Error: ideviceinstaller not found. Apps installation via USB is impossible (only via AirDrop on macOS)"
+		"ErrorInstallIpa" = "Error: Failed to install/upgrade the app"
 		"ErrorInvalidInput" = "Error: Invalid input."
 		"ErrorListLoad" = "Error: Failed to load apps list."
 		"ErrorMissingFiles" = "Error. Following files were not found:"
@@ -529,6 +531,7 @@ function Connect-AppleAccount {
 		Write-Host (Get-Lang "AuthFail")
 		
 		Invoke-Ipatool auth login
+		$null = Invoke-Ipatool kbsync --refresh
 		
 		# Создание пустого файла login для фиксации успешной авторизации:
 		if ($LASTEXITCODE -eq 0) {
@@ -851,8 +854,7 @@ function Move-IPA-Files {
 function Test-NumericInput {
 	param ([string]$InputValue)
 	if ([string]::IsNullOrWhiteSpace($InputValue) -or $InputValue -notmatch '^\d+$') {
-		Separator
-		Write-Host (Get-Lang "ErrorInvalidInput") -ForegroundColor DarkRed
+		Show-Error "ErrorInvalidInput"
 		return $false
 	}
 	return $true
@@ -1400,8 +1402,7 @@ function Get-iOS-MinVersion {
 function Check-RequiredFiles {
 	param ([array]$MissingFiles)
 	if ($MissingFiles) {
-		Separator
-		Write-Host (Get-Lang "ErrorMissingFiles") -ForegroundColor DarkRed
+		Show-Error "ErrorMissingFiles"
 		$MissingFiles | ForEach-Object { Write-Host "$_" -ForegroundColor DarkRed }
 		Separator
 		exit
@@ -1494,6 +1495,14 @@ function Install-Apps {
 			Copy-Item -Path $SelectedFile.FullName -Destination $TempFile -Force
 			try {
 				& "$script:ideviceinstallerFilePath" install $TempFile
+				
+				if ($LASTEXITCODE -ne 0) {
+					& "$script:ideviceinstallerFilePath" upgrade $TempFile
+					
+					if ($LASTEXITCODE -ne 0) {
+						Show-Error "ErrorInstallIpa"
+					}
+				}
 			} finally {
 				Remove-Item -Path $TempFile -Force -ErrorAction SilentlyContinue
 			}
@@ -1557,8 +1566,7 @@ $(Get-Lang 'UpdateMenu2')`n
 			}
 		}
 	} catch {
-		Separator
-		Write-Host (Get-Lang 'ErrorUpdateCheck') -ForegroundColor DarkRed
+		Show-Error "ErrorUpdateCheck"
 	}
 }
 
@@ -1768,6 +1776,7 @@ function Invoke-DownloaderMode {
 		Write-Host (Get-Lang "AuthSuccess")
 		Invoke-Ipatool auth info
 		Get-Current-AppleAccount
+		$null = Invoke-Ipatool kbsync --refresh
 	}
 	
 	# Вход с аккаунтом Apple:
@@ -1925,16 +1934,14 @@ $(Get-Lang 'ClearMenu3')`n
 				switch ($ClearChoice) {					
 					"1" {
 						if (!(Test-Path "$PurchasedIDsFilePath")) {
-							Separator
-							Write-Host (Get-Lang "ErrorPurchasedEmpty") -ForegroundColor DarkRed
+							Show-Error "ErrorPurchasedEmpty"
 						} else {
 							$RawData = Get-Content "$PurchasedIDsFilePath" -Raw -Encoding UTF8
 							
 							# Если файл пуст или содержит только пустые скобки {}:
 							if ([string]::IsNullOrWhiteSpace($RawData) -or $RawData.Trim() -eq '{}') {
 								Remove-Item "$PurchasedIDsFilePath" -Force -ErrorAction SilentlyContinue
-								Separator
-								Write-Host (Get-Lang "ErrorPurchasedEmpty") -ForegroundColor DarkRed
+								Show-Error "ErrorPurchasedEmpty"
 								continue
 							}
 							
@@ -1986,15 +1993,13 @@ $(Get-Lang 'ClearMenu3')`n
 					
 					"2" {
 						if (!(Test-Path "$DownloadedIDsFilePath")) {
-							Separator
-							Write-Host (Get-Lang "ErrorDownloadedEmpty") -ForegroundColor DarkRed
+							Show-Error "ErrorDownloadedEmpty"
 						} else {
 							$RawData = Get-Content "$DownloadedIDsFilePath" -Raw -Encoding UTF8
 							
 							if ([string]::IsNullOrWhiteSpace($RawData) -or $RawData.Trim() -eq '{}') {
 								Remove-Item "$DownloadedIDsFilePath" -Force -ErrorAction SilentlyContinue
-								Separator
-								Write-Host (Get-Lang "ErrorDownloadedEmpty") -ForegroundColor DarkRed
+								Show-Error "ErrorDownloadedEmpty"
 								continue
 							}
 							
@@ -2123,7 +2128,7 @@ while ($true) {
 		$script:ideviceinstallerFilePath = if ($IdeviceCmd) { $IdeviceCmd.Source } else { $null }
 		
 		if (-not $script:ideviceinstallerFilePath) {
-			Write-Host (Get-Lang "ErrorIdeviceinstallerNotFound") -ForegroundColor DarkRed
+			Show-Error "ErrorIdeviceinstallerNotFound"
 		}
 	}
 	
