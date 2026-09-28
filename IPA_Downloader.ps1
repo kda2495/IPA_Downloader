@@ -2,7 +2,7 @@
 Set-Location -Path $PSScriptRoot
 
 # Версия скрипта:
-$ScriptVersion = "4.0.7"
+$ScriptVersion = "4.0.8"
 
 # Определение операционной системы:
 $IsWin = [System.Runtime.InteropServices.RuntimeInformation]::IsOSPlatform([System.Runtime.InteropServices.OSPlatform]::Windows)
@@ -1616,12 +1616,6 @@ $(Get-Lang 'LanguageMenu2')`n
 	$LanguageChoice = Read-MenuChoice -MenuText $Language_Menu -OptionsCount 2
 	$script:CurrentLang = if ($LanguageChoice -eq '1') { "RU" } else { "EN" }
 	
-	# Проверка обновлений:
-	if (-not $script:UpdateChecked) {
-		Check-Update
-		$script:UpdateChecked = $true
-	}
-	
 	# Сохранение выбранного языка:
 	Set-Setting -Key "Language" -Value $script:CurrentLang
 	
@@ -1635,6 +1629,12 @@ $(Get-Lang 'LanguageMenu2')`n
 	# Сохранение режима работы и вывод баннера:
 	Set-Setting -Key "Mode" -Value $script:WorkMode
 	Show-ModeBanner
+	
+	# Проверка обновлений:
+	if (-not $script:UpdateChecked) {
+		Check-Update
+		$script:UpdateChecked = $true
+	}
 }
 
 # Операционная система:
@@ -1653,12 +1653,6 @@ foreach ($Dir in @("$AppsFolderPath", "$FilesFolderPath", "$MainAppFolderPath"))
 
 # Включение TLS 1.2 для совместимости со старыми версиями операционных систем:
 [Net.ServicePointManager]::SecurityProtocol = [Net.ServicePointManager]::SecurityProtocol -bor [Net.SecurityProtocolType]::Tls12
-
-# Предварительная загрузка списка приложений и файлов предупреждений:
-Initialize-RemoteFiles
-
-# Вывод предупреждения:
-Show-WarningMsg
 
 # Удаление временных файлов при запуске:
 Get-ChildItem -Path $PSScriptRoot -Filter "*.ipa.tmp" -File -ErrorAction SilentlyContinue | Remove-Item -Force -ErrorAction SilentlyContinue
@@ -2111,37 +2105,54 @@ $(Get-Lang 'ClearMenu3')`n
 
 # Смена режима работы:
 $script:UpdateChecked = $false
+$script:RemoteFilesInitialized = $false
+
+# Главный рабочий цикл скрипта:
+# Смена режима работы:
+$script:UpdateChecked = $false
+$script:RemoteFilesInitialized = $false # Флаг однократной загрузки удаленных файлов
+$script:DependenciesChecked = $false    # Флаг однократной проверки бинарных файлов
 
 # Главный рабочий цикл скрипта:
 while ($true) {
-	# Проверка наличия файлов под текущую операционную систему:
-	if ($IsWin) {
-		$MissingMainAppFiles = Get-MissingBinaryFiles -FolderPath $script:BinaryFolderPath
-		Check-RequiredFiles -MissingFiles $MissingMainAppFiles
-		Set-IpatoolBinaryPaths -FolderPath $script:BinaryFolderPath
-	} else {
-		$MissingUnixFiles = Get-MissingBinaryFiles -FolderPath $script:BinaryFolderPath
-		Check-RequiredFiles -MissingFiles $MissingUnixFiles
-		Set-IpatoolBinaryPaths -FolderPath $script:BinaryFolderPath
-		
-		$IdeviceCmd = Get-Command ideviceinstaller* -ErrorAction SilentlyContinue | Select-Object -First 1
-		$script:ideviceinstallerFilePath = if ($IdeviceCmd) { $IdeviceCmd.Source } else { $null }
-		
-		if (-not $script:ideviceinstallerFilePath) {
-			Show-Error "ErrorIdeviceinstallerNotFound"
-		}
-	}
 	
-	# Если режим не задан, то запускаем мастер настройки:
+	# Вызов первоначальной настройки или баннера с проверкой обновлений:
 	if ($null -eq $script:WorkMode) {
 		Invoke-SetupWizard
 	} else {
+		Show-ModeBanner
 		if (-not $script:UpdateChecked) {
 			Check-Update
 			$script:UpdateChecked = $true
 		}
-		
-		Show-ModeBanner
+	}
+	
+	# Загрузка файлов с GitHub и вывод предупреждения:
+	if (-not $script:RemoteFilesInitialized) {
+		Initialize-RemoteFiles
+		Show-WarningMsg
+		$script:RemoteFilesInitialized = $true
+	}
+	
+	# Проверка наличия необходимых файлов под текущую операционную систему:
+	if (-not $script:DependenciesChecked) {
+		if ($IsWin) {
+			$MissingMainAppFiles = Get-MissingBinaryFiles -FolderPath $script:BinaryFolderPath
+			Check-RequiredFiles -MissingFiles $MissingMainAppFiles
+			Set-IpatoolBinaryPaths -FolderPath $script:BinaryFolderPath
+		} else {
+			$MissingUnixFiles = Get-MissingBinaryFiles -FolderPath $script:BinaryFolderPath
+			Check-RequiredFiles -MissingFiles $MissingUnixFiles
+			Set-IpatoolBinaryPaths -FolderPath $script:BinaryFolderPath
+			
+			$IdeviceCmd = Get-Command ideviceinstaller* -ErrorAction SilentlyContinue | Select-Object -First 1
+			$script:ideviceinstallerFilePath = if ($IdeviceCmd) { $IdeviceCmd.Source } else { $null }
+			
+			if (-not $script:ideviceinstallerFilePath) {
+				Show-Error "ErrorIdeviceinstallerNotFound"
+			}
+		}
+		$script:DependenciesChecked = $true
 	}
 	
 	# Запуск выбранного режима работы:
@@ -2151,7 +2162,7 @@ while ($true) {
 		Invoke-DownloaderMode
 	}
 	
-	# Обработка сброса:
+	# Обработка сброса режима работы:
 	if ($null -eq $script:WorkMode) {
 		continue
 	}
