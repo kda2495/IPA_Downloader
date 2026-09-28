@@ -12,9 +12,6 @@ A script for purchasing/downloading any available App Store apps, as well as res
 ### Important:
 ipatool is an unofficial tool; therefore, using the script is only at your own risk.
 ### Script Features:
-#### IPA_Installer:
-* Check minimum iOS version for apps in the IPA_Downloader/Apps folder;
-* Install apps from the IPA_Downloader/Apps folder.
 #### IPA_Downloader:
 * Search for app and purchase (without downloading);
 * Search for app and download latest version;
@@ -25,6 +22,9 @@ ipatool is an unofficial tool; therefore, using the script is only at your own r
 * Show list of apps and purchase (without downloading);
 * Show list of apps and download latest version;
 * Show list of apps and download (with version selection);
+* Check minimum iOS version for apps in the IPA_Downloader/Apps folder;
+* Install apps from the IPA_Downloader/Apps folder.
+#### IPA_Installer:
 * Check minimum iOS version for apps in the IPA_Downloader/Apps folder;
 * Install apps from the IPA_Downloader/Apps folder.
 
@@ -94,11 +94,9 @@ Download the complete set of programs/updates for Windows 7/8.1 via the link:
 * Press Enter;
 * When update is available, choose to either visit GitHub to download new script version or continue with current version;
 * Press Enter.
-#### 4. By default, the script starts in IPA_Installer mode:
-* Enter the required command;
+#### 4. By default, the script starts in IPA_Downloader mode:
+* To log in enter the command: 1. Log in to Apple account;
 * Press Enter.
-* To switch to IPA_Downloader mode, enter command 5. Switch to IPA_Downloader.
-#### 5. After switching to IPA_Downloader mode:
 * Enter Apple account (Enter email:);
 * Press Enter;
 * Enter password (Enter password:);
@@ -170,11 +168,9 @@ eval "$(/opt/homebrew/bin/brew shellenv zsh)"
 * Press Enter;
 * When update is available, choose to either visit GitHub to download new script version or continue with current version;
 * Press Enter.
-#### 4. By default, the script starts in IPA_Installer mode:
-* Enter the required command;
+#### 4. By default, the script starts in IPA_Downloader mode:
+* To log in enter the command: 1. Log in to Apple account;
 * Press Enter.
-* To switch to IPA_Downloader mode, enter command 5. Switch to IPA_Downloader.
-#### 5. After switching to IPA_Downloader mode:
 * Enter Apple account (Enter email:);
 * Press Enter;
 * Enter password (Enter password:);
@@ -183,8 +179,6 @@ eval "$(/opt/homebrew/bin/brew shellenv zsh)"
 * If the two-factor authentication (2FA) code doesn't arrive automatically, turn on Airplane mode on your device, go to Settings - Apple Account - Sign-In & Security - Get Verification Code (this is the two-factor authentication (2FA) code);
 * Enter the two-factor authentication code (Enter 2FA code:);
 * Press Enter;
-* Enter your Mac password;
-* Click Always Allow;
 * Enter the required command;
 * Press Enter.
 
@@ -220,11 +214,9 @@ eval "$(/opt/homebrew/bin/brew shellenv zsh)"
 * Press Enter;
 * When update is available, choose to either visit GitHub to download new script version or continue with current version;
 * Press Enter.
-#### 5. By default, the script starts in IPA_Installer mode:
-* Enter the required command;
+#### 5. By default, the script starts in IPA_Downloader mode:
+* To log in enter the command: 1. Log in to Apple account;
 * Press Enter.
-* To switch to IPA_Downloader mode, enter command 5. Switch to IPA_Downloader.
-#### 6. After switching to IPA_Downloader mode:
 * Enter Apple account (Enter email:);
 * Press Enter;
 * Enter password (Enter password:);
@@ -237,25 +229,6 @@ eval "$(/opt/homebrew/bin/brew shellenv zsh)"
 * Press Enter.
 
 ## Script commands description:
-### IPA_Installer:
-#### 1. Check minimum iOS version for apps in the IPA_Downloader/Apps folder:
-* Apps must be located in the IPA_Downloader/Apps path;
-* The script will check the minimum iOS version required for the app to work.
-#### 2. Install apps from the IPA_Downloader/Apps folder:
-* Connect the device using a cable;
-* Apps must be located in the IPA_Downloader/Apps path;
-* Enter the index numbers (#) of the apps to install on the device;
-* Press Enter;
-* The script will install the selected apps on the device.
-#### 3. Tip Jar:
-* The script will navigate to the CloudTips page.
-#### 4. Change Language:
-* The script will change its interface language.
-#### 5. Switch to IPA_Downloader:
-* The script will switch the mode to IPA_Downloader.
-#### debug
-* Enable/disable debug mode.
-
 ### IPA_Downloader:
 #### 1. Search for app and purchase (without downloading):
 * Enter the app name to search;
@@ -342,6 +315,25 @@ eval "$(/opt/homebrew/bin/brew shellenv zsh)"
 * The script will navigate to the CloudTips page.
 #### 15. Change Language:
 * The script will change its interface language.
+#### debug
+* Enable/disable debug mode.
+
+### IPA_Installer:
+#### 1. Check minimum iOS version for apps in the IPA_Downloader/Apps folder:
+* Apps must be located in the IPA_Downloader/Apps path;
+* The script will check the minimum iOS version required for the app to work.
+#### 2. Install apps from the IPA_Downloader/Apps folder:
+* Connect the device using a cable;
+* Apps must be located in the IPA_Downloader/Apps path;
+* Enter the index numbers (#) of the apps to install on the device;
+* Press Enter;
+* The script will install the selected apps on the device.
+#### 3. Tip Jar:
+* The script will navigate to the CloudTips page.
+#### 4. Change Language:
+* The script will change its interface language.
+#### 5. Switch to IPA_Downloader:
+* The script will switch the mode to IPA_Downloader.
 #### debug
 * Enable/disable debug mode.
 

@@ -18,6 +18,7 @@ AppBank (MoodPetal): 6760329045
 AppBank (Document List): 6762059195
 Au.ru (Барахолка 24: объявления 24/7): 6760170997
 Avanpost Authenticator: 6758136708
+Bolt: 675033630
 Boosty: 1619978403
 CamScanner: 388627783
 CapCut: 1500855883
@@ -37,6 +38,7 @@ Duolingo: 570060128
 Every Lounge (EVERY): 1634765737
 Every Lounge (Phoenix Pass): 6449881964
 Facebook: 284882215
+Fasten: 1438528886
 Firefox: 989804926
 FixPrice: 1460007771
 GigaChat (G8AI): 6751318954
@@ -120,6 +122,7 @@ Ozon Пункт: 1535791151
 Ozon Селект: 6745216294
 Pass2U Wallet: 1142473931
 Perplexity: 1668000334
+Persona.aero: 1640247254
 PicsArt: 587366035
 Ping: 576773404
 Pinterest: 429047995
@@ -389,7 +392,7 @@ Zoom Workplace: 546505307
 Лэтуаль: 1156838088
 М.Видео: 1329931637
 Магнит: 881463973
-Макс: 6739530834
+Макс (Max): 6739530834
 Маруся: 1467719381
 Мегамаркет: 1438856489
 Мегафон: 778681735

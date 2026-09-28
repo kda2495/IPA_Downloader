@@ -9,7 +9,7 @@ $IsWin = [System.Runtime.InteropServices.RuntimeInformation]::IsOSPlatform([Syst
 $IsMac = [System.Runtime.InteropServices.RuntimeInformation]::IsOSPlatform([System.Runtime.InteropServices.OSPlatform]::OSX)
 $IsLin = [System.Runtime.InteropServices.RuntimeInformation]::IsOSPlatform([System.Runtime.InteropServices.OSPlatform]::Linux)
 
-# Папка MainApp и файл настроек (язык, режим работы):
+# Определение папок MainApp, Files и файла настроек:
 $MainAppFolderPath = Join-Path -Path $PSScriptRoot -ChildPath "MainApp"
 $FilesFolderPath = Join-Path -Path $PSScriptRoot -ChildPath "Files"
 $SettingsFilePath = Join-Path -Path $FilesFolderPath -ChildPath "Settings.txt"
@@ -46,7 +46,7 @@ function Set-Setting {
 	Set-Content -Path $SettingsFilePath -Value $Lines -Force
 }
 
-# Загрузка сохраненных настроек (язык, режим работы, отладка) или значений по умолчанию:
+# Загрузка сохраненных настроек или значений по умолчанию:
 $SavedSettings = Get-Settings
 $script:CurrentLang = if ($SavedSettings['Language'] -match '^(RU|EN)$') { $SavedSettings['Language'] } else { "RU" }
 $script:WorkMode = if ($SavedSettings['Mode'] -in @('Downloader', 'Installer')) { $SavedSettings['Mode'] } else { $null }
@@ -57,7 +57,7 @@ if (-not $IsWin) {
 	$script:Arch = [System.Runtime.InteropServices.RuntimeInformation]::OSArchitecture.ToString().ToLower()
 }
 
-# Функция вычисления папки с ipatool под текущую систему и архитектуру:
+# Функция вычисления папки с ipatool под текущую операционную систему и архитектуру:
 function Get-ArchSubFolder {
 	if ($IsWin) {
 		return "windows_amd64"
@@ -72,7 +72,7 @@ function Get-ArchSubFolder {
 	}
 }
 
-# Определение системы и архитектуры:
+# Определение папки с ipatool под текущую систему и архитектуру:
 $script:ArchSubFolder = Get-ArchSubFolder
 
 # Определение основных папок и переменных:
@@ -93,7 +93,7 @@ $WarningTempPath = Join-Path -Path $MainAppFolderPath -ChildPath "Warning_tmp.tx
 
 # Настройка консоли (для Windows):
 if ($IsWin) {
-Add-Type -TypeDefinition @"
+	Add-Type -TypeDefinition @"
 using System;
 using System.Runtime.InteropServices;
 public class ConsoleFont {
@@ -129,10 +129,10 @@ public class ConsoleFont {
 	chcp 65001 > $null
 }
 
-# Подключение системных сборок для работы с Zip-архивами:
+# Подключение системных сборок для работы с zip-архивами:
 Add-Type -AssemblyName System.IO.Compression.FileSystem
 
-# Переменная для кэширования списка с GitHub:
+# Определение переменной для кэширования списка с GitHub:
 $script:GitHubParsedList = $null
 
 # Локализация:
@@ -167,6 +167,21 @@ $LangStrings = @{
 		"DownloadedListMenu1" = "1. Полный список приложений (GitHub)"
 		"DownloadedListMenu2" = "2. Список загруженных приложений"
 		"DownloadedListMenu3" = "3. Список незагруженных приложений"
+		"DownloaderMenu1" = "1. Поиск приложения и покупка (без загрузки)"
+		"DownloaderMenu2" = "2. Поиск приложения и загрузка последней версии"
+		"DownloaderMenu3" = "3. Поиск приложения и загрузка (с выбором версии)"
+		"DownloaderMenu4" = "4. Ввод ID приложений и покупка (без загрузки)"
+		"DownloaderMenu5" = "5. Ввод ID приложений и загрузка последней версии"
+		"DownloaderMenu6" = "6. Ввод ID приложений и загрузка (с выбором версии)"
+		"DownloaderMenu7" = "7. Вывод списка приложений и покупка (без загрузки)"
+		"DownloaderMenu8" = "8. Вывод списка приложений и загрузка последней версии"
+		"DownloaderMenu9" = "9. Вывод списка приложений и загрузка (с выбором версии)"
+		"DownloaderMenu10" = "10. Проверка минимальной версии iOS для приложений в папке IPA_Downloader/Apps"
+		"DownloaderMenu11" = "11. Установка приложений из папки IPA_Downloader/Apps"
+		"DownloaderMenu12" = "12. Очистка данных"
+		"DownloaderMenu13" = "13. Выход из аккаунта Apple и сброс настроек"
+		"DownloaderMenu14" = "14. Банка для чаевых"
+		"DownloaderMenu15" = "15. Сменить язык (Change Language)"
 		"ErrorDownloadedEmpty" = "Ошибка: История загрузок пуста."
 		"ErrorDownloadFiles" = "Ошибка: Не удалось загрузить файл:"
 		"ErrorIdeviceinstallerNotFound" = "Ошибка: ideviceinstaller не найден. Установка приложений по USB невозможна (только по AirDrop на macOS)"
@@ -181,6 +196,7 @@ $LangStrings = @{
 		"ErrorUpdateCheck" = "Ошибка: Не удалось проверить наличие обновлений."
 		"FileName" = "Имя файла:"
 		"FileSaved" = "Готово. Файл сохранен в папку IPA_Downloader/Apps."
+		"KbSyncGeneration" = "Формирование kbsync. Это может занять некоторое время."
 		"HeaderAppID" = "ID приложения:"
 		"HeaderAppName" = "Название приложения:"
 		"HeaderMinIOS" = "Мин. версия iOS:"
@@ -200,21 +216,9 @@ $LangStrings = @{
 		"ListMenuTitle" = "Выберите список для отображения"
 		"LoadingVersionsIDList" = "Загрузка списка ID версий приложения..."
 		"LoggedOut" = "Выполнен выход из аккаунта Apple."
-		"Menu1" = "1. Поиск приложения и покупка (без загрузки)"
-		"Menu2" = "2. Поиск приложения и загрузка последней версии"
-		"Menu3" = "3. Поиск приложения и загрузка (с выбором версии)"
-		"Menu4" = "4. Ввод ID приложений и покупка (без загрузки)"
-		"Menu5" = "5. Ввод ID приложений и загрузка последней версии"
-		"Menu6" = "6. Ввод ID приложений и загрузка (с выбором версии)"
-		"Menu7" = "7. Вывод списка приложений и покупка (без загрузки)"
-		"Menu8" = "8. Вывод списка приложений и загрузка последней версии"
-		"Menu9" = "9. Вывод списка приложений и загрузка (с выбором версии)"
-		"Menu10" = "10. Проверка минимальной версии iOS для приложений в папке IPA_Downloader/Apps"
-		"Menu11" = "11. Установка приложений из папки IPA_Downloader/Apps"
-		"Menu12" = "12. Очистка данных"
-		"Menu13" = "13. Выход из аккаунта Apple и сброс настроек"
-		"Menu14" = "14. Банка для чаевых"
-		"Menu15" = "15. Сменить язык (Change Language)"
+		"LoginMenu1" = "1. Войти в аккаунт Apple"
+		"LoginMenu2" = "2. Перейти в режим IPA_Installer"
+		"LoginMenu3" = "3. Сменить язык (Change Language)"
 		"MenuTitle" = "Введите команду:"
 		"MinIOS" = "Минимальная версия iOS:"
 		"PurchasedListCleared" = "Готово. Список приобретенных приложений очищен."
@@ -259,6 +263,21 @@ $LangStrings = @{
 		"DownloadedListMenu1" = "1. Full apps list (GitHub)"
 		"DownloadedListMenu2" = "2. List of downloaded apps"
 		"DownloadedListMenu3" = "3. List of non-downloaded apps"
+		"DownloaderMenu1" = "1. Search for app and purchase (without downloading)"
+		"DownloaderMenu2" = "2. Search for app and download latest version"
+		"DownloaderMenu3" = "3. Search for app and download (with version selection)"
+		"DownloaderMenu4" = "4. Enter app IDs and purchase (without downloading)"
+		"DownloaderMenu5" = "5. Enter app IDs and download latest version"
+		"DownloaderMenu6" = "6. Enter app IDs and download (with version selection)"
+		"DownloaderMenu7" = "7. Show list of apps and purchase (without downloading)"
+		"DownloaderMenu8" = "8. Show list of apps and download latest version"
+		"DownloaderMenu9" = "9. Show list of apps and download (with version selection)"
+		"DownloaderMenu10" = "10. Check minimum iOS version for apps in IPA_Downloader/Apps folder"
+		"DownloaderMenu11" = "11. Install apps from IPA_Downloader/Apps folder"
+		"DownloaderMenu12" = "12. Clear data"
+		"DownloaderMenu13" = "13. Log out of Apple account and reset settings"
+		"DownloaderMenu14" = "14. Tip Jar"
+		"DownloaderMenu15" = "15. Change Language (Сменить язык)"
 		"ErrorDownloadedEmpty" = "Error: Download history is empty."
 		"ErrorDownloadFiles" = "Error: Failed to download file:"
 		"ErrorIdeviceinstallerNotFound" = "Error: ideviceinstaller not found. Apps installation via USB is impossible (only via AirDrop on macOS)"
@@ -285,6 +304,7 @@ $LangStrings = @{
 		"InstallerMenu3" = "3. Tip Jar"
 		"InstallerMenu4" = "4. Change Language (Сменить язык)"
 		"InstallerMenu5" = "5. Switch to IPA_Downloader"
+		"KbSyncGeneration" = "Generation of kbsync. This may take some time."
 		"LangChanged" = "Language successfully changed to English."
 		"LanguageMenu1" = "1. Русский"
 		"LanguageMenu2" = "2. English"
@@ -292,21 +312,9 @@ $LangStrings = @{
 		"ListMenuTitle" = "Select list to display"
 		"LoadingVersionsIDList" = "Loading list of app version IDs..."
 		"LoggedOut" = "Successfully logged out of Apple account."
-		"Menu1" = "1. Search for app and purchase (without downloading)"
-		"Menu2" = "2. Search for app and download latest version"
-		"Menu3" = "3. Search for app and download (with version selection)"
-		"Menu4" = "4. Enter app IDs and purchase (without downloading)"
-		"Menu5" = "5. Enter app IDs and download latest version"
-		"Menu6" = "6. Enter app IDs and download (with version selection)"
-		"Menu7" = "7. Show list of apps and purchase (without downloading)"
-		"Menu8" = "8. Show list of apps and download latest version"
-		"Menu9" = "9. Show list of apps and download (with version selection)"
-		"Menu10" = "10. Check minimum iOS version for apps in IPA_Downloader/Apps folder"
-		"Menu11" = "11. Install apps from IPA_Downloader/Apps folder"
-		"Menu12" = "12. Clear data"
-		"Menu13" = "13. Log out of Apple account and reset settings"
-		"Menu14" = "14. Tip Jar"
-		"Menu15" = "15. Change Language (Сменить язык)"
+		"LoginMenu1" = "1. Log in to Apple account"
+		"LoginMenu2" = "2. Switch to IPA_Installer mode"
+		"LoginMenu3" = "3. Change Language (Сменить язык)"
 		"MenuTitle" = "Enter a command:"
 		"MinIOS" = "Minimum iOS version:"
 		"PurchasedListCleared" = "Done. Purchased apps list cleared."
@@ -328,7 +336,7 @@ function Separator {
 	Write-Host "==============================================================================" -ForegroundColor Green
 }
 
-# Скомпилированные регулярные выражения для ускорения рендеринга таблиц:
+# Определение регулярных выражений для ускорения рендеринга таблиц:
 $script:reANSI = New-Object System.Text.RegularExpressions.Regex('\x1b\[[0-9;]*[a-zA-Z]', 'Compiled')
 $script:reSpaces = New-Object System.Text.RegularExpressions.Regex('[\u00A0\u2000-\u200A\u202F\u205F\u3000]', 'Compiled')
 $script:reDashes = New-Object System.Text.RegularExpressions.Regex('[\u2010-\u2015]', 'Compiled')
@@ -378,7 +386,7 @@ function Out-Table {
 			}
 			$cells += $cellInfo
 		}
-		# Добавляем массив ячеек как единый элемент:
+		# Добавление массива ячеек:
 		$CleanRows += , $cells 
 	}
 	
@@ -427,7 +435,7 @@ function Show-Error {
 	Write-Host (Get-Lang $Key) -ForegroundColor DarkRed
 }
 
-# Переменная для хранения текущего аккаунта Apple:
+# Определение переменной для хранения текущего аккаунта Apple:
 $script:CurrentAppleAccount = "UnknownAccount"
 
 # Функция получения текущего аккаунта Apple:
@@ -514,13 +522,13 @@ function Read-AppList-Json {
 
 # Функция входа в аккаунт Apple:
 function Connect-AppleAccount {
-	# При первой попытке авторизации баннер с текущим режимом работы и версией скрипта не отображается:
+	# Скрытие баннера с текущим режимом работы и версией скрипта при первой попытке авторизации:
 	$FirstAttempt = $true
 	
 	while (!(Test-Path "$LoginFilePath")) {
 		Remove-Item -Path $ipatoolHomePath -Recurse -Force -ErrorAction SilentlyContinue
 		
-		# При повторных попытках авторизации баннер с текущим режимом работы и версией скрипта отображается:
+		# Вывод баннера с текущим режимом работы и версией скрипта при повторных попытках авторизации:
 		if (-not $FirstAttempt) {
 			Show-ModeBanner
 		} else {
@@ -530,7 +538,12 @@ function Connect-AppleAccount {
 		Separator
 		Write-Host (Get-Lang "AuthFail")
 		
+		# Запрос аккаунта Apple и пароля:
 		Invoke-Ipatool auth login
+		
+		# Формирование kbsync:
+		Separator
+		Write-Host (Get-Lang "KbSyncGeneration")
 		$null = Invoke-Ipatool kbsync --refresh
 		
 		# Создание пустого файла login для фиксации успешной авторизации:
@@ -605,7 +618,7 @@ function Initialize-GitHub-List {
 	}
 	
 	try {
-		# Если файл отсутствует — возвращаем пустой список:
+		# Возвращение пустого списка, если файл отсутствует:
 		if (!(Test-Path $AppsIDListPath)) {
 			$script:GitHubParsedList = @()
 			return
@@ -658,7 +671,7 @@ function Initialize-RemoteFiles {
 			# Загрузка во временный файл:
 			Invoke-RestMethod -Uri $RemoteFile.Url -OutFile $RemoteFile.Temp -TimeoutSec 3 -ErrorAction Stop
 			
-			# Проверка, что временный файл действительно появился:
+			# Проверка наличия временного файла:
 			if (Test-Path $RemoteFile.Temp) {
 				# Замена старого файла только после успешной загрузки:
 				Move-Item -Path $RemoteFile.Temp -Destination $RemoteFile.Final -Force -ErrorAction Stop
@@ -670,7 +683,7 @@ function Initialize-RemoteFiles {
 			Separator
 			Write-Host "$(Get-Lang "ErrorDownloadFiles") $FileName" -ForegroundColor DarkRed
 			
-			# Удаление поврежденного временного файла:
+			# Удаление временного файла:
 			if (Test-Path $RemoteFile.Temp) {
 				Remove-Item -Path $RemoteFile.Temp -Force -ErrorAction SilentlyContinue
 			}
@@ -740,7 +753,7 @@ function Save-App-To-List {
 	
 	$IsDuplicate = $false
 	
-	# Синхронизация имен сохраненных приложений с Apps_ID_List.txt и поиск дубликатов:
+	# Синхронизация имен сохраненных приложений со списком приложений и поиск дубликатов:
 	foreach ($Item in $AccountApps) {
 		if ($ReferenceMap.ContainsKey($Item.appid)) {
 			$Item.name = $ReferenceMap[$Item.appid].Name
@@ -800,7 +813,7 @@ function Move-IPA-Files {
 		[string]$AppId,
 		[string]$AppName
 	)
-	# Создание папки Apps на случай, если она удалена в процессе работы скрипта:
+	# Создание папки Apps:
 	if (!(Test-Path $AppsFolderPath)) {
 		New-Item -Path $AppsFolderPath -ItemType Directory -Force | Out-Null
 	}
@@ -817,7 +830,7 @@ function Move-IPA-Files {
 			if ($Meta) {
 				$FinalAppName = $Meta.AppName
 				
-				# Проверка списка с GitHub, если имя неизвестно или не было передано:
+				# Проверка списка с GitHub:
 				if ([string]::IsNullOrWhiteSpace($AppName) -or $AppName -eq "Unknown") {
 					$GitHubName = Get-GitHub-AppName -AppId $AppId
 					if (![string]::IsNullOrWhiteSpace($GitHubName)) {
@@ -825,7 +838,7 @@ function Move-IPA-Files {
 					}
 				}
 				
-				# Применение найденного имени, очищенного от недопустимых символов:
+				# Применение найденного имени:
 				if (![string]::IsNullOrWhiteSpace($AppName) -and $AppName -ne "Unknown") {
 					$FinalAppName = $AppName -replace '[\\/:*?"<>|]', ''
 				}
@@ -860,7 +873,7 @@ function Test-NumericInput {
 	return $true
 }
 
-# Функция для парсинга введенных номеров и диапазонов:
+# Функция парсинга введенных номеров и диапазонов:
 function Parse-NumberSelection {
 	param (
 		[string]$Selection,
@@ -962,7 +975,7 @@ function IPA-Download-With-Version {
 	$RawVersions = [regex]::Matches($RawOutput, '(?<=")\d+(?=")') | ForEach-Object { $_.Value }
 	$RecentVersions = $RawVersions | Sort-Object
 	
-	# Если версии приложения не найдены:
+	# Вывод ошибки, если версии приложения не найдены:
 	if ($RecentVersions.Count -eq 0) {
 		Show-Error "ErrorNoVersionsFound"
 		return
@@ -998,10 +1011,6 @@ function IPA-Download-With-Version {
 			$PreSelectedVersions += $VersionMapping[$Idx - 1]
 		}
 		
-		Separator
-		Write-Host (Get-Lang "SelectedVersList")
-		Separator
-		
 		# Подготовка таблицы Print-StreamRow для отображения версий:
 		$HeaderNum = Get-Lang "HeaderNum"
 		$HeaderVerID = Get-Lang "HeaderVerID"
@@ -1033,10 +1042,6 @@ function IPA-Download-With-Version {
 			Write-Host ("│" + ($formatted -join "│") + "│")
 		}
 		
-		Write-Host $LineTop
-		Print-StreamRow @($HeaderNum, $HeaderVersion, $HeaderVerID)
-		Write-Host $LineSep
-		
 		$DetailedMapping = @()
 		$DetailCounter = 1
 		
@@ -1052,9 +1057,20 @@ function IPA-Download-With-Version {
 				ID = $VersionId
 				Version = $DisplayVersion
 			}
-			
-			Print-StreamRow @("$DetailCounter", "$DisplayVersion", "$VersionId")
 			$DetailCounter++
+		}
+		
+		Separator
+		Write-Host (Get-Lang "SelectedVersList")
+		Separator
+		
+		# Отрисовка таблицы:
+		Write-Host $LineTop
+		Print-StreamRow @($HeaderNum, $HeaderVersion, $HeaderVerID)
+		Write-Host $LineSep
+		
+		foreach ($Item in $DetailedMapping) {
+			Print-StreamRow @("$($Item.Index)", "$($Item.Version)", "$($Item.ID)")
 		}
 		
 		Write-Host $LineBottom
@@ -1090,7 +1106,7 @@ function IPA-Download-With-Version {
 			break
 		}
 		
-		# Если пользователь выбрал 0, цикл начинается заново с основной таблицы:
+		# Возврат цикла к основной таблице, если пользователь ввел 0:
 		if ($GoBack) {
 			continue 
 		}
@@ -1381,7 +1397,7 @@ function Get-iOS-MinVersion {
 	Separator
 	$Counter = 1
 	
-	# Присваивание вывода цикла напрямую переменной:
+	# Присваивание вывода цикла переменной:
 	$TableData = foreach ($File in @($FilesToProcess)) { 
 		$Meta = Get-IPA-Metadata -IpaPath $File.FullName
 		$MinOs = if ($Meta) { "$($Meta.MinIOS)" } else { "Error" }
@@ -1416,7 +1432,7 @@ function Update-PathFolder {
 	$PathSeparator = if ($IsWin) { ';' } else { ':' }
 	$PathEntries = $env:Path -split [regex]::Escape($PathSeparator)
 	
-	# Добавляем папку, только если её ещё нет в PATH:
+	# Добавление папки с ipatool в PATH:
 	if ($NewFolder -notin $PathEntries) {
 		$env:Path = $env:Path + $PathSeparator + $NewFolder
 	}
@@ -1521,33 +1537,14 @@ function Check-Update {
 			# Извлечение числа из версии:
 			$latestVerStr = [regex]::Match($latestRelease.tag_name, '\d+(\.\d+)+').Value
 			$currentVerStr = [regex]::Match($ScriptVersion, '\d+(\.\d+)+').Value
-			
-			# Проверка, есть ли текстовые приписки после версии:
-			$latestHasSuffix = ($latestRelease.tag_name -replace '\d+(\.\d+)+', '').Trim().Length -gt 0
-			$currentHasSuffix = ($ScriptVersion -replace '\d+(\.\d+)+', '').Trim().Length -gt 0
-			
 			$UpdateFound = $false
 			
 			# Проверка, что обе переменные не пустые, чтобы избежать ошибок конвертации:
 			if (![string]::IsNullOrEmpty($latestVerStr) -and ![string]::IsNullOrEmpty($currentVerStr)) {
 				
-				# Если числовая версия на GitHub больше:
+				# Вывод информации об обновлении, если числовая версия больше:
 				if ([version]$latestVerStr -gt [version]$currentVerStr) {
 					$UpdateFound = $true
-				}
-				
-				# Если числовые версии равны:
-				elseif ([version]$latestVerStr -eq [version]$currentVerStr) {
-					
-					# Переход от беты к релизу:
-					if ($currentHasSuffix -and -not $latestHasSuffix) {
-						$UpdateFound = $true
-					}
-					
-					# Переход между бетами:
-					elseif ($currentHasSuffix -and $latestHasSuffix -and ($latestRelease.tag_name -gt $ScriptVersion)) {
-						$UpdateFound = $true
-					}
 				}
 			}
 			
@@ -1619,12 +1616,8 @@ $(Get-Lang 'LanguageMenu2')`n
 	# Сохранение выбранного языка:
 	Set-Setting -Key "Language" -Value $script:CurrentLang
 	
-	# Выбор режима работы в зависимости от наличия авторизации:
-	if ($IsLoggedIn) {
-		$script:WorkMode = "Downloader"
-	} else {
-		$script:WorkMode = "Installer"
-	}
+	# Установка режима IPA_Downloader по умолчанию:
+	$script:WorkMode = "Downloader"
 	
 	# Сохранение режима работы и вывод баннера:
 	Set-Setting -Key "Mode" -Value $script:WorkMode
@@ -1644,7 +1637,7 @@ Write-Host "$OSVersion"
 # Версия PowerShell:
 Write-Host "PowerShell $PSVersion"
 
-# Проверка на наличие базовых папок:
+# Проверка наличия базовых папок:
 foreach ($Dir in @("$AppsFolderPath", "$FilesFolderPath", "$MainAppFolderPath")) {
 	if (!(Test-Path $Dir)) {
 		$null = New-Item -Path $Dir -ItemType "Directory"
@@ -1756,11 +1749,11 @@ function Invoke-DownloaderMode {
 			$SecureKp = $EncryptedContent | ConvertTo-SecureString
 			$script:Kp = [System.Net.NetworkCredential]::new("", $SecureKp).Password
 		} else {
-			# Генерация нового случайного ключа:
+			# Формирование нового случайного ключа:
 			$script:Kp = [guid]::NewGuid().ToString("N")
 		}
 	} else {
-		# Для macOS, Linux не требуется keychain-passphrase:
+		# Формирование пустой keychain-passphrase для macOS, Linux:
 		$script:Kp = ""
 	}
 	
@@ -1770,11 +1763,34 @@ function Invoke-DownloaderMode {
 		Write-Host (Get-Lang "AuthSuccess")
 		Invoke-Ipatool auth info
 		Get-Current-AppleAccount
-		$null = Invoke-Ipatool kbsync --refresh
+	} else {
+		# Вывод меню с выбором при отсутствии авторизации:
+		while (!(Test-Path "$LoginFilePath")) {
+			Separator
+			$LoginMenu = @"
+$(Get-Lang 'MenuTitle')
+$(Get-Lang 'LoginMenu1')
+$(Get-Lang 'LoginMenu2')
+$(Get-Lang 'LoginMenu3')`n
+"@
+			$LoginChoice = Read-Host $LoginMenu
+			
+			if ($LoginChoice -eq '1') {
+				Connect-AppleAccount
+			} elseif ($LoginChoice -eq '2') {
+				$script:WorkMode = "Installer"
+				Set-Setting -Key "Mode" -Value "Installer"
+				return
+			} elseif ($LoginChoice -eq '3') {
+				$script:CurrentLang = if ($script:CurrentLang -eq "RU") { "EN" } else { "RU" }
+				Set-Setting -Key "Language" -Value $script:CurrentLang
+				Separator
+				Write-Host (Get-Lang "LangChanged")
+			} else {
+				Show-Error "ErrorInvalidInput"
+			}
+		}
 	}
-	
-	# Вход с аккаунтом Apple:
-	Connect-AppleAccount
 	
 	# Сохранение настроек режима IPA_Downloader только после успешной авторизации с аккаунтом Apple:
 	Set-Setting -Key "Language" -Value $script:CurrentLang
@@ -1786,21 +1802,21 @@ function Invoke-DownloaderMode {
 		Separator
 		$MainMenu = @"
 $(Get-Lang 'MenuTitle')
-$(Get-Lang 'Menu1')
-$(Get-Lang 'Menu2')
-$(Get-Lang 'Menu3')
-$(Get-Lang 'Menu4')
-$(Get-Lang 'Menu5')
-$(Get-Lang 'Menu6')
-$(Get-Lang 'Menu7')
-$(Get-Lang 'Menu8')
-$(Get-Lang 'Menu9')
-$(Get-Lang 'Menu10')
-$(Get-Lang 'Menu11')
-$(Get-Lang 'Menu12')
-$(Get-Lang 'Menu13')
-$(Get-Lang 'Menu14')
-$(Get-Lang 'Menu15')`n
+$(Get-Lang 'DownloaderMenu1')
+$(Get-Lang 'DownloaderMenu2')
+$(Get-Lang 'DownloaderMenu3')
+$(Get-Lang 'DownloaderMenu4')
+$(Get-Lang 'DownloaderMenu5')
+$(Get-Lang 'DownloaderMenu6')
+$(Get-Lang 'DownloaderMenu7')
+$(Get-Lang 'DownloaderMenu8')
+$(Get-Lang 'DownloaderMenu9')
+$(Get-Lang 'DownloaderMenu10')
+$(Get-Lang 'DownloaderMenu11')
+$(Get-Lang 'DownloaderMenu12')
+$(Get-Lang 'DownloaderMenu13')
+$(Get-Lang 'DownloaderMenu14')
+$(Get-Lang 'DownloaderMenu15')`n
 "@
 	
 		$SwitchValue = Read-Host $MainMenu
@@ -1932,7 +1948,7 @@ $(Get-Lang 'ClearMenu3')`n
 						} else {
 							$RawData = Get-Content "$PurchasedIDsFilePath" -Raw -Encoding UTF8
 							
-							# Если файл пуст или содержит только пустые скобки {}:
+							# Очистка, если файл пуст или содержит только пустые скобки {}:
 							if ([string]::IsNullOrWhiteSpace($RawData) -or $RawData.Trim() -eq '{}') {
 								Remove-Item "$PurchasedIDsFilePath" -Force -ErrorAction SilentlyContinue
 								Show-Error "ErrorPurchasedEmpty"
@@ -1941,7 +1957,7 @@ $(Get-Lang 'ClearMenu3')`n
 							
 							$Data = $RawData | ConvertFrom-Json
 							
-							# Если старый формат или нет свойств:
+							# Очистка, если файл старого формата или без свойств:
 							if ($Data -isnot [System.Management.Automation.PSCustomObject] -or $Data.psobject.properties.Count -eq 0) {
 								Remove-Item "$PurchasedIDsFilePath" -Force -ErrorAction SilentlyContinue
 								Separator
@@ -1949,7 +1965,7 @@ $(Get-Lang 'ClearMenu3')`n
 								continue
 							}
 							
-							# Формируем динамическое меню аккаунтов:
+							# Формирование динамического меню аккаунтов:
 							$Accounts = @($Data.psobject.properties.Name)
 							$AccMenuText = "$(Get-Lang 'ClearAccountMenuTitle') $(Get-Lang 'CancelStep')`n"
 							$Counter = 1
@@ -1964,15 +1980,15 @@ $(Get-Lang 'ClearMenu3')`n
 							if ($AccChoice -eq '0') { continue }
 							
 							if ([int]$AccChoice -eq $Counter) {
-								# Если выбрано "Все аккаунты":
+								# Очистка, если выбрано "Все аккаунты":
 								Remove-Item "$PurchasedIDsFilePath" -Force -ErrorAction SilentlyContinue
 								Separator
 								Write-Host (Get-Lang "PurchasedListCleared")
 							} else {
-								# Удаляем данные выбранного аккаунта:
+								# Удаление данных выбранного аккаунта:
 								$SelectedAcc = $Accounts[[int]$AccChoice - 1]
 								
-								# Если в файле отсутствуют аккаунты, то удаляем файл:
+								# Удаление файла, если в файле отсутствуют аккаунты:
 								if ($Accounts.Count -le 1) {
 									Remove-Item "$PurchasedIDsFilePath" -Force -ErrorAction SilentlyContinue
 								} else {
@@ -2020,15 +2036,15 @@ $(Get-Lang 'ClearMenu3')`n
 							if ($AccChoice -eq '0') { continue }
 							
 							if ([int]$AccChoice -eq $Counter) {
-								# Если выбрано "Все аккаунты":
+								# Очистка, если выбрано "Все аккаунты":
 								Remove-Item "$DownloadedIDsFilePath" -Force -ErrorAction SilentlyContinue
 								Separator
 								Write-Host (Get-Lang "DownloadedListCleared")
 							} else {
-								# Удаляем данные выбранного аккаунта:
+								# Удаление данных выбранного аккаунта:
 								$SelectedAcc = $Accounts[[int]$AccChoice - 1]
 								
-								# Если в файле отсутствуют аккаунты, то удаляем файл:
+								# Удаление файла, если в файле отсутствуют аккаунты:
 								if ($Accounts.Count -le 1) {
 									Remove-Item "$DownloadedIDsFilePath" -Force -ErrorAction SilentlyContinue
 								} else {
@@ -2085,7 +2101,7 @@ $(Get-Lang 'ClearMenu3')`n
 			# Режим отладки:
 			"debug" {
 				$script:IsDebugEnabled = -not $script:IsDebugEnabled
-				Set-Setting -Key "DebugEnabled" -Value $script:IsDebugEnabled # <-- Сохраняем состояние в файл
+				Set-Setting -Key "DebugEnabled" -Value $script:IsDebugEnabled
 				Separator
 				if ($script:IsDebugEnabled) {
 					Write-Host (Get-Lang "DebugEnabled")
@@ -2107,13 +2123,11 @@ $(Get-Lang 'ClearMenu3')`n
 $script:UpdateChecked = $false
 $script:RemoteFilesInitialized = $false
 
-# Главный рабочий цикл скрипта:
-# Смена режима работы:
+# Главный рабочий цикл:
 $script:UpdateChecked = $false
-$script:RemoteFilesInitialized = $false # Флаг однократной загрузки удаленных файлов
-$script:DependenciesChecked = $false    # Флаг однократной проверки бинарных файлов
+$script:RemoteFilesInitialized = $false
+$script:DependenciesChecked = $false
 
-# Главный рабочий цикл скрипта:
 while ($true) {
 	
 	# Вызов первоначальной настройки или баннера с проверкой обновлений:
@@ -2134,7 +2148,7 @@ while ($true) {
 		$script:RemoteFilesInitialized = $true
 	}
 	
-	# Проверка наличия необходимых файлов под текущую операционную систему:
+	# Проверка наличия необходимых файлов под текущую операционную систему и архитектуру:
 	if (-not $script:DependenciesChecked) {
 		if ($IsWin) {
 			$MissingMainAppFiles = Get-MissingBinaryFiles -FolderPath $script:BinaryFolderPath
