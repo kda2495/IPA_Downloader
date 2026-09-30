@@ -6,7 +6,7 @@
 
 # IPA_Downloader
 [![Russian README](https://img.shields.io/badge/README-Russian-blue.svg)](README.md)  
-A script for purchasing/downloading any available App Store apps, as well as restoring removed ones - provided they were previously purchased via your Apple account (powered by [ipatool-cpp](https://github.com/Sorvigolova/ipatool))
+A script for purchasing/downloading any available App Store apps, as well as restoring removed ones - provided they were previously purchased via your Apple account (powered by [ipatool-cpp](https://github.com/Sorvigolova/ipatool)).
 
 ## Information about the script:
 ### Important:
@@ -92,7 +92,7 @@ Download the complete set of programs/updates for Windows 7/8.1 via the link:
 #### 3. On the first run, initial configuration is required:
 * Select language;
 * Press Enter;
-* When update is available, choose to either visit GitHub to download new script version or continue with current version;
+* When update is available, choose to either visit the repository to download new script version or continue with current version;
 * Press Enter.
 #### 4. By default, the script starts in IPA_Downloader mode:
 * To log in enter the command: 1. Log in to Apple account;
@@ -166,7 +166,7 @@ eval "$(/opt/homebrew/bin/brew shellenv zsh)"
 #### 3. On the first run, initial configuration is required:
 * Select language;
 * Press Enter;
-* When update is available, choose to either visit GitHub to download new script version or continue with current version;
+* When update is available, choose to either visit the repository to download new script version or continue with current version;
 * Press Enter.
 #### 4. By default, the script starts in IPA_Downloader mode:
 * To log in enter the command: 1. Log in to Apple account;
@@ -212,7 +212,7 @@ eval "$(/opt/homebrew/bin/brew shellenv zsh)"
 #### 4. On the first run, initial configuration is required:
 * Select language;
 * Press Enter;
-* When update is available, choose to either visit GitHub to download new script version or continue with current version;
+* When update is available, choose to either visit the repository to download new script version or continue with current version;
 * Press Enter.
 #### 5. By default, the script starts in IPA_Downloader mode:
 * To log in enter the command: 1. Log in to Apple account;
@@ -271,22 +271,22 @@ eval "$(/opt/homebrew/bin/brew shellenv zsh)"
 * Enter the index numbers (#) of the app version IDs to download;
 * Press Enter;
 * The script will download the selected app versions.
-#### 7. Show list of apps and purchase (without downloading):
-* Enter the list of apps to display (full apps list (GitHub), list of purchased apps, list of non-purchased apps);
+#### 7. Select an app list and purchase (without downloading):
+* Enter the list of apps to display (full apps list, list of apps purchased by the script, list of apps not purchased by the script);
 * Press Enter;
 * The selected list will be displayed;
 * Enter the index numbers (#) of the apps to purchase;
 * Press Enter;
 * The script will purchase the selected apps.
-#### 8. Show list of apps and download latest version:
-* Enter the list of apps to display (full apps list (GitHub), list of purchased apps, list of non-purchased apps);
+#### 8. Select an app list and download latest version:
+* Enter the list of apps to display (full apps list, list of apps downloaded by the script, list of apps not downloaded by the script);
 * Press Enter;
 * The selected list will be displayed;
 * Enter the index numbers (#) of the apps to download;
 * Press Enter;
 * The script will download the selected apps.
-#### 9. Show list of apps and download (with version selection):
-* Enter the list of apps to display (full apps list (GitHub), list of purchased apps, list of non-purchased apps);
+#### 9. Select an app list and download (with version selection):
+* Enter the list of apps to display (full apps list, list of apps downloaded by the script, list of apps not downloaded by the script);
 * Press Enter;
 * Enter the index numbers (#) of the apps to download;
 * Press Enter;
@@ -304,7 +304,7 @@ eval "$(/opt/homebrew/bin/brew shellenv zsh)"
 * Press Enter;
 * The script will install the selected apps on the device.
 #### 12. Clear data:
-* Enter the data list to clear (downloaded apps list, purchased apps list, apps in the IPA_Downloader/Apps folder);
+* Enter the data list to clear (list of apps downloaded by the script, list of apps purchased by the script, apps in the IPA_Downloader/Apps folder);
 * Press Enter;
 * When choosing to clear either the downloaded apps list or the purchased apps list, select the specific account you want to clear;
 * Press Enter;
@@ -347,6 +347,7 @@ eval "$(/opt/homebrew/bin/brew shellenv zsh)"
 * WARNING: could not locate Payload/App.app/SC_Info/App.sinf in archive! - App signature not found in the installed ipa file.
 * Login error: GSA SRP exception: GSA complete error -27952: Update iCloud for Windows to the latest version to sign in - Advanced Data Protection needs to be disabled via Settings - Apple Account - iCloud - Advanced Data Protection.
 * Login error: failed to initialize SAP signer: WinHttpSendRequest failed: 12029 - Connection error, check the system’s use of a proxy server by entering the following into the Windows command line (cmd): `netsh winhttp show proxy` and press Enter. If necessary, remove the unused proxy server by entering the following into the Windows command line (run as an administrator): `netsh winhttp reset proxy` and press Enter.
+* If you encounter any issues with authorization, try logging in to your Apple account on the icloud.com website.
 * If the app immediately closes when launched after installation, log in to the App Store using the account from which it was downloaded, and install any free/paid app. After that, launch the problematic app again.
 
 ### If you encounter an issue:

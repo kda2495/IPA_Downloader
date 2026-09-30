@@ -2,7 +2,7 @@
 Set-Location -Path $PSScriptRoot
 
 # Версия скрипта:
-$ScriptVersion = "4.0.8"
+$ScriptVersion = "4.0.9"
 
 # Определение операционной системы:
 $IsWin = [System.Runtime.InteropServices.RuntimeInformation]::IsOSPlatform([System.Runtime.InteropServices.OSPlatform]::Windows)
@@ -79,15 +79,15 @@ $script:ArchSubFolder = Get-ArchSubFolder
 $OSVersion = [System.Environment]::OSVersion
 $PSVersion = $PSVersionTable.PSVersion.ToString()
 $script:BinaryFolderPath = Join-Path -Path $MainAppFolderPath -ChildPath $script:ArchSubFolder
-$DownloadedIDsFilePath = Join-Path -Path $FilesFolderPath -ChildPath "Downloaded_IDs.json"
-$PurchasedIDsFilePath = Join-Path -Path $FilesFolderPath -ChildPath "Purchased_IDs.json"
+$DownloadedAppsListFilePath = Join-Path -Path $FilesFolderPath -ChildPath "DownloadedAppsList.json"
+$PurchasedAppsListFilePath = Join-Path -Path $FilesFolderPath -ChildPath "PurchasedAppsList.json"
 $AppsFolderPath = Join-Path -Path $PSScriptRoot -ChildPath "Apps"
 $ipatoolHomePath = Join-Path -Path $HOME -ChildPath ".ipatool"
 $LoginFilePath = Join-Path -Path $ipatoolHomePath -ChildPath "login"
 $TempFolderPath = [System.IO.Path]::GetTempPath()
 $TempIpaFilePath = Join-Path -Path $TempFolderPath -ChildPath "Temp.ipa"
-$AppsIDListPath = Join-Path -Path $FilesFolderPath -ChildPath "Apps_ID_List.txt"
-$AppsIDTempListPath = Join-Path -Path $MainAppFolderPath -ChildPath "Apps_ID_List_tmp.txt"
+$AppsListPath = Join-Path -Path $FilesFolderPath -ChildPath "AppsList.txt"
+$AppsListTempPath = Join-Path -Path $MainAppFolderPath -ChildPath "AppsList_tmp.txt"
 $WarningPath = Join-Path -Path $FilesFolderPath -ChildPath "Warning.txt"
 $WarningTempPath = Join-Path -Path $MainAppFolderPath -ChildPath "Warning_tmp.txt"
 
@@ -132,8 +132,8 @@ public class ConsoleFont {
 # Подключение системных сборок для работы с zip-архивами:
 Add-Type -AssemblyName System.IO.Compression.FileSystem
 
-# Определение переменной для кэширования списка с GitHub:
-$script:GitHubParsedList = $null
+# Определение переменной для кэширования списка приложений:
+$script:RepoParsedList = $null
 
 # Локализация:
 $LangStrings = @{
@@ -157,25 +157,25 @@ $LangStrings = @{
 		"CancelStepVerID" = "(0: Возврат к вводу порядкового номера (№) ID версий):"
 		"ClearAccountMenuTitle" = "Выберите аккаунты Apple для очистки"
 		"ClearAllAccounts" = "Все аккаунты Apple"
-		"ClearMenu1" = "1. Список приобретенных приложений"
-		"ClearMenu2" = "2. Список загруженных приложений"
+		"ClearMenu1" = "1. Список приобретенных скриптом приложений"
+		"ClearMenu2" = "2. Список загруженных скриптом приложений"
 		"ClearMenu3" = "3. Приложения в папке IPA_Downloader/Apps"
 		"ClearMenuTitle" = "Выберите данные для очистки"
 		"DebugEnabled" = "Режим отладки включен."
 		"DebugDisabled" = "Режим отладки отключен."
-		"DownloadedListCleared" = "Готово. Список загруженных приложений очищен."
-		"DownloadedListMenu1" = "1. Полный список приложений (GitHub)"
-		"DownloadedListMenu2" = "2. Список загруженных приложений"
-		"DownloadedListMenu3" = "3. Список незагруженных приложений"
+		"DownloadedListCleared" = "Готово. Список загруженных скриптом приложений очищен."
+		"DownloadedListMenu1" = "1. Полный список приложений"
+		"DownloadedListMenu2" = "2. Список загруженных скриптом приложений"
+		"DownloadedListMenu3" = "3. Список незагруженных скриптом приложений"
 		"DownloaderMenu1" = "1. Поиск приложения и покупка (без загрузки)"
 		"DownloaderMenu2" = "2. Поиск приложения и загрузка последней версии"
 		"DownloaderMenu3" = "3. Поиск приложения и загрузка (с выбором версии)"
 		"DownloaderMenu4" = "4. Ввод ID приложений и покупка (без загрузки)"
 		"DownloaderMenu5" = "5. Ввод ID приложений и загрузка последней версии"
 		"DownloaderMenu6" = "6. Ввод ID приложений и загрузка (с выбором версии)"
-		"DownloaderMenu7" = "7. Вывод списка приложений и покупка (без загрузки)"
-		"DownloaderMenu8" = "8. Вывод списка приложений и загрузка последней версии"
-		"DownloaderMenu9" = "9. Вывод списка приложений и загрузка (с выбором версии)"
+		"DownloaderMenu7" = "7. Выбор списка приложений и покупка (без загрузки)"
+		"DownloaderMenu8" = "8. Выбор списка приложений и загрузка последней версии"
+		"DownloaderMenu9" = "9. Выбор списка приложений и загрузка (с выбором версии)"
 		"DownloaderMenu10" = "10. Проверка минимальной версии iOS для приложений в папке IPA_Downloader/Apps"
 		"DownloaderMenu11" = "11. Установка приложений из папки IPA_Downloader/Apps"
 		"DownloaderMenu12" = "12. Очистка данных"
@@ -221,15 +221,15 @@ $LangStrings = @{
 		"LoginMenu3" = "3. Сменить язык (Change Language)"
 		"MenuTitle" = "Введите команду:"
 		"MinIOS" = "Минимальная версия iOS:"
-		"PurchasedListCleared" = "Готово. Список приобретенных приложений очищен."
-		"PurchasedListMenu1" = "1. Полный список приложений (GitHub)"
-		"PurchasedListMenu2" = "2. Список приобретенных приложений"
-		"PurchasedListMenu3" = "3. Список неприобретенных приложений"
+		"PurchasedListCleared" = "Готово. Список приобретенных скриптом приложений очищен."
+		"PurchasedListMenu1" = "1. Полный список приложений"
+		"PurchasedListMenu2" = "2. Список приобретенных скриптом приложений"
+		"PurchasedListMenu3" = "3. Список неприобретенных скриптом приложений"
 		"SelectedApp" = "Выбрано приложение:"
 		"SelectedVer" = "Выбрана версия:"
 		"SelectedVersList" = "Выбраны следующие версии:"
 		"TipJar" = "Спасибо за поддержку!"
-		"UpdateAvailableTitle" = "Доступно обновление (версия {0}). Перейти на страницу GitHub для загрузки обновления?"
+		"UpdateAvailableTitle" = "Доступно обновление (версия {0}). Перейти на страницу репозитория для загрузки обновления?"
 		"UpdateMenu1" = "1. Да"
 		"UpdateMenu2" = "2. Нет"
 	}
@@ -253,25 +253,25 @@ $LangStrings = @{
 		"CancelStepVerID" = "(0: Return to entering index numbers (#) of version IDs):"
 		"ClearAccountMenuTitle" = "Select Apple accounts to clear"
 		"ClearAllAccounts" = "All Apple accounts"
-		"ClearMenu1" = "1. Purchased apps list"
-		"ClearMenu2" = "2. Downloaded apps list"
+		"ClearMenu1" = "1. List of apps purchased by the script"
+		"ClearMenu2" = "2. List of apps downloaded by the script"
 		"ClearMenu3" = "3. Apps in IPA_Downloader/Apps folder"
 		"ClearMenuTitle" = "Select data to clear"
 		"DebugEnabled" = "Debug mode enabled."
 		"DebugDisabled" = "Debug mode disabled"
-		"DownloadedListCleared" = "Done. Downloaded apps list cleared."
-		"DownloadedListMenu1" = "1. Full apps list (GitHub)"
-		"DownloadedListMenu2" = "2. List of downloaded apps"
-		"DownloadedListMenu3" = "3. List of non-downloaded apps"
+		"DownloadedListCleared" = "Done. List of apps downloaded by the script cleared."
+		"DownloadedListMenu1" = "1. Full apps list"
+		"DownloadedListMenu2" = "2. List of apps downloaded by the script"
+		"DownloadedListMenu3" = "3. List of apps not downloaded by the script"
 		"DownloaderMenu1" = "1. Search for app and purchase (without downloading)"
 		"DownloaderMenu2" = "2. Search for app and download latest version"
 		"DownloaderMenu3" = "3. Search for app and download (with version selection)"
 		"DownloaderMenu4" = "4. Enter app IDs and purchase (without downloading)"
 		"DownloaderMenu5" = "5. Enter app IDs and download latest version"
 		"DownloaderMenu6" = "6. Enter app IDs and download (with version selection)"
-		"DownloaderMenu7" = "7. Show list of apps and purchase (without downloading)"
-		"DownloaderMenu8" = "8. Show list of apps and download latest version"
-		"DownloaderMenu9" = "9. Show list of apps and download (with version selection)"
+		"DownloaderMenu7" = "7. Select an app list and purchase (without downloading)"
+		"DownloaderMenu8" = "8. Select an app list and download latest version"
+		"DownloaderMenu9" = "9. Select an app list  and download (with version selection)"
 		"DownloaderMenu10" = "10. Check minimum iOS version for apps in IPA_Downloader/Apps folder"
 		"DownloaderMenu11" = "11. Install apps from IPA_Downloader/Apps folder"
 		"DownloaderMenu12" = "12. Clear data"
@@ -317,15 +317,15 @@ $LangStrings = @{
 		"LoginMenu3" = "3. Change Language (Сменить язык)"
 		"MenuTitle" = "Enter a command:"
 		"MinIOS" = "Minimum iOS version:"
-		"PurchasedListCleared" = "Done. Purchased apps list cleared."
-		"PurchasedListMenu1" = "1. Full apps list (GitHub)"
-		"PurchasedListMenu2" = "2. List of purchased apps"
-		"PurchasedListMenu3" = "3. List of non-purchased apps"
+		"PurchasedListCleared" = "Done. List of apps purchased by the script cleared."
+		"PurchasedListMenu1" = "1. Full apps list"
+		"PurchasedListMenu2" = "2. List of apps purchased by the script"
+		"PurchasedListMenu3" = "3. List of apps not purchased by the script"
 		"SelectedApp" = "Selected app:"
 		"SelectedVer" = "Selected version:"
 		"SelectedVersList" = "Selected versions:"
 		"TipJar" = "Thanks for your support!"
-		"UpdateAvailableTitle" = "Update available (version {0}). Open GitHub page to download the update?"
+		"UpdateAvailableTitle" = "Update available (version {0}). Open the repository page to download the update?"
 		"UpdateMenu1" = "1. Yes"
 		"UpdateMenu2" = "2. No"
 	}
@@ -475,10 +475,10 @@ function Read-MenuChoice {
 # Функция получения имени приложения по ID:
 function Resolve-AppDisplayName {
 	param ([string]$AppId)
-	$GitHubName = Get-GitHub-AppName -AppId $AppId
+	$RepoName = Get-Repo-AppName -AppId $AppId
 	return @{
-		Display = if ([string]::IsNullOrWhiteSpace($GitHubName)) { $AppId } else { $GitHubName }
-		Final = if ([string]::IsNullOrWhiteSpace($GitHubName)) { "Unknown" } else { $GitHubName }
+		Display = if ([string]::IsNullOrWhiteSpace($RepoName)) { $AppId } else { $RepoName }
+		Final = if ([string]::IsNullOrWhiteSpace($RepoName)) { "Unknown" } else { $RepoName }
 	}
 }
 
@@ -526,8 +526,6 @@ function Connect-AppleAccount {
 	$FirstAttempt = $true
 	
 	while (!(Test-Path "$LoginFilePath")) {
-		Remove-Item -Path $ipatoolHomePath -Recurse -Force -ErrorAction SilentlyContinue
-		
 		# Вывод баннера с текущим режимом работы и версией скрипта при повторных попытках авторизации:
 		if (-not $FirstAttempt) {
 			Show-ModeBanner
@@ -557,6 +555,7 @@ function Connect-AppleAccount {
 				$SecureKp | ConvertFrom-SecureString | Set-Content -Path $KeychainFilePath -Force
 			}
 		} else {
+			# Удаление папки .ipatool:
 			Remove-Item -Path $ipatoolHomePath -Recurse -Force -ErrorAction SilentlyContinue
 		}
 	}
@@ -612,28 +611,28 @@ function Get-IPA-Metadata {
 }
 
 # Функция инициализации и кэширования списка приложений:
-function Initialize-GitHub-List {
-	if ($null -ne $script:GitHubParsedList) {
+function Initialize-Repo-List {
+	if ($null -ne $script:RepoParsedList) {
 		return
 	}
 	
 	try {
 		# Возвращение пустого списка, если файл отсутствует:
-		if (!(Test-Path $AppsIDListPath)) {
-			$script:GitHubParsedList = @()
+		if (!(Test-Path $AppsListPath)) {
+			$script:RepoParsedList = @()
 			return
 		}
 		
 		# Чтение уже загруженного локального файла:
-		$Raw = Get-Content -Path $AppsIDListPath -Raw -Encoding UTF8 -ErrorAction Stop
+		$Raw = Get-Content -Path $AppsListPath -Raw -Encoding UTF8 -ErrorAction Stop
 		
 		if ([string]::IsNullOrWhiteSpace($Raw)) {
-			$script:GitHubParsedList = @()
+			$script:RepoParsedList = @()
 			return
 		}
 		
 		# Парсинг списка:
-		$script:GitHubParsedList = @(
+		$script:RepoParsedList = @(
 			$Raw -split "`r?`n" |
 			Where-Object {
 				$_ -match '^(.+?):\s*(\d+)'
@@ -647,7 +646,7 @@ function Initialize-GitHub-List {
 		)
 	}
 	catch {
-		$script:GitHubParsedList = @()
+		$script:RepoParsedList = @()
 	}
 }
 
@@ -655,9 +654,9 @@ function Initialize-GitHub-List {
 function Initialize-RemoteFiles {
 	$RemoteFiles = @(
 		[PSCustomObject]@{
-			Url = "https://raw.githubusercontent.com/kda2495/IPA_Downloader/refs/heads/main/Files/Apps_ID_List.txt"
-			Temp = $AppsIDTempListPath
-			Final = $AppsIDListPath
+			Url = "https://raw.githubusercontent.com/kda2495/IPA_Downloader/refs/heads/main/Files/AppsList.txt"
+			Temp = $AppsListTempPath
+			Final = $AppsListPath
 		}
 		[PSCustomObject]@{
 			Url = "https://raw.githubusercontent.com/kda2495/IPA_Downloader/refs/heads/main/Files/Warning.txt"
@@ -691,10 +690,10 @@ function Initialize-RemoteFiles {
 	}
 	
 	# Сброс кэша перед повторной инициализацией:
-	$script:GitHubParsedList = $null
+	$script:RepoParsedList = $null
 	
-	# Чтение Apps_ID_List.txt и сохранение в памяти:
-	Initialize-GitHub-List
+	# Чтение AppsList.txt и сохранение в памяти:
+	Initialize-Repo-List
 	
 	# Чтение предупреждения и сохранение в памяти:
 	$script:WarningText = $null
@@ -716,7 +715,7 @@ function Save-App-To-List {
 		return
 	}
 	
-	$HistoryFile = if ($Type -eq "Purchased") { "$PurchasedIDsFilePath" } else { "$DownloadedIDsFilePath" }
+	$HistoryFile = if ($Type -eq "Purchased") { "$PurchasedAppsListFilePath" } else { "$DownloadedAppsListFilePath" }
 	
 	# Создание файла, если его нет:
 	if (!(Test-Path $HistoryFile)) {
@@ -742,12 +741,12 @@ function Save-App-To-List {
 	if ($AccountApps -isnot [System.Collections.IEnumerable]) { $AccountApps = @($AccountApps) }
 	
 	# Загрузка списка:
-	Initialize-GitHub-List
+	Initialize-Repo-List
 	
 	# Создание хэш-таблицы для поиска актуальных имен и индексов:
 	$ReferenceMap = @{}
-	for ($i = 0; $i -lt $script:GitHubParsedList.Count; $i++) {
-		$RefApp = $script:GitHubParsedList[$i]
+	for ($i = 0; $i -lt $script:RepoParsedList.Count; $i++) {
+		$RefApp = $script:RepoParsedList[$i]
 		$ReferenceMap[$RefApp.Id] = @{ Index = $i; Name = $RefApp.Name }
 	}
 	
@@ -800,10 +799,10 @@ function Show-WarningMsg {
 }
 
 # Функция поиска имени приложения по кэшу:
-function Get-GitHub-AppName {
+function Get-Repo-AppName {
 	param ([string]$AppId)
-	Initialize-GitHub-List
-	$App = $script:GitHubParsedList | Where-Object { $_.Id -eq $AppId } | Select-Object -First 1
+	Initialize-Repo-List
+	$App = $script:RepoParsedList | Where-Object { $_.Id -eq $AppId } | Select-Object -First 1
 	if ($App) { return $App.Name } else { return $null }
 }
 
@@ -830,11 +829,11 @@ function Move-IPA-Files {
 			if ($Meta) {
 				$FinalAppName = $Meta.AppName
 				
-				# Проверка списка с GitHub:
+				# Проверка списка приложений из репозитория:
 				if ([string]::IsNullOrWhiteSpace($AppName) -or $AppName -eq "Unknown") {
-					$GitHubName = Get-GitHub-AppName -AppId $AppId
-					if (![string]::IsNullOrWhiteSpace($GitHubName)) {
-						$AppName = $GitHubName
+					$RepoName = Get-Repo-AppName -AppId $AppId
+					if (![string]::IsNullOrWhiteSpace($RepoName)) {
+						$AppName = $RepoName
 					}
 				}
 				
@@ -1169,13 +1168,13 @@ function Search-Apps {
 		Show-Error "ErrorInvalidInput"
 	}
 	
-	# Инициализация списка из Apps_ID_List.txt:
-	Initialize-GitHub-List
+	# Инициализация списка из AppsList.txt:
+	Initialize-Repo-List
 	
 	# Поиск в списке приложений:
 	$FoundApps = @()
-	if ($null -ne $script:GitHubParsedList) {
-		$FoundApps += @($script:GitHubParsedList | Where-Object { $_.Name -match [regex]::Escape($AppName) } | ForEach-Object {
+	if ($null -ne $script:RepoParsedList) {
+		$FoundApps += @($script:RepoParsedList | Where-Object { $_.Name -match [regex]::Escape($AppName) } | ForEach-Object {
 			[PSCustomObject]@{
 				name = $_.Name
 				id = $_.Id
@@ -1285,7 +1284,7 @@ function Get-Apps-From-List {
 	$Menu1 = if ($ListMode -eq "Purchase") { Get-Lang 'PurchasedListMenu1' } else { Get-Lang 'DownloadedListMenu1' }
 	$Menu2 = if ($ListMode -eq "Purchase") { Get-Lang 'PurchasedListMenu2' } else { Get-Lang 'DownloadedListMenu2' }
 	$Menu3 = if ($ListMode -eq "Purchase") { Get-Lang 'PurchasedListMenu3' } else { Get-Lang 'DownloadedListMenu3' }
-	$TargetFile = if ($ListMode -eq "Purchase") { "$PurchasedIDsFilePath" } else { "$DownloadedIDsFilePath" }
+	$TargetFile = if ($ListMode -eq "Purchase") { "$PurchasedAppsListFilePath" } else { "$DownloadedAppsListFilePath" }
 	$EmptyError = if ($ListMode -eq "Purchase") { "ErrorPurchasedEmpty" } else { "ErrorDownloadedEmpty" }
 	$List_Menu = @"
 $MenuTitle $(Get-Lang 'CancelStep')
@@ -1301,12 +1300,12 @@ $Menu3`n
 	
 	switch ($ListChoice) {
 		"1" {
-			Initialize-GitHub-List
-			if ($script:GitHubParsedList.Count -eq 0) {
+			Initialize-Repo-List
+			if ($script:RepoParsedList.Count -eq 0) {
 				Show-Error "ErrorListLoad"
 				return $null
 			}
-			foreach ($App in $script:GitHubParsedList) {
+			foreach ($App in $script:RepoParsedList) {
 				$Lines += "{0}: {1}" -f $App.Name, $App.Id
 			}
 		}
@@ -1321,8 +1320,8 @@ $Menu3`n
 		}
 		
 		"3" {
-			Initialize-GitHub-List
-			if ($script:GitHubParsedList.Count -eq 0) {
+			Initialize-Repo-List
+			if ($script:RepoParsedList.Count -eq 0) {
 				Show-Error "ErrorListLoad"
 				return $null
 			}
@@ -1335,7 +1334,7 @@ $Menu3`n
 				}
 			}
 			
-			foreach ($App in $script:GitHubParsedList) {
+			foreach ($App in $script:RepoParsedList) {
 				if ($App.Id -and $SavedIds -notcontains $App.Id) {
 					$Lines += "{0}: {1}" -f $App.Name, $App.Id
 				}
@@ -1595,11 +1594,8 @@ function Open-TipJar {
 
 # Функция первоначальной настройки:
 function Invoke-SetupWizard {
-	# Проверка авторизации (наличие файла login):
-	$IsLoggedIn = Test-Path $LoginFilePath
-	
-	# Очистка папки .ipatool, если авторизация не произведена:
-	if (-not $IsLoggedIn) {
+	# Удаление папки .ipatool:
+	if (!(Test-Path "$LoginFilePath")) {
 		Remove-Item -Path $ipatoolHomePath -Recurse -Force -ErrorAction SilentlyContinue
 	}
 	
@@ -1650,12 +1646,12 @@ foreach ($Dir in @("$AppsFolderPath", "$FilesFolderPath", "$MainAppFolderPath"))
 # Удаление временных файлов при запуске:
 Get-ChildItem -Path $PSScriptRoot -Filter "*.ipa.tmp" -File -ErrorAction SilentlyContinue | Remove-Item -Force -ErrorAction SilentlyContinue
 Get-ChildItem -Path $PSScriptRoot -Filter "*.ipa" -File -ErrorAction SilentlyContinue | Remove-Item -Force -ErrorAction SilentlyContinue
-if (Test-Path $AppsIDTempListPath) { Remove-Item $AppsIDTempListPath -Force -ErrorAction SilentlyContinue }
+if (Test-Path $AppsListTempPath) { Remove-Item $AppsListTempPath -Force -ErrorAction SilentlyContinue }
 if (Test-Path $WarningTempPath) { Remove-Item $WarningTempPath -Force -ErrorAction SilentlyContinue }
 
 # Функция режима IPA_Installer:
 function Invoke-InstallerMode {
-	# Удаление папки .ipatool (в случае неудачной авторизации ранее):
+	# Удаление папки .ipatool:
 	Remove-Item -Path $ipatoolHomePath -Recurse -Force -ErrorAction SilentlyContinue
 	
 	while ($true) {
@@ -1739,7 +1735,6 @@ function Invoke-Ipatool {
 
 # Функция режима IPA_Downloader:
 function Invoke-DownloaderMode {
-	
 	# Инициализация keychain-passphrase (только на Windows):
 	if ($IsWin) {
 		$KeychainFilePath = Join-Path -Path $ipatoolHomePath -ChildPath "keychain-passphrase"
@@ -1766,6 +1761,10 @@ function Invoke-DownloaderMode {
 	} else {
 		# Вывод меню с выбором при отсутствии авторизации:
 		while (!(Test-Path "$LoginFilePath")) {
+			# Удаление папки .ipatool:
+			Remove-Item -Path $ipatoolHomePath -Recurse -Force -ErrorAction SilentlyContinue
+			
+			# Вывод меню:
 			Separator
 			$LoginMenu = @"
 $(Get-Lang 'MenuTitle')
@@ -1885,7 +1884,7 @@ $(Get-Lang 'DownloaderMenu15')`n
 				}
 			}
 			
-			# 7. Вывод списка приложений и покупка (без загрузки):
+			# 7. Выбор списка приложений и покупка (без загрузки):
 			"7" {
 				Separator
 				$SelectedApps = Get-Apps-From-List -ListMode "Purchase"
@@ -1896,7 +1895,7 @@ $(Get-Lang 'DownloaderMenu15')`n
 				}
 			}
 			
-			# 8. Вывод списка приложений и загрузка последней версии:
+			# 8. Выбор списка приложений и загрузка последней версии:
 			"8" {
 				Separator
 				$SelectedApps = Get-Apps-From-List -ListMode "Download"
@@ -1907,7 +1906,7 @@ $(Get-Lang 'DownloaderMenu15')`n
 				}
 			}
 			
-			# 9. Вывод списка приложений и загрузка (с выбором версии):
+			# 9. Выбор списка приложений и загрузка (с выбором версии):
 			"9" {
 				Separator
 				$SelectedApps = Get-Apps-From-List -ListMode "Download"
@@ -1931,26 +1930,26 @@ $(Get-Lang 'DownloaderMenu15')`n
 			# 12. Очистка данных скрипта:
 			"12" {
 				Separator
-				$Clear_Menu = @"
+				$ClearMenu = @"
 $(Get-Lang 'ClearMenuTitle') $(Get-Lang 'CancelStep')
 $(Get-Lang 'ClearMenu1')
 $(Get-Lang 'ClearMenu2')
 $(Get-Lang 'ClearMenu3')`n
 "@
-				$ClearChoice = Read-MenuChoice -MenuText $Clear_Menu -OptionsCount 3 -AllowCancel
+				$ClearChoice = Read-MenuChoice -MenuText $ClearMenu -OptionsCount 3 -AllowCancel
 				
 				if ($ClearChoice -eq '0') { continue }
 				
-				switch ($ClearChoice) {					
+				switch ($ClearChoice) {
 					"1" {
-						if (!(Test-Path "$PurchasedIDsFilePath")) {
+						if (!(Test-Path "$PurchasedAppsListFilePath")) {
 							Show-Error "ErrorPurchasedEmpty"
 						} else {
-							$RawData = Get-Content "$PurchasedIDsFilePath" -Raw -Encoding UTF8
+							$RawData = Get-Content "$PurchasedAppsListFilePath" -Raw -Encoding UTF8
 							
 							# Очистка, если файл пуст или содержит только пустые скобки {}:
 							if ([string]::IsNullOrWhiteSpace($RawData) -or $RawData.Trim() -eq '{}') {
-								Remove-Item "$PurchasedIDsFilePath" -Force -ErrorAction SilentlyContinue
+								Remove-Item "$PurchasedAppsListFilePath" -Force -ErrorAction SilentlyContinue
 								Show-Error "ErrorPurchasedEmpty"
 								continue
 							}
@@ -1959,7 +1958,7 @@ $(Get-Lang 'ClearMenu3')`n
 							
 							# Очистка, если файл старого формата или без свойств:
 							if ($Data -isnot [System.Management.Automation.PSCustomObject] -or $Data.psobject.properties.Count -eq 0) {
-								Remove-Item "$PurchasedIDsFilePath" -Force -ErrorAction SilentlyContinue
+								Remove-Item "$PurchasedAppsListFilePath" -Force -ErrorAction SilentlyContinue
 								Separator
 								Write-Host (Get-Lang "PurchasedListCleared")
 								continue
@@ -1981,7 +1980,7 @@ $(Get-Lang 'ClearMenu3')`n
 							
 							if ([int]$AccChoice -eq $Counter) {
 								# Очистка, если выбрано "Все аккаунты":
-								Remove-Item "$PurchasedIDsFilePath" -Force -ErrorAction SilentlyContinue
+								Remove-Item "$PurchasedAppsListFilePath" -Force -ErrorAction SilentlyContinue
 								Separator
 								Write-Host (Get-Lang "PurchasedListCleared")
 							} else {
@@ -1990,10 +1989,10 @@ $(Get-Lang 'ClearMenu3')`n
 								
 								# Удаление файла, если в файле отсутствуют аккаунты:
 								if ($Accounts.Count -le 1) {
-									Remove-Item "$PurchasedIDsFilePath" -Force -ErrorAction SilentlyContinue
+									Remove-Item "$PurchasedAppsListFilePath" -Force -ErrorAction SilentlyContinue
 								} else {
 									$Data.psobject.properties.Remove($SelectedAcc)
-									$Data | ConvertTo-Json -Depth 5 | Set-Content "$PurchasedIDsFilePath" -Encoding UTF8
+									$Data | ConvertTo-Json -Depth 5 | Set-Content "$PurchasedAppsListFilePath" -Encoding UTF8
 								}
 								Separator
 								Write-Host ((Get-Lang "AccountCleared") -f $SelectedAcc)
@@ -2002,13 +2001,13 @@ $(Get-Lang 'ClearMenu3')`n
 					}
 					
 					"2" {
-						if (!(Test-Path "$DownloadedIDsFilePath")) {
+						if (!(Test-Path "$DownloadedAppsListFilePath")) {
 							Show-Error "ErrorDownloadedEmpty"
 						} else {
-							$RawData = Get-Content "$DownloadedIDsFilePath" -Raw -Encoding UTF8
+							$RawData = Get-Content "$DownloadedAppsListFilePath" -Raw -Encoding UTF8
 							
 							if ([string]::IsNullOrWhiteSpace($RawData) -or $RawData.Trim() -eq '{}') {
-								Remove-Item "$DownloadedIDsFilePath" -Force -ErrorAction SilentlyContinue
+								Remove-Item "$DownloadedAppsListFilePath" -Force -ErrorAction SilentlyContinue
 								Show-Error "ErrorDownloadedEmpty"
 								continue
 							}
@@ -2016,7 +2015,7 @@ $(Get-Lang 'ClearMenu3')`n
 							$Data = $RawData | ConvertFrom-Json
 							
 							if ($Data -isnot [System.Management.Automation.PSCustomObject] -or $Data.psobject.properties.Count -eq 0) {
-								Remove-Item "$DownloadedIDsFilePath" -Force -ErrorAction SilentlyContinue
+								Remove-Item "$DownloadedAppsListFilePath" -Force -ErrorAction SilentlyContinue
 								Separator
 								Write-Host (Get-Lang "DownloadedListCleared")
 								continue
@@ -2037,7 +2036,7 @@ $(Get-Lang 'ClearMenu3')`n
 							
 							if ([int]$AccChoice -eq $Counter) {
 								# Очистка, если выбрано "Все аккаунты":
-								Remove-Item "$DownloadedIDsFilePath" -Force -ErrorAction SilentlyContinue
+								Remove-Item "$DownloadedAppsListFilePath" -Force -ErrorAction SilentlyContinue
 								Separator
 								Write-Host (Get-Lang "DownloadedListCleared")
 							} else {
@@ -2046,10 +2045,10 @@ $(Get-Lang 'ClearMenu3')`n
 								
 								# Удаление файла, если в файле отсутствуют аккаунты:
 								if ($Accounts.Count -le 1) {
-									Remove-Item "$DownloadedIDsFilePath" -Force -ErrorAction SilentlyContinue
+									Remove-Item "$DownloadedAppsListFilePath" -Force -ErrorAction SilentlyContinue
 								} else {
 									$Data.psobject.properties.Remove($SelectedAcc)
-									$Data | ConvertTo-Json -Depth 5 | Set-Content "$DownloadedIDsFilePath" -Encoding UTF8
+									$Data | ConvertTo-Json -Depth 5 | Set-Content "$DownloadedAppsListFilePath" -Encoding UTF8
 								}
 								Separator
 								Write-Host ((Get-Lang "AccountCleared") -f $SelectedAcc)
@@ -2141,7 +2140,7 @@ while ($true) {
 		}
 	}
 	
-	# Загрузка файлов с GitHub и вывод предупреждения:
+	# Загрузка файлов из репозитория и вывод предупреждения:
 	if (-not $script:RemoteFilesInitialized) {
 		Initialize-RemoteFiles
 		Show-WarningMsg
