@@ -12,21 +12,19 @@ A script for purchasing/downloading any available App Store apps, as well as res
 ### Important:
 ipatool is an unofficial tool; therefore, using the script is only at your own risk.
 ### Script Features:
-#### IPA_Downloader:
-* Search for app and purchase (without downloading);
-* Search for app and download latest version;
-* Search for app and download (with version selection);
-* Enter app IDs and purchase (without downloading);
-* Enter app IDs and download latest version;
-* Enter app IDs and download (with version selection);
-* Show list of apps and purchase (without downloading);
-* Show list of apps and download latest version;
-* Show list of apps and download (with version selection);
-* Check minimum iOS version for apps in the IPA_Downloader/Apps folder;
-* Install apps from the IPA_Downloader/Apps folder.
-#### IPA_Installer:
-* Check minimum iOS version for apps in the IPA_Downloader/Apps folder;
-* Install apps from the IPA_Downloader/Apps folder.
+#### IPA_Downloader (downloading and installing apps):
+* Search for apps by name or ID and purchase (without downloading)
+* Search for apps by name or ID and download latest version
+* Search for apps by name or ID and download (with version selection)
+* Select an app list and purchase (without downloading)
+* Select an app list and download latest version
+* Select an app list and download (with version selection)
+* Check the minimum iOS version for apps in the Apps folder
+* Install apps from Apps folder
+
+#### IPA_Installer (installing apps):
+* Check the minimum iOS version for apps in the Apps folder
+* Install apps from Apps folder.
 
 #### The script CANNOT:
 * Download apps that have **NOT** been previously purchased from the App Store;
@@ -36,10 +34,11 @@ ipatool is an unofficial tool; therefore, using the script is only at your own r
 * To purchase or download apps, they must be previously acquired in the App Store;
 * Apps are downloaded directly from the App Store;
 * It is recommended to disable security keys and switch to standard two-factor authentication;
-* The script supports bulk purchasing/downloading of apps. Simply enter the index numbers (#) of the apps/versions from the tables, separated by commas or hyphens. For example, entering 1, 2, 3-5 will purchase/download the apps with index numbers (#) 1, 2, 3, 4, and 5.
+* The script supports bulk purchasing/downloading of apps. Simply enter the index numbers (#) of the apps/versions from the tables, separated by commas or hyphens. For example, entering 1, 2, 3-5 will purchase/download the apps with index numbers (#) 1, 2, 3, 4, and 5;
+* It is possible to create a custom list of applications; you just need to add data in the format `App name: its ID`, for example: `Google: 284815942` to the file Files/AppsListCustom.txt.
 
 ### General requirements for use:
-* Windows 7, 8.1, 10, 11 (x64);
+* Windows 7 - 11 (x64);
 * macOS starting from 10.15 Catalina (both Apple Silicon and Intel are supported);
 * Linux (x64 and ARM64: Arch Linux, Ubuntu, Debian, Fedora, etc.);
 * Stable internet connection;
@@ -47,9 +46,10 @@ ipatool is an unofficial tool; therefore, using the script is only at your own r
 
 ## Using on Windows:
 ### Windows requirements:
-* Installed AppleMobileDeviceSupport64 driver for supporting app installation via script (included in iTunes):  
+* To install downloaded apps via the script, the AppleMobileDeviceSupport64 driver is required (included in iTunes):  
 [Link to download iTunes from the Apple website](https://www.apple.com/itunes/download/win64)
-* Instead of a full iTunes installation, you can extract the iTunes installer with any archiver (7-Zip, WinRAR) and selectively install AppleMobileDeviceSupport64.msi.
+* Instead of a full iTunes installation, you can selectively install AppleMobileDeviceSupport64.msi by extracting the iTunes installer with any archiver (7-Zip, WinRAR).
+* The script works without this driver, but it is required to install downloaded apps on the device.
 
 ### Requirements for Windows 7 and 8.1:
 #### All steps must be performed strictly in the following order:
@@ -57,29 +57,16 @@ Download the complete set of programs/updates for Windows 7/8.1 via the link:
 [Link for the complete set of programs/updates](https://disk.yandex.ru/d/Fft0whzAz-C7Jg)
 
 #### 1. Update system certificates via UpdRootsCert:
-* Follow the link to download UpdRootsCert:  
-[Link to download UpdRootsCert](https://disk.yandex.ru/d/SdHMgwJ55MTQRg)  
-* Download the UpdRootsCert.exe file;  
-* Run the UpdRootsCert.exe file;  
-* Check the boxes: System Root Certificates, Add a monthly task to the Task Scheduler;  
+* Run the UpdRootsCert.exe file;
+* Check the boxes: System Root Certificates, Add a monthly task to the Task Scheduler;
 * Click the Install button.
 
 #### 2. Install .NET Framework 4.8:
-* Follow the link to download .NET Framework 4.8:  
-[Link to download .NET Framework 4.8](https://go.microsoft.com/fwlink/?linkid=2088631)  
-* Download the NDP48-x86-x64-AllOS-ENU.exe file;  
-* Run the NDP48-x86-x64-AllOS-ENU.exe file;  
+* Run the NDP48-x86-x64-AllOS-ENU.exe file;
 * Install .NET Framework 4.8 following the installation wizard instructions.
 
 #### 3. Install the KB3191566 update (to add PowerShell 5.1 support):
-* Follow the link to download KB3191566:  
-[Link to download KB3191566](https://www.microsoft.com/en-us/download/details.aspx?id=54616)  
-* Click the Download button;  
-* Check the boxes: Win7AndW2K8R2-KB3191566-x64.zip (for Windows 7) or Win8.1AndW2K12R2-KB3191564-x64.msu (for Windows 8.1);  
-* Click the Download button;  
-* Download the files: Win7AndW2K8R2-KB3191566-x64.zip (for Windows 7) or Win8.1AndW2K12R2-KB3191564-x64.msu (for Windows 8.1);  
-* Extract the Win7AndW2K8R2-KB3191566-x64.zip archive (for Windows 7);  
-* Run the files: Win7AndW2K8R2-KB3191566-x64.msu (for Windows 7) or Win8.1AndW2K12R2-KB3191564-x64.msu (for Windows 8.1);  
+* Run the files: Win7AndW2K8R2-KB3191566-x64.msu (for Windows 7) or Win8.1AndW2K12R2-KB3191564-x64.msu (for Windows 8.1);
 * Install the KB3191566 update following the installation wizard instructions.
 
 #### 4. Install the KB2999226 update:
@@ -87,16 +74,16 @@ Download the complete set of programs/updates for Windows 7/8.1 via the link:
 * Install the KB2999226 update following the installation wizard instructions.
 
 ### How to use (Windows):
-#### 1. Extract the IPA_Downloader.zip archive using any archiver;
+#### 1. Extract the IPA_Downloader.zip archive using any archiver (7-Zip, WinRAR);
 #### 2. Double-click the Start_IPA_Downloader.bat file;
 #### 3. On the first run, initial configuration is required:
 * Select language;
 * Press Enter;
 * When update is available, choose to either visit the repository to download new script version or continue with current version;
 * Press Enter.
-#### 4. By default, the script starts in IPA_Downloader mode:
+#### 4. By default, the script starts in IPA_Downloader mode (downloading and installing apps):
 * To log in enter the command: 1. Log in to Apple account;
-* Press Enter.
+* Press Enter;
 * Enter Apple account (Enter email:);
 * Press Enter;
 * Enter password (Enter password:);
@@ -152,15 +139,15 @@ eval "$(/opt/homebrew/bin/brew shellenv zsh)"
 * To update Homebrew and all its components, type in Terminal: `brew update && brew upgrade && brew cleanup` and press Enter.
 
 ### How to use (macOS):
-#### 1. Extract the IPA_Downloader.zip archive using any archiver;
+#### 1. Extract the IPA_Downloader.zip archive using any archiver (7-Zip, WinRAR);
 #### 2. Double-click the Start_IPA_Downloader.command file;
 * The first time, macOS will block Start_IPA_Downloader.command from running;
 * Click "Done" in the prompt that appears;
 * Click the Apple menu () in the top-left corner of the screen and select "System Settings...";
 * In the left sidebar, scroll down and select "Privacy & Security";
 * Scroll down the right side of the screen to the "Security" section;
-* Next to "Start_IPA_Downloader.command was blocked from use because it is not from an identified developer", click "Open Anyway";
-* In the pop-up window, click "Open Anyway";
+* Next to "“Start_IPA_Downloader” was blocked to protect your Mac", click "Open Anyway";
+* In the pop-up window "Open “Start_IPA_Downloader”?", click "Open Anyway";
 * Enter your Mac password or use Touch ID;
 * If necessary, double-click the Start_IPA_Downloader.command file again.
 #### 3. On the first run, initial configuration is required:
@@ -168,9 +155,9 @@ eval "$(/opt/homebrew/bin/brew shellenv zsh)"
 * Press Enter;
 * When update is available, choose to either visit the repository to download new script version or continue with current version;
 * Press Enter.
-#### 4. By default, the script starts in IPA_Downloader mode:
+#### 4. By default, the script starts in IPA_Downloader mode (downloading and installing apps):
 * To log in enter the command: 1. Log in to Apple account;
-* Press Enter.
+* Press Enter;
 * Enter Apple account (Enter email:);
 * Press Enter;
 * Enter password (Enter password:);
@@ -189,20 +176,20 @@ eval "$(/opt/homebrew/bin/brew shellenv zsh)"
 ### Linux requirements:
 #### Install the required packages:
 #### Arch Linux / Manjaro:
-  * Install PowerShell: `sudo pacman -S powershell-bin` (or via AUR: `yay -S powershell-bin`)
-  * Install iOS utilities: `sudo pacman -S ideviceinstaller usbmuxd`
-  * Enable usbmuxd service: `sudo systemctl enable --now usbmuxd`
+* Install PowerShell: `sudo pacman -S powershell-bin` (or via AUR: `yay -S powershell-bin`)
+* Install iOS utilities: `sudo pacman -S ideviceinstaller usbmuxd`
+* Enable usbmuxd service: `sudo systemctl enable --now usbmuxd`
 #### Ubuntu / Debian:
-  * Install PowerShell: [Microsoft Instructions](https://learn.microsoft.com/powershell/scripting/install/install-ubuntu) or `sudo apt install powershell`
-  * Install iOS utilities: `sudo apt install ideviceinstaller usbmuxd`
-  * Enable usbmuxd service: `sudo systemctl enable --now usbmuxd`
+* Install PowerShell: [Microsoft Instructions](https://learn.microsoft.com/powershell/scripting/install/install-ubuntu) or `sudo apt install powershell`
+* Install iOS utilities: `sudo apt install ideviceinstaller usbmuxd`
+* Enable usbmuxd service: `sudo systemctl enable --now usbmuxd`
 #### Fedora / RHEL:
-  * Install PowerShell: `sudo dnf install powershell`
-  * Install iOS utilities: `sudo dnf install ideviceinstaller usbmuxd`
-  * Enable usbmuxd service: `sudo systemctl enable --now usbmuxd`
+* Install PowerShell: `sudo dnf install powershell`
+* Install iOS utilities: `sudo dnf install ideviceinstaller usbmuxd`
+* Enable usbmuxd service: `sudo systemctl enable --now usbmuxd`
 
 ### How to use (Linux):
-#### 1. Extract the IPA_Downloader archive using any archiver;
+#### 1. Extract the IPA_Downloader archive using any archiver (7-Zip, WinRAR);
 #### 2. Make the launcher script executable (if needed):
 * Type in Terminal: `chmod +x Start_IPA_Downloader.sh`
 * Press Enter.
@@ -214,9 +201,9 @@ eval "$(/opt/homebrew/bin/brew shellenv zsh)"
 * Press Enter;
 * When update is available, choose to either visit the repository to download new script version or continue with current version;
 * Press Enter.
-#### 5. By default, the script starts in IPA_Downloader mode:
+#### 5. By default, the script starts in IPA_Downloader mode (downloading and installing apps):
 * To log in enter the command: 1. Log in to Apple account;
-* Press Enter.
+* Press Enter;
 * Enter Apple account (Enter email:);
 * Press Enter;
 * Enter password (Enter password:);
@@ -229,111 +216,129 @@ eval "$(/opt/homebrew/bin/brew shellenv zsh)"
 * Press Enter.
 
 ## Script commands description:
-### IPA_Downloader:
-#### 1. Search for app and purchase (without downloading):
-* Enter the app name to search;
+### IPA_Downloader (downloading and installing apps):
+#### 1. Search for apps by name or ID and purchase (without downloading):
+* Enter the app name or app IDs (separated by commas) to search;
 * Press Enter;
-* A list of found apps will be displayed;
+* If an app name is entered, a list of found apps will be displayed;
 * Enter the index numbers (#) of the apps to purchase;
 * Press Enter;
 * The script will purchase the selected apps.
-#### 2. Search for app and download latest version:
-* Enter the app name to search;
+
+* If app IDs are entered, the script will purchase the specified apps.
+#### 2. Search for apps by name or ID and download latest version:
+* Enter the app name or app IDs (separated by commas) to search;
 * Press Enter;
-* A list of found apps will be displayed;
+* If an app name is entered, a list of found apps will be displayed;
 * Enter the index numbers (#) of the apps to download;
 * Press Enter;
 * The script will download the selected apps.
-#### 3. Search for app and download (with version selection):
-* Enter the app name to search;
+
+* If app IDs are entered, the script will download the specified apps.
+#### 3. Search for apps by name or ID and download (with version selection):
+* Enter the app name or app IDs (separated by commas) to search;
 * Press Enter;
-* A list of found apps will be displayed;
+* If an app name is entered, a list of found apps will be displayed;
 * Enter the index numbers (#) of the apps to display app version IDs;
 * Press Enter;
 * A list of app version IDs will be displayed (from the first to the latest);
-* Enter the index numbers (#) of the app version IDs to download;
+* Enter the index numbers (#) of the app version IDs to display app versions;
+* Press Enter;
+* A list of app versions will be displayed;
+* Enter the index numbers (#) of the app versions to download;
 * Press Enter;
 * The script will download the selected app versions.
-#### 4. Enter app IDs and purchase (without downloading):
-* Enter the app IDs to purchase (in the format 1, 2, 3);
-* Press Enter;
-* The script will purchase the selected apps.
-#### 5. Enter app IDs and download latest version:
-* Enter the app IDs to download (in the format 1, 2, 3);
-* Press Enter;
-* The script will download the selected apps.
-#### 6. Enter app IDs and download (with version selection):
-* Enter the app IDs to download (in the format 1, 2, 3);
-* Press Enter;
-* Enter the index numbers (#) of the apps to download;
-* Press Enter;
+
+* If app IDs are entered:
 * A list of app version IDs will be displayed (from the first to the latest);
-* Enter the index numbers (#) of the app version IDs to download;
+* Enter the index numbers (#) of the app version IDs to display app versions;
+* Press Enter;
+* A list of app versions will be displayed;
+* Enter the index numbers (#) of the app versions to download;
 * Press Enter;
 * The script will download the selected app versions.
-#### 7. Select an app list and purchase (without downloading):
-* Enter the list of apps to display (full apps list, list of apps purchased by the script, list of apps not purchased by the script);
+#### 4. Select an app list and purchase (without downloading):
+* Select the app list to display:
+1. Main apps list (Files/AppsList.txt);  
+2. Custom apps list (Files/AppsListCustom.txt);  
+3. List of apps purchased by the script (Files/PurchasedAppsList.json);  
+4. List of not purchased apps by the script.  
 * Press Enter;
 * The selected list will be displayed;
 * Enter the index numbers (#) of the apps to purchase;
 * Press Enter;
 * The script will purchase the selected apps.
-#### 8. Select an app list and download latest version:
-* Enter the list of apps to display (full apps list, list of apps downloaded by the script, list of apps not downloaded by the script);
+#### 5. Select an app list and download latest version:
+* Select the app list to display:
+1. Main apps list (Files/AppsList.txt);  
+2. Custom apps list (Files/AppsListCustom.txt);  
+3. List of apps downloaded by the script (Files/DownloadedAppsList.json);  
+4. List of apps not downloaded by the script.  
 * Press Enter;
 * The selected list will be displayed;
 * Enter the index numbers (#) of the apps to download;
 * Press Enter;
 * The script will download the selected apps.
-#### 9. Select an app list and download (with version selection):
-* Enter the list of apps to display (full apps list, list of apps downloaded by the script, list of apps not downloaded by the script);
+#### 6. Select an app list and download (with version selection):
+* Select the app list to display:
+1. Main apps list (Files/AppsList.txt);  
+2. Custom apps list (Files/AppsListCustom.txt);  
+3. List of apps downloaded by the script (Files/DownloadedAppsList.json);  
+4. List of apps not downloaded by the script.  
 * Press Enter;
+* The selected list will be displayed;
 * Enter the index numbers (#) of the apps to download;
 * Press Enter;
 * A list of app version IDs will be displayed (from the first to the latest);
-* Enter the index numbers (#) of the app version IDs to download;
+* Enter the index numbers (#) of the app version IDs to display app versions;
+* Press Enter;
+* A list of app versions will be displayed;
+* Enter the index numbers (#) of the app versions to download;
 * Press Enter;
 * The script will download the selected app versions.
-#### 10. Check minimum iOS version for apps in the IPA_Downloader/Apps folder:
-* Apps must be located in the IPA_Downloader/Apps path;
-* The script will check the minimum iOS version required for the app to work.
-#### 11. Install apps from the IPA_Downloader/Apps folder:
+#### 7. Check the minimum iOS version for apps in the Apps folder:
+* Apps must be located in the Apps folder;
+* The script will check the minimum iOS version required to install the app.
+#### 8. Install apps from Apps folder:
 * Connect the device using a cable;
-* Apps must be located in the IPA_Downloader/Apps path;
+* Apps must be located in the Apps folder;
 * Enter the index numbers (#) of the apps to install on the device;
 * Press Enter;
 * The script will install the selected apps on the device.
-#### 12. Clear data:
-* Enter the data list to clear (list of apps downloaded by the script, list of apps purchased by the script, apps in the IPA_Downloader/Apps folder);
+#### 9. Clear data:
+* Select the data to clear:
+1. List of apps purchased by the script (Files/PurchasedAppsList.json);  
+2. List of apps downloaded by the script (Files/DownloadedAppsList.json);  
+3. Apps in Apps folder.  
 * Press Enter;
-* When choosing to clear either the downloaded apps list or the purchased apps list, select the specific account you want to clear;
+* When choosing to clear the list of apps purchased by the script or the list of apps downloaded by the script, select the Apple account to clear;
 * Press Enter;
 * The script will clear the selected data type.
-#### 13. Log out of Apple account and reset settings:
+#### 10. Log out of Apple account and reset settings:
 * The script will log out of the Apple account and reset all settings.
-#### 14. Tip Jar:
+#### 11. Tip Jar:
 * The script will navigate to the CloudTips page.
-#### 15. Change Language:
+#### 12. Change Language (Сменить язык):
 * The script will change its interface language.
 #### debug
 * Enable/disable debug mode.
 
-### IPA_Installer:
-#### 1. Check minimum iOS version for apps in the IPA_Downloader/Apps folder:
-* Apps must be located in the IPA_Downloader/Apps path;
-* The script will check the minimum iOS version required for the app to work.
-#### 2. Install apps from the IPA_Downloader/Apps folder:
+### IPA_Installer (installing apps):
+#### 1. Check the minimum iOS version for apps in the Apps folder:
+* Apps must be located in the Apps folder;
+* The script will check the minimum iOS version required to install the app.
+#### 2. Install apps from Apps folder:
 * Connect the device using a cable;
-* Apps must be located in the IPA_Downloader/Apps path;
+* Apps must be located in the Apps folder;
 * Enter the index numbers (#) of the apps to install on the device;
 * Press Enter;
 * The script will install the selected apps on the device.
 #### 3. Tip Jar:
 * The script will navigate to the CloudTips page.
-#### 4. Change Language:
+#### 4. Change Language (Сменить язык):
 * The script will change its interface language.
 #### 5. Switch to IPA_Downloader:
-* The script will switch the mode to IPA_Downloader.
+* The script will switch the mode to IPA_Downloader (downloading and installing apps).
 #### debug
 * Enable/disable debug mode.
 
@@ -370,6 +375,10 @@ If the app is installed on your device, press and hold the app icon:
 * The Share App option will appear;
 * Copy the link and paste it into a browser;
 * Copy the numeric identifier (the value after id in the URL).
+
+#### Option 3:
+[AppMagic website](https://appmagic.rocks/top-charts/apps)  
+
 ### Tracking new app releases:
 [The topic on the 4PDA](https://4pda.to/forum/index.php?showtopic=1046078)  
 [AppBank Website](https://pwa.appbank.pw/)
