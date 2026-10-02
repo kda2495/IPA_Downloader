@@ -2,7 +2,7 @@
 Set-Location -Path $PSScriptRoot
 
 # Версия скрипта:
-$ScriptVersion = "4.1.0"
+$ScriptVersion = "4.1.1"
 
 # Определение операционной системы:
 $IsWin = [System.Runtime.InteropServices.RuntimeInformation]::IsOSPlatform([System.Runtime.InteropServices.OSPlatform]::Windows)
@@ -83,6 +83,7 @@ $PurchasedAppsListFilePath = Join-Path -Path $FilesFolderPath -ChildPath "Purcha
 $AppsFolderPath = Join-Path -Path $PSScriptRoot -ChildPath "Apps"
 $ipatoolHomePath = Join-Path -Path $HOME -ChildPath ".ipatool"
 $LoginFilePath = Join-Path -Path $ipatoolHomePath -ChildPath "login"
+$AccountFilePath = Join-Path -Path $ipatoolHomePath -ChildPath "account"
 $AuthFileNames = @("account", "cookies", "login")
 $TempFolderPath = [System.IO.Path]::GetTempPath()
 $TempIpaFilePath = Join-Path -Path $TempFolderPath -ChildPath "Temp.ipa"
@@ -2139,6 +2140,11 @@ function Invoke-DownloaderMode {
 	} else {
 		# Формирование пустой keychain-passphrase для macOS, Linux:
 		$script:Kp = ""
+	}
+	
+	# Удаление файла login, если файл account отсутствует:
+	if (!(Test-Path $AccountFilePath)) {
+		Remove-Item -Path $LoginFilePath -Force -ErrorAction SilentlyContinue
 	}
 	
 	# Проверка осуществленного входа с аккаунтом Apple:
