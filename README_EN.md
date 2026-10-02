@@ -377,7 +377,9 @@ If the app is installed on your device, press and hold the app icon:
 * Copy the numeric identifier (the value after id in the URL).
 
 #### Option 3:
-[AppMagic website](https://appmagic.rocks/top-charts/apps)  
+You can view the full list of purchased apps via the website [reportaproblem.apple.com](https://reportaproblem.apple.com)  
+Next, enter the app name in the search box on the [appmagic.rocks](https://appmagic.rocks/top-charts/apps) website and go to the app’s page.  
+On the app page, select Select App with the App Store icon and copy the ID from the browser’s address bar.  
 
 ### Tracking new app releases:
 [The topic on the 4PDA](https://4pda.to/forum/index.php?showtopic=1046078)  

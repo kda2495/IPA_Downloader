@@ -373,7 +373,9 @@ eval "$(/opt/homebrew/bin/brew shellenv zsh)"
 * Скопируйте числовой идентификатор (значение после id в адресе ссылки).
 
 ### Вариант 3:
-[Сайт AppMagic](https://appmagic.rocks/top-charts/apps)  
+Посмотреть полный список купленных приложений можно через сайт [reportaproblem.apple.com](https://reportaproblem.apple.com)  
+Далее название приложения введите в окне поиска на сайте [appmagic.rocks](https://appmagic.rocks/top-charts/apps?country=RU&store=2) и перейдите на страницу приложения.  
+На странице приложения выберите Select App с иконкой App Store и скопируйте ID из адресной строки браузера.  
 
 ### Отслеживание выхода новых приложений:
 [Тема на 4PDA](https://4pda.to/forum/index.php?showtopic=1046078)  
