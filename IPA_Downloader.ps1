@@ -2,7 +2,7 @@
 Set-Location -Path $PSScriptRoot
 
 # Версия скрипта:
-$ScriptVersion = "4.0.9"
+$ScriptVersion = "4.1.0"
 
 # Определение операционной системы:
 $IsWin = [System.Runtime.InteropServices.RuntimeInformation]::IsOSPlatform([System.Runtime.InteropServices.OSPlatform]::Windows)
@@ -83,6 +83,7 @@ $PurchasedAppsListFilePath = Join-Path -Path $FilesFolderPath -ChildPath "Purcha
 $AppsFolderPath = Join-Path -Path $PSScriptRoot -ChildPath "Apps"
 $ipatoolHomePath = Join-Path -Path $HOME -ChildPath ".ipatool"
 $LoginFilePath = Join-Path -Path $ipatoolHomePath -ChildPath "login"
+$AuthFileNames = @("account", "cookies", "login")
 $TempFolderPath = [System.IO.Path]::GetTempPath()
 $TempIpaFilePath = Join-Path -Path $TempFolderPath -ChildPath "Temp.ipa"
 $AppsListPath = Join-Path -Path $FilesFolderPath -ChildPath "AppsList.txt"
@@ -139,6 +140,14 @@ $script:RepoParsedList = $null
 $LangStrings = @{
 	"RU" = @{
 		"AccountCleared" = "Готово. Данные аккаунта {0} удалены."
+		"AccountCurrent" = "(текущий)"
+		"AccountLoggedOut" = "Выполнен выход из аккаунта Apple: {0}"
+		"AccountLogoutMenuTitle" = "Выберите аккаунты Apple для выхода"
+		"AccountMenu1" = "1. Добавить аккаунт"
+		"AccountMenu2" = "2. Сменить аккаунт"
+		"AccountMenu3" = "3. Выйти из аккаунта Apple"
+		"AccountMenuTitle" = "Операции с аккаунтом Apple"
+		"AccountSwitchMenuTitle" = "Выберите аккаунт Apple для перехода"
 		"AddedToDownloadedAppsList" = "Добавлено в список приложений, загруженных скриптом (Files/DownloadedAppsList.json):`n{0} (ID: {1})"
 		"AddedToPurchasedAppsList" = "Добавлено в список приложений, приобретенных скриптом (Files/PurchasedAppsList.json):`n{0} (ID: {1})"
 		"AlreadyInList" = "Уже есть в списке: {0} (ID: {1})"
@@ -173,7 +182,7 @@ $LangStrings = @{
 		"DownloaderMenu7" = "7. Проверка минимальной версии iOS для приложений в папке Apps"
 		"DownloaderMenu8" = "8. Установка приложений из папки Apps"
 		"DownloaderMenu9" = "9. Очистка данных"
-		"DownloaderMenu10" = "10. Выход из аккаунта Apple и сброс настроек"
+		"DownloaderMenu10" = "10. Операции с аккаунтом Apple"
 		"DownloaderMenu11" = "11. Банка для чаевых"
 		"DownloaderMenu12" = "12. Сменить язык (Change Language)"
 		"ErrorAppsListCustomEmpty" = "Ошибка: Пользовательский список приложений пуст.`nДобавьте приложения в Files/AppsListCustom.txt"
@@ -186,6 +195,7 @@ $LangStrings = @{
 		"ErrorMissingFiles" = "Ошибка. Следующие файлы не найдены:"
 		"ErrorNoApps" = "Ошибка: В папке Apps отсутствуют приложения."
 		"ErrorNoAppsFound" = "Ошибка: Приложения не найдены."
+		"ErrorNoOtherAccounts" = "Ошибка: Других аккаунтов Apple не найдено."
 		"ErrorNoVersionsFound" = "Ошибка: Версии приложения не найдены."
 		"ErrorOpenUrl" = "Ошибка: Не удалось открыть страницу."
 		"ErrorPurchasedAppsListEmpty" = "Ошибка: История покупок пуста."
@@ -218,6 +228,7 @@ $LangStrings = @{
 		"LoginMenu1" = "1. Войти в аккаунт Apple"
 		"LoginMenu2" = "2. Перейти в режим IPA_Installer"
 		"LoginMenu3" = "3. Сменить язык (Change Language)"
+		"LogoutAllAccounts" = "Выйти из всех аккаунтов Apple и сбросить настройки скрипта"
 		"MenuTitle" = "Введите команду:"
 		"MinIOS" = "Минимальная версия iOS для установки:"
 		"PurchasedAppsListCleared" = "Готово. Список приложений, приобретенных скриптом (Files/PurchasedAppsList.json), очищен."
@@ -233,6 +244,14 @@ $LangStrings = @{
 	}
 	"EN" = @{
 		"AccountCleared" = "Done. Account {0} data cleared."
+		"AccountCurrent" = "(current)"
+		"AccountLoggedOut" = "Successfully logged out of Apple account: {0}"
+		"AccountLogoutMenuTitle" = "Select Apple accounts to log out of"
+		"AccountMenu1" = "1. Add account"
+		"AccountMenu2" = "2. Switch account"
+		"AccountMenu3" = "3. Log out of Apple account"
+		"AccountMenuTitle" = "Apple account operations"
+		"AccountSwitchMenuTitle" = "Select Apple account to switch to"
 		"AddedToDownloadedAppsList" = "Added to list of apps downloaded by the script (Files/DownloadedAppsList.json):`n{0} (ID: {1})"
 		"AddedToPurchasedAppsList" = "Added to list of apps purchased by the script (Files/PurchasedAppsList.json):`n{0} (ID: {1})"
 		"AlreadyInList" = "Already in list: {0} (ID: {1})"
@@ -267,7 +286,7 @@ $LangStrings = @{
 		"DownloaderMenu7" = "7. Check the minimum iOS version for apps in the Apps folder"
 		"DownloaderMenu8" = "8. Install apps from Apps folder"
 		"DownloaderMenu9" = "9. Clear data"
-		"DownloaderMenu10" = "10. Log out of Apple account and reset settings"
+		"DownloaderMenu10" = "10. Apple account operations"
 		"DownloaderMenu11" = "11. Tip Jar"
 		"DownloaderMenu12" = "12. Change Language (Сменить язык)"
 		"ErrorAppsListCustomEmpty" = "Error: Custom apps list is empty.`nAdd apps to the Files/AppsListCustom.txt file"
@@ -280,6 +299,7 @@ $LangStrings = @{
 		"ErrorMissingFiles" = "Error. Following files were not found:"
 		"ErrorNoApps" = "Error: No apps found in Apps folder."
 		"ErrorNoAppsFound" = "Error: No apps found."
+		"ErrorNoOtherAccounts" = "Error: No other Apple accounts found."
 		"ErrorNoVersionsFound" = "Error: No app versions found."
 		"ErrorOpenUrl" = "Error: Failed to open the page."
 		"ErrorPurchasedAppsListEmpty" = "Error: Purchase history is empty."
@@ -312,6 +332,7 @@ $LangStrings = @{
 		"LoginMenu1" = "1. Log in to Apple account"
 		"LoginMenu2" = "2. Switch to IPA_Installer mode"
 		"LoginMenu3" = "3. Change Language (Сменить язык)"
+		"LogoutAllAccounts" = "Log out of all Apple accounts and reset script settings"
 		"MenuTitle" = "Enter a command:"
 		"MinIOS" = "Minimum iOS version required to install:"
 		"PurchasedAppsListCleared" = "Done. List of apps purchased by the script (Files/PurchasedAppsList.json) cleared."
@@ -551,11 +572,208 @@ function Connect-AppleAccount {
 				$SecureKp | ConvertFrom-SecureString | Set-Content -Path $KeychainFilePath -Force
 			}
 		} else {
-			# Удаление папки .ipatool:
-			Remove-Item -Path $ipatoolHomePath -Recurse -Force -ErrorAction SilentlyContinue
+			# Удаление файлов авторизации:
+			Clear-ActiveAccountFiles
 		}
 	}
 	Get-Current-AppleAccount
+	
+	# Удаление ранее сохраненной папки аккаунта:
+	$OldAccountFolderPath = Join-Path -Path $ipatoolHomePath -ChildPath $script:CurrentAppleAccount
+	if ($OldAccountFolderPath -ne $ipatoolHomePath -and (Test-Path $OldAccountFolderPath)) {
+		Remove-Item -Path $OldAccountFolderPath -Recurse -Force -ErrorAction SilentlyContinue
+	}
+}
+
+# Функция получения списка сохраненных аккаунтов Apple:
+function Get-SavedAppleAccounts {
+	if (!(Test-Path $ipatoolHomePath)) {
+		return @()
+	}
+	
+	return @(Get-ChildItem -Path $ipatoolHomePath -Directory -ErrorAction SilentlyContinue | Sort-Object Name | ForEach-Object { $_.Name })
+}
+
+# Функция сохранения файлов авторизации текущего аккаунта в папку с названием аккаунта:
+function Save-ActiveAccountFiles {
+	param ([string]$Account)
+	
+	$AccountFolderPath = Join-Path -Path $ipatoolHomePath -ChildPath $Account
+	$null = New-Item -Path $AccountFolderPath -ItemType Directory -Force
+	
+	foreach ($FileName in $AuthFileNames) {
+		$SourcePath = Join-Path -Path $ipatoolHomePath -ChildPath $FileName
+		if (Test-Path $SourcePath) {
+			Move-Item -Path $SourcePath -Destination $AccountFolderPath -Force
+		}
+	}
+}
+
+# Функция возврата файлов авторизации сохраненного аккаунта из папки с названием аккаунта в .ipatool:
+function Restore-SavedAccountFiles {
+	param ([string]$Account)
+	
+	$AccountFolderPath = Join-Path -Path $ipatoolHomePath -ChildPath $Account
+	
+	foreach ($FileName in $AuthFileNames) {
+		$SourcePath = Join-Path -Path $AccountFolderPath -ChildPath $FileName
+		if (Test-Path $SourcePath) {
+			Move-Item -Path $SourcePath -Destination $ipatoolHomePath -Force
+		}
+	}
+	
+	# Удаление пустой папки аккаунта:
+	Remove-Item -Path $AccountFolderPath -Recurse -Force -ErrorAction SilentlyContinue
+}
+
+# Функция удаления файлов авторизации текущего аккаунта:
+function Clear-ActiveAccountFiles {
+	foreach ($FileName in $AuthFileNames) {
+		Remove-Item -Path (Join-Path -Path $ipatoolHomePath -ChildPath $FileName) -Force -ErrorAction SilentlyContinue
+	}
+	
+	# Удаление папки .ipatool, если сохраненных аккаунтов нет:
+	if (@(Get-SavedAppleAccounts).Count -eq 0) {
+		Remove-Item -Path $ipatoolHomePath -Recurse -Force -ErrorAction SilentlyContinue
+	}
+}
+
+# Функция перехода на сохраненный аккаунт Apple:
+function Switch-AppleAccount {
+	param ([string]$Account)
+	
+	# Сохранение файлов текущего аккаунта в папку с названием аккаунта:
+	if (Test-Path "$LoginFilePath") {
+		Save-ActiveAccountFiles -Account $script:CurrentAppleAccount
+	}
+	
+	# Возврат файлов выбранного аккаунта:
+	Restore-SavedAccountFiles -Account $Account
+	Get-Current-AppleAccount
+}
+
+# Функция выбора сохраненного аккаунта Apple для перехода:
+function Select-AppleAccount {
+	param ([switch]$AllowCancel)
+	
+	$Accounts = @(Get-SavedAppleAccounts)
+	if ($Accounts.Count -eq 0) {
+		Show-Error "ErrorNoOtherAccounts"
+		return
+	}
+	
+	$AccountMenuText = "$(Get-Lang 'AccountSwitchMenuTitle')"
+	if ($AllowCancel) {
+		$AccountMenuText += " $(Get-Lang 'CancelStep')"
+	}
+	$AccountMenuText += "`n"
+	$Counter = 1
+	foreach ($Account in $Accounts) {
+		$AccountMenuText += "$Counter. $Account`n"
+		$Counter++
+	}
+	
+	Separator
+	$AccountChoice = Read-MenuChoice -MenuText $AccountMenuText -OptionsCount $Accounts.Count -AllowCancel:$AllowCancel
+	if ($AccountChoice -eq '0') { return }
+	
+	Switch-AppleAccount -Account $Accounts[[int]$AccountChoice - 1]
+}
+
+# Функция добавления аккаунта Apple:
+function Add-AppleAccount {
+	$PreviousAccount = $script:CurrentAppleAccount
+	
+	# Сохранение файлов текущего аккаунта в папку с названием аккаунта:
+	Save-ActiveAccountFiles -Account $PreviousAccount
+	
+	try {
+		# Вход в новый аккаунт Apple:
+		Connect-AppleAccount
+	}
+	finally {
+		# Возврат предыдущего аккаунта, если вход не завершен:
+		if (!(Test-Path "$LoginFilePath")) {
+			Clear-ActiveAccountFiles
+			Restore-SavedAccountFiles -Account $PreviousAccount
+		}
+	}
+}
+
+# Функция выхода из всех аккаунтов Apple и сброса настроек:
+function Reset-AllAppleAccounts {
+	Separator
+	Write-Host (Get-Lang "LoggedOut")
+	Invoke-Ipatool auth revoke
+	
+	# Удаление файлов настроек и папки .ipatool:
+	Remove-Item -Path $SettingsFilePath -Force -ErrorAction SilentlyContinue
+	Remove-Item -Path $ipatoolHomePath -Recurse -Force -ErrorAction SilentlyContinue
+	
+	# Сброс режима работы:
+	$script:WorkMode = $null
+}
+
+# Функция выхода из выбранного аккаунта Apple:
+function Invoke-AppleAccountLogout {
+	# Формирование списка аккаунтов:
+	$SavedAccounts = @(Get-SavedAppleAccounts)
+	$Accounts = @($script:CurrentAppleAccount) + $SavedAccounts
+	
+	$AccountMenuText = "$(Get-Lang 'AccountLogoutMenuTitle') $(Get-Lang 'CancelStep')`n"
+	$Counter = 1
+	foreach ($Account in $Accounts) {
+		$CurrentMark = if ($Counter -eq 1) { " $(Get-Lang 'AccountCurrent')" } else { "" }
+		$AccountMenuText += "$Counter. $Account$CurrentMark`n"
+		$Counter++
+	}
+	$AccountMenuText += "$Counter. $(Get-Lang 'LogoutAllAccounts')`n"
+	
+	Separator
+	$AccountChoice = Read-MenuChoice -MenuText $AccountMenuText -OptionsCount $Counter -AllowCancel
+	if ($AccountChoice -eq '0') { return }
+	
+	# Выход из аккаунтов Apple и сброс настроек скрипта:
+	if ([int]$AccountChoice -eq $Counter -or $Accounts.Count -eq 1) {
+		Reset-AllAppleAccounts
+		return
+	}
+	
+	$SelectedAccount = $Accounts[[int]$AccountChoice - 1]
+	
+	if ($AccountChoice -eq '1') {
+		# Выход из текущего аккаунта:
+		Separator
+		Write-Host ((Get-Lang "AccountLoggedOut") -f $SelectedAccount)
+		Invoke-Ipatool auth revoke
+		Clear-ActiveAccountFiles
+		
+		# Выбор аккаунта для перехода:
+		Select-AppleAccount
+	} else {
+		# Удаление сохраненного аккаунта:
+		Remove-Item -Path (Join-Path -Path $ipatoolHomePath -ChildPath $SelectedAccount) -Recurse -Force -ErrorAction SilentlyContinue
+		Separator
+		Write-Host ((Get-Lang "AccountLoggedOut") -f $SelectedAccount)
+	}
+}
+
+# Функция меню операций с аккаунтом Apple:
+function Invoke-AccountMenu {
+	Separator
+	$AccountMenu = @"
+$(Get-Lang 'AccountMenuTitle') $(Get-Lang 'CancelStep')
+$(Get-Lang 'AccountMenu1')
+$(Get-Lang 'AccountMenu2')
+$(Get-Lang 'AccountMenu3')`n
+"@
+	$AccountChoice = Read-MenuChoice -MenuText $AccountMenu -OptionsCount 3 -AllowCancel
+	
+	switch ($AccountChoice) {
+		"1" { Add-AppleAccount }
+		"2" { Select-AppleAccount -AllowCancel }
+		"3" { Invoke-AppleAccountLogout }
+	}
 }
 
 # Функция извлечения метаданных из ipa:
@@ -1063,7 +1281,7 @@ function IPA-Download-With-Version {
 	)
 	if (!(Test-NumericInput -InputValue $AppId)) { return }
 	
-	$RawOutput = Invoke-Ipatool list-versions -i $AppId
+	$RawOutput = Invoke-Ipatool list-versions -i $AppId --purchase
 	
 	if ($RawOutput -match "Error:") {
 		Write-Host $RawOutput -ForegroundColor DarkRed
@@ -1755,9 +1973,9 @@ function Open-TipJar {
 
 # Функция первоначальной настройки:
 function Invoke-SetupWizard {
-	# Удаление папки .ipatool:
+	# Удаление файлов авторизации:
 	if (!(Test-Path "$LoginFilePath")) {
-		Remove-Item -Path $ipatoolHomePath -Recurse -Force -ErrorAction SilentlyContinue
+		Clear-ActiveAccountFiles
 	}
 	
 	# Запрос выбора языка:
@@ -1821,10 +2039,11 @@ if (Test-Path $WarningTempPath) { Remove-Item $WarningTempPath -Force -ErrorActi
 
 # Функция режима IPA_Installer:
 function Invoke-InstallerMode {
-	# Удаление папки .ipatool:
-	Remove-Item -Path $ipatoolHomePath -Recurse -Force -ErrorAction SilentlyContinue
+	# Удаление файлов авторизации:
+	Clear-ActiveAccountFiles
 	
 	while ($true) {
+		# Вывод меню IPA_Installer:
 		Separator
 		$Installer_Menu = @"
 $(Get-Lang 'MenuTitle')
@@ -1924,15 +2143,11 @@ function Invoke-DownloaderMode {
 	
 	# Проверка осуществленного входа с аккаунтом Apple:
 	if (Test-Path "$LoginFilePath") {
-		Separator
-		Write-Host (Get-Lang "AuthSuccess")
-		Invoke-Ipatool auth info
 		Get-Current-AppleAccount
 	} else {
-		# Вывод меню с выбором при отсутствии авторизации:
 		while (!(Test-Path "$LoginFilePath")) {
-			# Удаление папки .ipatool:
-			Remove-Item -Path $ipatoolHomePath -Recurse -Force -ErrorAction SilentlyContinue
+			# Удаление файлов авторизации:
+			Clear-ActiveAccountFiles
 			
 			# Вывод меню:
 			Separator
@@ -1967,7 +2182,12 @@ $(Get-Lang 'LoginMenu3')`n
 	
 	# Основной цикл:
 	while (Test-Path "$LoginFilePath") {
-	
+		# Вывод данных текущего аккаунта Apple:
+		Separator
+		Write-Host (Get-Lang "AuthSuccess")
+		Invoke-Ipatool auth info
+		
+		# Вывод меню IPA_Downloader:
 		Separator
 		$MainMenu = @"
 $(Get-Lang 'MenuTitle')
@@ -2118,36 +2338,36 @@ $(Get-Lang 'ClearMenu3')`n
 							
 							# Формирование динамического меню аккаунтов:
 							$Accounts = @($Data.psobject.properties.Name)
-							$AccMenuText = "$(Get-Lang 'ClearAccountMenuTitle') $(Get-Lang 'CancelStep')`n"
+							$AccountMenuText = "$(Get-Lang 'ClearAccountMenuTitle') $(Get-Lang 'CancelStep')`n"
 							$Counter = 1
-							foreach ($Acc in $Accounts) {
-								$AccMenuText += "$Counter. $Acc`n"
+							foreach ($Account in $Accounts) {
+								$AccountMenuText += "$Counter. $Account`n"
 								$Counter++
 							}
-							$AccMenuText += "$Counter. $(Get-Lang 'ClearAllAccounts')`n"
+							$AccountMenuText += "$Counter. $(Get-Lang 'ClearAllAccounts')`n"
 							
 							Separator
-							$AccChoice = Read-MenuChoice -MenuText $AccMenuText -OptionsCount $Counter -AllowCancel
-							if ($AccChoice -eq '0') { continue }
+							$AccountChoice = Read-MenuChoice -MenuText $AccountMenuText -OptionsCount $Counter -AllowCancel
+							if ($AccountChoice -eq '0') { continue }
 							
-							if ([int]$AccChoice -eq $Counter) {
+							if ([int]$AccountChoice -eq $Counter) {
 								# Очистка, если выбрано "Все аккаунты":
 								Remove-Item "$PurchasedAppsListFilePath" -Force -ErrorAction SilentlyContinue
 								Separator
 								Write-Host (Get-Lang "PurchasedAppsListCleared")
 							} else {
 								# Удаление данных выбранного аккаунта:
-								$SelectedAcc = $Accounts[[int]$AccChoice - 1]
+								$SelectedAccount = $Accounts[[int]$AccountChoice - 1]
 								
 								# Удаление файла, если в файле отсутствуют аккаунты:
 								if ($Accounts.Count -le 1) {
 									Remove-Item "$PurchasedAppsListFilePath" -Force -ErrorAction SilentlyContinue
 								} else {
-									$Data.psobject.properties.Remove($SelectedAcc)
+									$Data.psobject.properties.Remove($SelectedAccount)
 									$Data | ConvertTo-Json -Depth 5 | Set-Content "$PurchasedAppsListFilePath" -Encoding UTF8
 								}
 								Separator
-								Write-Host ((Get-Lang "AccountCleared") -f $SelectedAcc)
+								Write-Host ((Get-Lang "AccountCleared") -f $SelectedAccount)
 							}
 						}
 					}
@@ -2174,36 +2394,36 @@ $(Get-Lang 'ClearMenu3')`n
 							}
 							
 							$Accounts = @($Data.psobject.properties.Name)
-							$AccMenuText = "$(Get-Lang 'ClearAccountMenuTitle') $(Get-Lang 'CancelStep')`n"
+							$AccountMenuText = "$(Get-Lang 'ClearAccountMenuTitle') $(Get-Lang 'CancelStep')`n"
 							$Counter = 1
-							foreach ($Acc in $Accounts) {
-								$AccMenuText += "$Counter. $Acc`n"
+							foreach ($Account in $Accounts) {
+								$AccountMenuText += "$Counter. $Account`n"
 								$Counter++
 							}
-							$AccMenuText += "$Counter. $(Get-Lang 'ClearAllAccounts')`n"
+							$AccountMenuText += "$Counter. $(Get-Lang 'ClearAllAccounts')`n"
 							
 							Separator
-							$AccChoice = Read-MenuChoice -MenuText $AccMenuText -OptionsCount $Counter -AllowCancel
-							if ($AccChoice -eq '0') { continue }
+							$AccountChoice = Read-MenuChoice -MenuText $AccountMenuText -OptionsCount $Counter -AllowCancel
+							if ($AccountChoice -eq '0') { continue }
 							
-							if ([int]$AccChoice -eq $Counter) {
+							if ([int]$AccountChoice -eq $Counter) {
 								# Очистка, если выбрано "Все аккаунты":
 								Remove-Item "$DownloadedAppsListFilePath" -Force -ErrorAction SilentlyContinue
 								Separator
 								Write-Host (Get-Lang "DownloadedAppsListCleared")
 							} else {
 								# Удаление данных выбранного аккаунта:
-								$SelectedAcc = $Accounts[[int]$AccChoice - 1]
+								$SelectedAccount = $Accounts[[int]$AccountChoice - 1]
 								
 								# Удаление файла, если в файле отсутствуют аккаунты:
 								if ($Accounts.Count -le 1) {
 									Remove-Item "$DownloadedAppsListFilePath" -Force -ErrorAction SilentlyContinue
 								} else {
-									$Data.psobject.properties.Remove($SelectedAcc)
+									$Data.psobject.properties.Remove($SelectedAccount)
 									$Data | ConvertTo-Json -Depth 5 | Set-Content "$DownloadedAppsListFilePath" -Encoding UTF8
 								}
 								Separator
-								Write-Host ((Get-Lang "AccountCleared") -f $SelectedAcc)
+								Write-Host ((Get-Lang "AccountCleared") -f $SelectedAccount)
 							}
 						}
 					}
@@ -2221,19 +2441,13 @@ $(Get-Lang 'ClearMenu3')`n
 				}
 			}
 			
-			# 10. Выход из аккаунта Apple и сброс настроек:
+			# 10. Операции с аккаунтом Apple:
 			"10" {
-				Separator
-				Write-Host (Get-Lang "LoggedOut")
-				Invoke-Ipatool auth revoke
-				
-				# Удаление файлов настроек и папки .ipatool:
-				Remove-Item -Path $SettingsFilePath -Force -ErrorAction SilentlyContinue
-				Remove-Item -Path $ipatoolHomePath -Recurse -Force -ErrorAction SilentlyContinue
-				
-				# Сброс режима работы:
-				$script:WorkMode = $null
-				return
+				Invoke-AccountMenu
+				# Выход из всех аккаунтов:
+				if ($null -eq $script:WorkMode) {
+					return
+				}
 			}
 			
 			# 11. Банка для чаевых:

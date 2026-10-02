@@ -314,8 +314,12 @@ eval "$(/opt/homebrew/bin/brew shellenv zsh)"
 * When choosing to clear the list of apps purchased by the script or the list of apps downloaded by the script, select the Apple account to clear;
 * Press Enter;
 * The script will clear the selected data type.
-#### 10. Log out of Apple account and reset settings:
-* The script will log out of the Apple account and reset all settings.
+#### 10. Apple Account operations:
+* Enter the required action:
+1. Add account;  
+2. Switch account;  
+3. Log out of Apple Account;  
+* Press Enter.
 #### 11. Tip Jar:
 * The script will navigate to the CloudTips page.
 #### 12. Change Language (Сменить язык):
@@ -344,14 +348,16 @@ eval "$(/opt/homebrew/bin/brew shellenv zsh)"
 
 ## Possible errors and solution:
 ### Troubleshooting errors:
+* Processing -File ./IPA_Downloader.ps1 failed: Access to the path is denied (macOS) - Allow Terminal access in System Settings - Privacy & Security - Full Disk Access.
 * Download error: HTTP request failed: Timeout was reached - Failed to connect to Apple servers, check your internet connection.
 * Error: license is required - The app was not previously purchased on this Apple account.
 * Purchase error: app not found - App purchase failed because the app has been removed from the App Store.
 * Purchase error: item is temporarily unavailable - The app was not previously purchased on this Apple account, the purchase failed because the app has been removed from the App Store.
+* Login error: GSA SRP exception: GSA complete error -27952: Update iCloud for Windows to the latest version to sign in - Advanced Data Protection needs to be disabled in Settings - Apple Account - iCloud - Advanced Data Protection.
+* Login error: failed to initialize SAP signer: WinHttpSendRequest failed: 12029 - Connection error, check the system’s use of a proxy server by entering the following into the Windows command line (cmd): `netsh winhttp show proxy` and press Enter. If necessary, remove the unused proxy server by entering the following into the Windows command line (run as an administrator): `netsh winhttp reset proxy` and press Enter.
 * No device found - Device not found. Make sure the AppleMobileDeviceSupport64 driver is installed (relevant for Windows).
 * WARNING: could not locate Payload/App.app/SC_Info/App.sinf in archive! - App signature not found in the installed ipa file.
-* Login error: GSA SRP exception: GSA complete error -27952: Update iCloud for Windows to the latest version to sign in - Advanced Data Protection needs to be disabled via Settings - Apple Account - iCloud - Advanced Data Protection.
-* Login error: failed to initialize SAP signer: WinHttpSendRequest failed: 12029 - Connection error, check the system’s use of a proxy server by entering the following into the Windows command line (cmd): `netsh winhttp show proxy` and press Enter. If necessary, remove the unused proxy server by entering the following into the Windows command line (run as an administrator): `netsh winhttp reset proxy` and press Enter.
+* ERROR: Install failed. Got error "APIInternalError" with code 0x00000000: Error Domain=IXErrorDomain Code=46 - You need to remove the app from the device, restart the device, and try installing it again.
 * If you encounter any issues with authorization, try logging in to your Apple account on the icloud.com website.
 * If the app immediately closes when launched after installation, log in to the App Store using the account from which it was downloaded, and install any free/paid app. After that, launch the problematic app again.
 
@@ -364,22 +370,22 @@ eval "$(/opt/homebrew/bin/brew shellenv zsh)"
 ## Useful information:
 ### Finding an App ID:
 #### Option 1:
-Find the app link in the App Store and copy the numeric identifier (the value after "id" in the URL).
+Find the app link in the App Store and copy the value after `id` in the URL.  
 <details>
  <summary>Screenshot (click to view)</summary>
 <img width="389" height="36" alt="AppStore_Link" src="https://github.com/user-attachments/assets/e73fd860-ed11-4293-8600-aef61fe3dc7f" />
 </details>
 
 #### Option 2:
-If the app is installed on your device, press and hold the app icon:
+If the app is installed on your device, press and hold the app icon:  
 * The Share App option will appear;
 * Copy the link and paste it into a browser;
-* Copy the numeric identifier (the value after id in the URL).
+* Copy the value after `id` in the URL.
 
 #### Option 3:
 You can view the full list of purchased apps via the website [reportaproblem.apple.com](https://reportaproblem.apple.com)  
-Next, enter the app name in the search box on the [appmagic.rocks](https://appmagic.rocks/top-charts/apps) website and go to the app’s page.  
-On the app page, select Select App with the App Store icon and copy the ID from the browser’s address bar.  
+* Next, enter the app name in the search box on the [appmagic.rocks](https://appmagic.rocks/top-charts/apps) website and go to the app’s page;
+* On the app page, select Select App with the App Store icon and copy the value in the end of URL.
 
 ### Tracking new app releases:
 [The topic on the 4PDA](https://4pda.to/forum/index.php?showtopic=1046078)  
