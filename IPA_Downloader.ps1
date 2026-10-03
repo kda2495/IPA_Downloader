@@ -2,7 +2,7 @@
 Set-Location -Path $PSScriptRoot
 
 # Версия скрипта:
-$ScriptVersion = "4.1.1"
+$ScriptVersion = "4.1.2"
 
 # Определение операционной системы:
 $IsWin = [System.Runtime.InteropServices.RuntimeInformation]::IsOSPlatform([System.Runtime.InteropServices.OSPlatform]::Windows)
@@ -24,7 +24,7 @@ function Get-Settings {
 			}
 		}
 	}
-
+	
 	return $Settings
 }
 
@@ -151,7 +151,8 @@ $LangStrings = @{
 		"AccountSwitchMenuTitle" = "Выберите аккаунт Apple для перехода"
 		"AddedToDownloadedAppsList" = "Добавлено в список приложений, загруженных скриптом (Files/DownloadedAppsList.json):`n{0} (ID: {1})"
 		"AddedToPurchasedAppsList" = "Добавлено в список приложений, приобретенных скриптом (Files/PurchasedAppsList.json):`n{0} (ID: {1})"
-		"AlreadyInList" = "Уже есть в списке: {0} (ID: {1})"
+		"AlreadyInDownloadedAppsList" = "Уже есть в списке приложений, загруженных скриптом (Files/DownloadedAppsList.json):`n{0} (ID: {1})"
+		"AlreadyInPurchasedAppsList" = "Уже есть в списке приложений, приобретенных скриптом (Files/PurchasedAppsList.json):`n{0} (ID: {1})`nДля загрузки приложения используйте другую команду."
 		"AppsCleared" = "Готово. Приложения в папке Apps удалены."
 		"AskAppNumDownload" = "Введите порядковые номера (№) приложений для загрузки"
 		"AskAppNumPurchase" = "Введите порядковые номера (№) приложений для покупки"
@@ -190,8 +191,8 @@ $LangStrings = @{
 		"ErrorAppsListLoad" = "Ошибка загрузки списка приложений."
 		"ErrorDownloadFiles" = "Ошибка: Не удалось загрузить файл:"
 		"ErrorDownloadedAppsListEmpty" = "Ошибка: История загрузок пуста."
-		"ErrorIdeviceinstallerNotFound" = "Ошибка: ideviceinstaller не найден.`nУстановка приложений по USB невозможна (только по AirDrop на macOS)"
-		"ErrorInstallIpa" = "Ошибка: Не удалось установить/обновить приложение"
+		"ErrorIdeviceinstallerNotFound" = "Ошибка: ideviceinstaller не найден.`nУстановка приложений по USB невозможна (только по AirDrop на macOS)."
+		"ErrorInstallIpa" = "Ошибка: Не удалось установить/обновить приложение."
 		"ErrorInvalidInput" = "Ошибка: Неверный ввод."
 		"ErrorMissingFiles" = "Ошибка. Следующие файлы не найдены:"
 		"ErrorNoApps" = "Ошибка: В папке Apps отсутствуют приложения."
@@ -255,7 +256,8 @@ $LangStrings = @{
 		"AccountSwitchMenuTitle" = "Select Apple account to switch to"
 		"AddedToDownloadedAppsList" = "Added to list of apps downloaded by the script (Files/DownloadedAppsList.json):`n{0} (ID: {1})"
 		"AddedToPurchasedAppsList" = "Added to list of apps purchased by the script (Files/PurchasedAppsList.json):`n{0} (ID: {1})"
-		"AlreadyInList" = "Already in list: {0} (ID: {1})"
+		"AlreadyInDownloadedAppsList" = "Already in list of apps downloaded by the script (Files/DownloadedAppsList.json):`n{0} (ID: {1})"
+		"AlreadyInPurchasedAppsList" = "Already in list of apps purchased by the script (Files/PurchasedAppsList.json):`n{0} (ID: {1})`nUse another command to download the app."
 		"AppsCleared" = "Done. Apps folder has been cleared."
 		"AskAppNumDownload" = "Enter index numbers (#) of apps to download"
 		"AskAppNumPurchase" = "Enter index numbers (#) of apps to purchase"
@@ -290,12 +292,12 @@ $LangStrings = @{
 		"DownloaderMenu10" = "10. Apple account operations"
 		"DownloaderMenu11" = "11. Tip Jar"
 		"DownloaderMenu12" = "12. Change Language (Сменить язык)"
-		"ErrorAppsListCustomEmpty" = "Error: Custom apps list is empty.`nAdd apps to the Files/AppsListCustom.txt file"
+		"ErrorAppsListCustomEmpty" = "Error: Custom apps list is empty.`nAdd apps to the Files/AppsListCustom.txt file."
 		"ErrorAppsListLoad" = "Error: Failed to load apps list."
 		"ErrorDownloadFiles" = "Error: Failed to download file:"
 		"ErrorDownloadedAppsListEmpty" = "Error: Download history is empty."
-		"ErrorIdeviceinstallerNotFound" = "Error: ideviceinstaller not found.`nInstalling apps via USB is impossible (only via AirDrop on macOS)"
-		"ErrorInstallIpa" = "Error: Failed to install/upgrade the app"
+		"ErrorIdeviceinstallerNotFound" = "Error: ideviceinstaller not found.`nInstalling apps via USB is impossible (only via AirDrop on macOS)."
+		"ErrorInstallIpa" = "Error: Failed to install/upgrade the app."
 		"ErrorInvalidInput" = "Error: Invalid input."
 		"ErrorMissingFiles" = "Error. Following files were not found:"
 		"ErrorNoApps" = "Error: No apps found in Apps folder."
@@ -372,47 +374,47 @@ function Out-Table {
 	if (-not $Data -or $Data.Count -eq 0) { return }
 	
 	# Очистка и измерение ячеек:
-	function Get-CellInfo([string]$text) {
-		if ([string]::IsNullOrEmpty($text)) { return @{ Text = ""; Width = 0 } }
+	function Get-CellInfo([string]$Text) {
+		if ([string]::IsNullOrEmpty($Text)) { return @{ Text = ""; Width = 0 } }
 		
 		# Замена текста для корректного отображения:
-		$s = $script:reANSI.Replace($text, '')
-		$s = $script:reSpaces.Replace($s, ' ')
-		$s = $script:reDashes.Replace($s, '-')
-		$s = $script:reHidden.Replace($s, '')
-		$s = $s.Normalize([System.Text.NormalizationForm]::FormC)
+		$CleanText = $script:reANSI.Replace($Text, '')
+		$CleanText = $script:reSpaces.Replace($CleanText, ' ')
+		$CleanText = $script:reDashes.Replace($CleanText, '-')
+		$CleanText = $script:reHidden.Replace($CleanText, '')
+		$CleanText = $CleanText.Normalize([System.Text.NormalizationForm]::FormC)
 		
 		# Расчет ширины:
-		$visualWidth = $s.Length + $script:reWide.Matches($s).Count
-		return @{ Text = $s; Width = $visualWidth }
+		$VisualWidth = $CleanText.Length + $script:reWide.Matches($CleanText).Count
+		return @{ Text = $CleanText; Width = $VisualWidth }
 	}
 	
 	# Обработка заголовков таблицы:
-	$CleanHeaders = foreach ($h in $Headers) { Get-CellInfo $h }
+	$CleanHeaders = foreach ($Header in $Headers) { Get-CellInfo $Header }
 	$ColWidths = $CleanHeaders | ForEach-Object { $_.Width }
 	
 	# Обработка данных:
 	$CleanRows = @()
 	foreach ($Row in $Data) {
-		$cells = @()
-		for ($i = 0; $i -lt $Properties.Count; $i++) {
-			$cellInfo = Get-CellInfo "$($Row.($Properties[$i]))"
+		$Cells = @()
+		for ($ColumnIndex = 0; $ColumnIndex -lt $Properties.Count; $ColumnIndex++) {
+			$CellInfo = Get-CellInfo "$($Row.($Properties[$ColumnIndex]))"
 			
 			# Обновление ширины колонки:
-			if ($cellInfo.Width -gt $ColWidths[$i]) {
-				$ColWidths[$i] = $cellInfo.Width
+			if ($CellInfo.Width -gt $ColWidths[$ColumnIndex]) {
+				$ColWidths[$ColumnIndex] = $CellInfo.Width
 			}
-			$cells += $cellInfo
+			$Cells += $CellInfo
 		}
 		# Добавление массива ячеек:
-		$CleanRows += , $cells 
+		$CleanRows += , $Cells 
 	}
 	
 	# Формирование элементов рамок:
 	$TopParts = @(); $SepParts = @(); $BottomParts = @()
-	foreach ($w in $ColWidths) {
-		$line = "─" * ($w + 2)
-		$TopParts += $line; $SepParts += $line; $BottomParts += $line
+	foreach ($ColWidth in $ColWidths) {
+		$BorderLine = "─" * ($ColWidth + 2)
+		$TopParts += $BorderLine; $SepParts += $BorderLine; $BottomParts += $BorderLine
 	}
 	
 	$LineTop = "┌" + ($TopParts -join "┬") + "┐"
@@ -420,13 +422,13 @@ function Out-Table {
 	$LineBottom = "└" + ($BottomParts -join "┴") + "┘"
 	
 	# Сборка готовой строки:
-	function Build-Row($cellsInfo) {
-		$formatted = for ($i = 0; $i -lt $cellsInfo.Count; $i++) {
-			$cell = $cellsInfo[$i]
-			$padCount = [Math]::Max(0, $ColWidths[$i] - $cell.Width)
-			" " + $cell.Text + (" " * $padCount) + " "
+	function Build-Row($CellsInfo) {
+		$FormattedCells = for ($ColumnIndex = 0; $ColumnIndex -lt $CellsInfo.Count; $ColumnIndex++) {
+			$Cell = $CellsInfo[$ColumnIndex]
+			$PadCount = [Math]::Max(0, $ColWidths[$ColumnIndex] - $Cell.Width)
+			" " + $Cell.Text + (" " * $PadCount) + " "
 		}
-		return "│" + ($formatted -join "│") + "│"
+		return "│" + ($FormattedCells -join "│") + "│"
 	}
 	
 	# Итоговый вывод:
@@ -434,8 +436,8 @@ function Out-Table {
 	Write-Host (Build-Row $CleanHeaders)
 	Write-Host $LineSep
 	
-	for ($r = 0; $r -lt $CleanRows.Count; $r++) {
-		Write-Host (Build-Row $CleanRows[$r])
+	for ($RowIndex = 0; $RowIndex -lt $CleanRows.Count; $RowIndex++) {
+		Write-Host (Build-Row $CleanRows[$RowIndex])
 	}
 	
 	Write-Host $LineBottom
@@ -557,14 +559,15 @@ function Connect-AppleAccount {
 		# Запрос аккаунта Apple и пароля:
 		Invoke-Ipatool auth login
 		
-		# Формирование kbsync:
-		Separator
-		Write-Host (Get-Lang "KbSyncGeneration")
-		$null = Invoke-Ipatool kbsync --refresh
-		
-		# Создание пустого файла login для фиксации успешной авторизации:
+		# Авторизация пройдена:
 		if ($LASTEXITCODE -eq 0) {
+			# Создание пустого файла login для фиксации успешной авторизации:
 			New-Item -Path $LoginFilePath -ItemType File -Force | Out-Null
+			
+			# Формирование kbsync:
+			Separator
+			Write-Host (Get-Lang "KbSyncGeneration")
+			$null = Invoke-Ipatool kbsync --refresh
 			
 			# Сохранение keychain-passphrase с шифрованием после успешного входа:
 			if ($IsWin -and !([string]::IsNullOrEmpty($script:Kp))) {
@@ -728,6 +731,7 @@ function Invoke-AppleAccountLogout {
 		$AccountMenuText += "$Counter. $Account$CurrentMark`n"
 		$Counter++
 	}
+	
 	$AccountMenuText += "$Counter. $(Get-Lang 'LogoutAllAccounts')`n"
 	
 	Separator
@@ -1092,8 +1096,8 @@ function Save-App-To-List {
 	$AccountApps = $AccountApps | Sort-Object `
 		@{ Expression = { if ($ReferenceMap.ContainsKey($_.appid)) { $ReferenceMap[$_.appid].Index } else { [int]::MaxValue } } }, `
 		@{ Expression = { 
-			$name = [regex]::Replace("$($_.name)".ToUpper().Replace('Ё','Е'), '\d+', { $args[0].Value.PadLeft(10, '0') })
-			[BitConverter]::ToString([Text.Encoding]::BigEndianUnicode.GetBytes($name))
+			$Name = [regex]::Replace("$($_.name)".ToUpper().Replace('Ё','Е'), '\d+', { $args[0].Value.PadLeft(10, '0') })
+			[BitConverter]::ToString([Text.Encoding]::BigEndianUnicode.GetBytes($Name))
 		} }
 	
 	# Сохранение обновленных данных:
@@ -1103,7 +1107,8 @@ function Save-App-To-List {
 	# Вывод сообщений:
 	if ($IsDuplicate) {
 		$CurrentName = if ($ReferenceMap.ContainsKey($AppId)) { $ReferenceMap[$AppId].Name } else { $AppNameOnly }
-		Write-Host ((Get-Lang "AlreadyInList") -f $CurrentName, $AppId)
+		$DuplicateMsgKey = if ($Type -eq "Purchased") { "AlreadyInPurchasedAppsList" } else { "AlreadyInDownloadedAppsList" }
+		Write-Host ((Get-Lang $DuplicateMsgKey) -f $CurrentName, $AppId)
 	} else {
 		$MsgKey = if ($Type -eq "Purchased") { "AddedToPurchasedAppsList" } else { "AddedToDownloadedAppsList" }
 		Write-Host ((Get-Lang $MsgKey) -f $AppNameOnly, $AppId)
@@ -1297,10 +1302,9 @@ function IPA-Download-With-Version {
 	
 	# Извлечение всех версий:
 	$RawVersions = [regex]::Matches($RawOutput, '(?<=")\d+(?=")') | ForEach-Object { $_.Value }
-	$RecentVersions = $RawVersions | Sort-Object
 	
 	# Вывод ошибки, если версии приложения не найдены:
-	if ($RecentVersions.Count -eq 0) {
+	if ($RawVersions.Count -eq 0) {
 		Show-Error "ErrorNoVersionsFound"
 		return
 	}
@@ -1310,7 +1314,7 @@ function IPA-Download-With-Version {
 	
 	$VersionMapping = @()
 	$Counter = 1
-	foreach ($VersionId in $RecentVersions) {
+	foreach ($VersionId in $RawVersions) {
 		$VersionMapping += [PSCustomObject]@{
 			Num = $Counter
 			ID = $VersionId
@@ -1342,28 +1346,28 @@ function IPA-Download-With-Version {
 		
 		$W1 = [Math]::Max($HeaderNum.Length, "$($PreSelectedVersions.Count)".Length)
 		$MaxIdLen = $HeaderVersionID.Length
-		foreach ($v in $PreSelectedVersions) {
-			if ($v.ID.Length -gt $MaxIdLen) { $MaxIdLen = $v.ID.Length }
+		foreach ($PreSelectedVersion in $PreSelectedVersions) {
+			if ($PreSelectedVersion.ID.Length -gt $MaxIdLen) { $MaxIdLen = $PreSelectedVersion.ID.Length }
 		}
 		$W2 = [Math]::Max($HeaderVersion.Length, 15)
 		$W3 = $MaxIdLen
 		
 		$ColWidths = @($W1, $W2, $W3)
 		
-		$TopParts = foreach ($w in $ColWidths) { "─" * ($w + 2) }
-		$SepParts = foreach ($w in $ColWidths) { "─" * ($w + 2) }
-		$BottomParts = foreach ($w in $ColWidths) { "─" * ($w + 2) }
+		$TopParts = foreach ($ColWidth in $ColWidths) { "─" * ($ColWidth + 2) }
+		$SepParts = foreach ($ColWidth in $ColWidths) { "─" * ($ColWidth + 2) }
+		$BottomParts = foreach ($ColWidth in $ColWidths) { "─" * ($ColWidth + 2) }
 		$LineTop = "┌" + ($TopParts -join "┬") + "┐"
 		$LineSep = "├" + ($SepParts -join "┼") + "┤"
 		$LineBottom = "└" + ($BottomParts -join "┴") + "┘"
 		
-		function Print-StreamRow ([string[]]$cells) {
-			$formatted = for ($i = 0; $i -lt $cells.Count; $i++) {
-				$text = "$($cells[$i])"
-				$pad = [Math]::Max(0, $ColWidths[$i] - $text.Length)
-				" " + $text + (" " * $pad) + " "
+		function Print-StreamRow ([string[]]$Cells) {
+			$FormattedCells = for ($ColumnIndex = 0; $ColumnIndex -lt $Cells.Count; $ColumnIndex++) {
+				$Text = "$($Cells[$ColumnIndex])"
+				$PadCount = [Math]::Max(0, $ColWidths[$ColumnIndex] - $Text.Length)
+				" " + $Text + (" " * $PadCount) + " "
 			}
-			Write-Host ("│" + ($formatted -join "│") + "│")
+			Write-Host ("│" + ($FormattedCells -join "│") + "│")
 		}
 		
 		$DetailedMapping = @()
@@ -1782,10 +1786,10 @@ function Set-IpatoolBinaryPaths {
 	
 	if ($IsWin) {
 		$ipatoolFile = Get-ChildItem -Path $FolderPath -Filter "ipatool*.exe" -File -ErrorAction SilentlyContinue | Select-Object -First 1
-		$ideviceFile = Get-ChildItem -Path $FolderPath -Filter "ideviceinstaller*.exe" -File -ErrorAction SilentlyContinue | Select-Object -First 1
+		$ideviceinstallerFile = Get-ChildItem -Path $FolderPath -Filter "ideviceinstaller*.exe" -File -ErrorAction SilentlyContinue | Select-Object -First 1
 		
 		if ($ipatoolFile) { $script:ipatoolFilePath = $ipatoolFile.FullName }
-		if ($ideviceFile) { $script:ideviceinstallerFilePath = $ideviceFile.FullName }
+		if ($ideviceinstallerFile) { $script:ideviceinstallerFilePath = $ideviceinstallerFile.FullName }
 		
 		# Добавление папки с ipatool в PATH текущего процесса:
 		Update-PathFolder -NewFolder $FolderPath
@@ -2450,6 +2454,7 @@ $(Get-Lang 'ClearMenu3')`n
 			# 10. Операции с аккаунтом Apple:
 			"10" {
 				Invoke-AccountMenu
+				
 				# Выход из всех аккаунтов:
 				if ($null -eq $script:WorkMode) {
 					return

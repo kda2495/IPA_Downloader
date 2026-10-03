@@ -34,7 +34,7 @@ ipatool is an unofficial tool; therefore, using the script is only at your own r
 * To purchase or download apps, they must be previously acquired in the App Store;
 * Apps are downloaded directly from the App Store;
 * It is recommended to disable security keys and switch to standard two-factor authentication;
-* The script supports bulk purchasing/downloading of apps. Simply enter the index numbers (#) of the apps/versions from the tables, separated by commas or hyphens. For example, entering 1, 2, 3-5 will purchase/download the apps with index numbers (#) 1, 2, 3, 4, and 5;
+* The script supports bulk purchasing/downloading/installing apps. Simply enter the index numbers (#) of the apps/versions from the tables, separated by commas or hyphens. For example, entering 1, 2, 3-5 will purchase/download/installing the apps with index numbers (#) 1, 2, 3, 4, and 5;
 * It is possible to create a custom list of applications; you just need to add data in the format `App name: its ID`, for example: `Google: 284815942` to the file Files/AppsListCustom.txt.
 
 ### General requirements for use:
@@ -349,6 +349,7 @@ eval "$(/opt/homebrew/bin/brew shellenv zsh)"
 ## Possible errors and solution:
 ### Troubleshooting errors:
 * Processing -File ./IPA_Downloader.ps1 failed: Access to the path is denied (macOS) - Allow Terminal access in System Settings - Privacy & Security - Full Disk Access.
+* Error: account is disabled - Apple account is temporarily blocked by Apple (usually due to multiple attempts to enter incorrect password or 2FA code), account needs to be unblocked via the device or on the `icloud.com` website.
 * Download error: HTTP request failed: Timeout was reached - Failed to connect to Apple servers, check your internet connection.
 * Error: license is required - The app was not previously purchased on this Apple account.
 * Purchase error: app not found - App purchase failed because the app has been removed from the App Store.
@@ -358,7 +359,13 @@ eval "$(/opt/homebrew/bin/brew shellenv zsh)"
 * No device found - Device not found. Make sure the AppleMobileDeviceSupport64 driver is installed (relevant for Windows).
 * WARNING: could not locate Payload/App.app/SC_Info/App.sinf in archive! - App signature not found in the installed ipa file.
 * ERROR: Install failed. Got error "APIInternalError" with code 0x00000000: Error Domain=IXErrorDomain Code=46 - You need to remove the app from the device, restart the device, and try installing it again.
-* If you encounter any issues with authorization, try logging in to your Apple account on the icloud.com website.
+* Could not connect to lockdownd: Invalid HostID. Exiting. - Delete the folders listed below, then uninstall iTunes and AppleMobileDeviceSupport64, and reinstall iTunes or AppleMobileDeviceSupport64, connect the device and tap `Trust` when the `Trust This Computer?` prompt appears.  
+`C:\ProgramData\Apple\`  
+`C:\ProgramData\Apple\Apple Computer\`  
+`C:\Users\%username%\AppData\Local\Apple Computer\`  
+`C:\Users\%username%\AppData\Local\Apple Inc\`  
+`C:\Users\%username%\AppData\Roaming\Apple Computer\`  
+* If you encounter any issues with authorization, try logging in to your Apple account on the `icloud.com` website.
 * If the app immediately closes when launched after installation, log in to the App Store using the account from which it was downloaded, and install any free/paid app. After that, launch the problematic app again.
 
 ### If you encounter an issue:
