@@ -350,6 +350,7 @@ eval "$(/opt/homebrew/bin/brew shellenv zsh)"
 ### Troubleshooting errors:
 * Processing -File ./IPA_Downloader.ps1 failed: Access to the path is denied (macOS) - Allow Terminal access in System Settings - Privacy & Security - Full Disk Access.
 * Error: account is disabled - Apple account is temporarily blocked by Apple (usually due to multiple attempts to enter incorrect password or 2FA code), account needs to be unblocked via the device or on the `icloud.com` website.
+* Download error: HTTP request failed: Couldn't resolve host name - Сheck your internet connection.
 * Download error: HTTP request failed: Timeout was reached - Failed to connect to Apple servers, check your internet connection.
 * Error: license is required - The app was not previously purchased on this Apple account.
 * Purchase error: app not found - App purchase failed because the app has been removed from the App Store.

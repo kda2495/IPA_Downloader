@@ -346,6 +346,7 @@ eval "$(/opt/homebrew/bin/brew shellenv zsh)"
 ### Расшифровка ошибок:
 * Обработка -File ./IPA_Downloader.ps1 завершилась сбоем: Access to the path is denied (macOS) - Включите Терминалу доступ по пути: Системные настройки - Конфиденциальность и безопасность - Доступ к диску.
 * Error: account is disabled - Аккаунт Apple временно заблокирован Apple (обычно из-за многократных попыток ввода неверных данных пароля или кода 2FA), требуется разблокировка аккаунта через устройство или на сайте `icloud.com`
+* Download error: HTTP request failed: Couldn't resolve host name - Проверьте подключение к интернету.
 * Download error: HTTP request failed: Timeout was reached - Не удалось подключиться к серверам Apple, проверьте Ваше интернет-соединение.
 * Error: license is required - Приложение не было приобретено на этом аккаунте Apple ранее.
 * Purchase error: app not found - Покупка приложения не удалась, так как приложение удалено из App Store.

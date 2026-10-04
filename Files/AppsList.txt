@@ -144,6 +144,7 @@ Rutube: 966511294
 Rutube (Starship Battle: Commander): 6760892177
 Rutube (SlicingDices): 6766530710
 Rutube Kids: 904606459
+Rutube Studio: (RStudio): 6801144026
 S7 Airlines: 552920434
 S7 Airlines (Учебник Путешествий): 6746844981
 S7 Airlines (Узнай Сибирь): 6755426632
@@ -555,7 +556,6 @@ Zoom Workplace: 546505307
 Столото (Stolotto New Year): 6755774447
 Сургутнефтегазбанк (BNG): 6744011402
 Сургутнефтегазбанк (Черника Онлайн): 6776650255
-Т-Банк (DocStorage): 6451046063
 Т-Банк (T-Start): 6476151601
 Т-Банк (EasyCatch Sounder): 6748913132
 Т-Банк (Clanstrix): 6751548294
