@@ -2,7 +2,7 @@
 Set-Location -Path $PSScriptRoot
 
 # Версия скрипта:
-$ScriptVersion = "4.1.3"
+$ScriptVersion = "4.1.4"
 
 # Переменная состояния keychain-passphrase:
 $script:KeychainEnabled = $false
@@ -53,6 +53,7 @@ $SavedSettings = Get-Settings
 $script:CurrentLang = if ($SavedSettings['Language'] -match '^(RU|EN)$') { $SavedSettings['Language'] } else { "RU" }
 $script:WorkMode = if ($SavedSettings['Mode'] -in @('Downloader', 'Installer')) { $SavedSettings['Mode'] } else { $null }
 $script:IsDebugEnabled = if ($SavedSettings['DebugEnabled'] -eq 'True') { $true } else { $false }
+$script:KeychainEnabled = if ($SavedSettings['KeychainEnabled'] -in @('True', 'False')) { $SavedSettings['KeychainEnabled'] -eq 'True' } else { $script:KeychainEnabled }
 
 # Определение архитектуры macOS и Linux:
 if (-not $IsWin) {
@@ -1925,29 +1926,36 @@ function Install-Apps {
 	
 	$ipaFiles = Get-iOS-MinVersion
 	if ($null -ne $ipaFiles) {
-		Separator
-		$SelectedIndices = Read-NumberSelection -PromptKey 'AskFileNum' -MaxCount $ipaFiles.Count
-		if ($null -eq $SelectedIndices) { return }
-		
-		foreach ($Index in $SelectedIndices) {
-			$SelectedFile = $ipaFiles[$Index - 1]
+		while ($true) {
 			Separator
-			Write-Host "$(Get-Lang 'InstallApp') $($SelectedFile.Name)"
-			$TempFile = "$TempipaFilePath"
-			Copy-Item -Path $SelectedFile.FullName -Destination $TempFile -Force
-			try {
-				& "$script:ideviceinstallerFilePath" install $TempFile
-				
-				if ($LASTEXITCODE -ne 0) {
-					& "$script:ideviceinstallerFilePath" upgrade $TempFile
+			$SelectedIndices = Read-NumberSelection -PromptKey 'AskFileNum' -MaxCount $ipaFiles.Count
+			if ($null -eq $SelectedIndices) { return }
+			
+			$InstallFailed = $false
+			foreach ($Index in $SelectedIndices) {
+				$SelectedFile = $ipaFiles[$Index - 1]
+				Separator
+				Write-Host "$(Get-Lang 'InstallApp') $($SelectedFile.Name)"
+				$TempFile = "$TempipaFilePath"
+				Copy-Item -Path $SelectedFile.FullName -Destination $TempFile -Force
+				try {
+					& "$script:ideviceinstallerFilePath" install $TempFile
 					
 					if ($LASTEXITCODE -ne 0) {
-						Show-Error "ErrorInstallipa"
+						& "$script:ideviceinstallerFilePath" upgrade $TempFile
+						
+						if ($LASTEXITCODE -ne 0) {
+							Show-Error "ErrorInstallipa"
+							$InstallFailed = $true
+						}
 					}
+				} finally {
+					Remove-Item -Path $TempFile -Force -ErrorAction SilentlyContinue
 				}
-			} finally {
-				Remove-Item -Path $TempFile -Force -ErrorAction SilentlyContinue
 			}
+			
+			# Возврат к выбору приложений для установки, если установка завершилась ошибкой:
+			if (!$InstallFailed) { return }
 		}
 	}
 }
@@ -2083,8 +2091,9 @@ $(Get-Lang 'LanguageMenu2')`n
 	# Установка режима IPA_Downloader по умолчанию:
 	$script:WorkMode = "Downloader"
 	
-	# Сохранение режима работы и вывод баннера:
+	# Сохранение режима работы, состояния keychain-passphrase и вывод баннера:
 	Set-Setting -Key "Mode" -Value $script:WorkMode
+	Set-Setting -Key "KeychainEnabled" -Value $script:KeychainEnabled
 	Show-ModeBanner
 	
 	# Проверка обновлений:
@@ -2312,6 +2321,7 @@ $(Get-Lang 'LoginMenu3')`n
 	# Сохранение настроек режима IPA_Downloader только после успешной авторизации с аккаунтом Apple:
 	Set-Setting -Key "Language" -Value $script:CurrentLang
 	Set-Setting -Key "Mode" -Value "Downloader"
+	Set-Setting -Key "KeychainEnabled" -Value $script:KeychainEnabled
 	
 	# Основной цикл:
 	while (Test-Path "$LoginFilePath") {

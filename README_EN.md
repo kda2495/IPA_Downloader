@@ -75,7 +75,7 @@ Download the complete set of programs/updates for Windows 7/8.1 via the link:
 
 ### How to use (Windows):
 #### 1. Extract the IPA_Downloader.zip archive using any archiver (7-Zip, WinRAR);
-#### 2. Double-click the Start_IPA_Downloader.bat file;
+#### 2. Double-click the Start_IPA_Downloader_Windows.bat file;
 #### 3. On the first run, initial configuration is required:
 * Select language;
 * Press Enter;
@@ -140,16 +140,16 @@ eval "$(/opt/homebrew/bin/brew shellenv zsh)"
 
 ### How to use (macOS):
 #### 1. Extract the IPA_Downloader.zip archive using any archiver (7-Zip, WinRAR);
-#### 2. Double-click the Start_IPA_Downloader.command file;
-* The first time, macOS will block Start_IPA_Downloader.command from running;
+#### 2. Double-click the Start_IPA_Downloader_macOS.command file;
+* The first time, macOS will block Start_IPA_Downloader_macOS.command from running;
 * Click "Done" in the prompt that appears;
 * Click the Apple menu () in the top-left corner of the screen and select "System Settings...";
 * In the left sidebar, scroll down and select "Privacy & Security";
 * Scroll down the right side of the screen to the "Security" section;
-* Next to "“Start_IPA_Downloader” was blocked to protect your Mac", click "Open Anyway";
-* In the pop-up window "Open “Start_IPA_Downloader”?", click "Open Anyway";
+* Next to "“Start_IPA_Downloader_macOS.command” was blocked to protect your Mac", click "Open Anyway";
+* In the pop-up window "Open “Start_IPA_Downloader_macOS.command”?", click "Open Anyway";
 * Enter your Mac password or use Touch ID;
-* If necessary, double-click the Start_IPA_Downloader.command file again.
+* If necessary, double-click the Start_IPA_Downloader_macOS.command file again.
 #### 3. On the first run, initial configuration is required:
 * Select language;
 * Press Enter;
@@ -191,10 +191,10 @@ eval "$(/opt/homebrew/bin/brew shellenv zsh)"
 ### How to use (Linux):
 #### 1. Extract the IPA_Downloader archive using any archiver (7-Zip, WinRAR);
 #### 2. Make the launcher script executable (if needed):
-* Type in Terminal: `chmod +x Start_IPA_Downloader.sh`
+* Type in Terminal: `chmod +x Start_IPA_Downloader_Linux.sh`
 * Press Enter.
 #### 3. Run the script:
-* Type in Terminal: `./Start_IPA_Downloader.sh` (or double-click Start_IPA_Downloader.sh in your file manager);
+* Type in Terminal: `./Start_IPA_Downloader_Linux.sh` (or double-click Start_IPA_Downloader_Linux.sh in your file manager);
 * Press Enter.
 #### 4. On the first run, initial configuration is required:
 * Select language;
