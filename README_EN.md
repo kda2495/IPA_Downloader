@@ -300,11 +300,13 @@ eval "$(/opt/homebrew/bin/brew shellenv zsh)"
 * Apps must be located in the Apps folder;
 * The script will check the minimum iOS version required to install the app.
 #### 8. Install apps from Apps folder:
-* Connect the device using a cable;
 * Apps must be located in the Apps folder;
-* Enter the index numbers (#) of the apps to install on the device;
+* Connect the device using a cable;
+* Enter the index numbers (#) of the the devices for installation;
 * Press Enter;
-* The script will install the selected apps on the device.
+* Enter the index numbers (#) of the apps to install on the devices;
+* Press Enter;
+* The script will install the selected apps on the devices.
 #### 9. Clear data:
 * Select the data to clear:
 1. List of apps purchased by the script (Files/PurchasedAppsList.json);  

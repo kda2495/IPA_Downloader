@@ -2,7 +2,7 @@
 Set-Location -Path $PSScriptRoot
 
 # Версия скрипта:
-$ScriptVersion = "4.1.4"
+$ScriptVersion = "4.1.5"
 
 # Переменная состояния keychain-passphrase:
 $script:KeychainEnabled = $false
@@ -160,6 +160,7 @@ $LangStrings = @{
 		"AskAppNumDownload" = "Введите порядковые номера (№) приложений для загрузки"
 		"AskAppNumPurchase" = "Введите порядковые номера (№) приложений для покупки"
 		"AskAppSearch" = "Введите название приложения или ID приложений"
+		"AskDeviceNum" = "Введите порядковые номера (№) устройств для установки"
 		"AskFileNum" = "Введите порядковые номера (№) файлов для установки"
 		"AskVersionsDownloadNum" = "Введите порядковые номера (№) версий для загрузки"
 		"AskVersionsListNum" = "Введите порядковые номера (№) ID версий для отображения списка версий"
@@ -195,12 +196,14 @@ $LangStrings = @{
 		"ErrorAuthCheck" = "Ошибка: Не удалось подтвердить вход в аккаунт Apple."
 		"ErrorDownloadFiles" = "Ошибка: Не удалось загрузить файл:"
 		"ErrorDownloadedAppsListEmpty" = "Ошибка: История загрузок пуста."
+		"ErrorideviceidNotFound" = "Ошибка: idevice_id не найден.`nПоиск подключенных устройств невозможен."
 		"ErrorideviceinstallerNotFound" = "Ошибка: ideviceinstaller не найден.`nУстановка приложений по USB невозможна (только по AirDrop на macOS)."
 		"ErrorInstallipa" = "Ошибка: Не удалось установить/обновить приложение."
 		"ErrorInvalidInput" = "Ошибка: Неверный ввод."
 		"ErrorMissingFiles" = "Ошибка. Следующие файлы не найдены:"
 		"ErrorNoApps" = "Ошибка: В папке Apps отсутствуют приложения."
 		"ErrorNoAppsFound" = "Ошибка: Приложения не найдены."
+		"ErrorNoDevices" = "Ошибка: Подключенные устройства не найдены.`nПодключите устройство по USB и подтвердите доверие компьютеру."
 		"ErrorNoOtherAccounts" = "Ошибка: Других аккаунтов Apple не найдено."
 		"ErrorNoVersionsFound" = "Ошибка: Версии приложения не найдены."
 		"ErrorOpenUrl" = "Ошибка: Не удалось открыть страницу."
@@ -211,11 +214,14 @@ $LangStrings = @{
 		"KbSyncGeneration" = "Формирование kbsync. Это может занять некоторое время..."
 		"HeaderAppID" = "ID приложения:"
 		"HeaderAppName" = "Название приложения:"
+		"HeaderDeviceName" = "Имя устройства:"
 		"HeaderMinIOS" = "Мин. версия iOS:"
 		"HeaderNum" = "№"
+		"HeaderUDID" = "UDID:"
 		"HeaderVersionID" = "ID версии:"
 		"HeaderVersion" = "Версия:"
 		"InstallApp" = "Установка:"
+		"InstallDevice" = "Устройство:"
 		"InstallerMenu1" = "1. Проверка минимальной версии iOS для приложений в папке Apps"
 		"InstallerMenu2" = "2. Установка приложений из папки Apps"
 		"InstallerMenu3" = "3. Банка для чаевых"
@@ -266,6 +272,7 @@ $LangStrings = @{
 		"AskAppNumDownload" = "Enter index numbers (#) of apps to download"
 		"AskAppNumPurchase" = "Enter index numbers (#) of apps to purchase"
 		"AskAppSearch" = "Enter app name or app IDs"
+		"AskDeviceNum" = "Enter index numbers (#) of devices to install on"
 		"AskFileNum" = "Enter index numbers (#) of files to install"
 		"AskVersionsDownloadNum" = "index numbers (#) of app versions to download"
 		"AskVersionsListNum" = "Enter index numbers (#) of version IDs to display app versions"
@@ -301,12 +308,14 @@ $LangStrings = @{
 		"ErrorAuthCheck" = "Error: Failed to verify the Apple account login."
 		"ErrorDownloadFiles" = "Error: Failed to download file:"
 		"ErrorDownloadedAppsListEmpty" = "Error: Download history is empty."
+		"ErrorideviceidNotFound" = "Error: idevice_id not found.`nScanning connected devices is impossible."
 		"ErrorideviceinstallerNotFound" = "Error: ideviceinstaller not found.`nInstalling apps via USB is impossible (only via AirDrop on macOS)."
 		"ErrorInstallipa" = "Error: Failed to install/upgrade the app."
 		"ErrorInvalidInput" = "Error: Invalid input."
 		"ErrorMissingFiles" = "Error. Following files were not found:"
 		"ErrorNoApps" = "Error: No apps found in Apps folder."
 		"ErrorNoAppsFound" = "Error: No apps found."
+		"ErrorNoDevices" = "Error: No connected devices found.`nConnect a device via USB and trust this computer."
 		"ErrorNoOtherAccounts" = "Error: No other Apple accounts found."
 		"ErrorNoVersionsFound" = "Error: No app versions found."
 		"ErrorOpenUrl" = "Error: Failed to open the page."
@@ -316,11 +325,14 @@ $LangStrings = @{
 		"FileSaved" = "Done. File saved to Apps folder."
 		"HeaderAppID" = "App ID:"
 		"HeaderAppName" = "App Name:"
+		"HeaderDeviceName" = "Device Name:"
 		"HeaderMinIOS" = "Min. iOS version:"
 		"HeaderNum" = "#"
+		"HeaderUDID" = "UDID:"
 		"HeaderVersionID" = "Version ID:"
 		"HeaderVersion" = "Version:"
 		"InstallApp" = "Installing:"
+		"InstallDevice" = "Device:"
 		"InstallerMenu1" = "1. Check the minimum iOS version for apps in the Apps folder"
 		"InstallerMenu2" = "2. Install apps from Apps folder"
 		"InstallerMenu3" = "3. Tip Jar"
@@ -1865,16 +1877,18 @@ function Update-PathFolder {
 	}
 }
 
-# Функция установки путей к ipatool/ideviceinstaller и применения PATH/прав запуска:
+# Функция установки путей к ipatool/ideviceinstaller/idevice_id и применения PATH/прав запуска:
 function Set-ipatoolBinaryPaths {
 	param ([string]$FolderPath)
 	
 	if ($IsWin) {
 		$ipatoolFile = Get-ChildItem -Path $FolderPath -Filter "ipatool*.exe" -File -ErrorAction SilentlyContinue | Select-Object -First 1
 		$ideviceinstallerFile = Get-ChildItem -Path $FolderPath -Filter "ideviceinstaller*.exe" -File -ErrorAction SilentlyContinue | Select-Object -First 1
+		$ideviceidFile = Get-ChildItem -Path $FolderPath -Filter "idevice_id*.exe" -File -ErrorAction SilentlyContinue | Select-Object -First 1
 		
 		if ($ipatoolFile) { $script:ipatoolFilePath = $ipatoolFile.FullName }
 		if ($ideviceinstallerFile) { $script:ideviceinstallerFilePath = $ideviceinstallerFile.FullName }
+		if ($ideviceidFile) { $script:ideviceidFilePath = $ideviceidFile.FullName }
 		
 		# Добавление папки с ipatool в PATH текущего процесса:
 		Update-PathFolder -NewFolder $FolderPath
@@ -1900,7 +1914,7 @@ function Get-MissingBinaryFiles {
 	$MissingFiles = @()
 	
 	if ($IsWin) {
-		$RequiredPatterns = @("ideviceinstaller*.exe", "ipatool*.exe")
+		$RequiredPatterns = @("ideviceinstaller*.exe", "idevice_id*.exe", "ipatool*.exe")
 		foreach ($Pattern in $RequiredPatterns) {
 			$Found = Get-ChildItem -Path $FolderPath -Filter $Pattern -File -ErrorAction SilentlyContinue
 			if (-not $Found) {
@@ -1917,6 +1931,31 @@ function Get-MissingBinaryFiles {
 	return $MissingFiles
 }
 
+# Функция получения списка подключенных устройств:
+function Get-ConnectedDevices {
+	$Devices = @()
+	$UdidList = @(& "$script:ideviceidFilePath" -l 2>$null)
+	
+	foreach ($Udid in $UdidList) {
+		$Udid = "$Udid".Trim()
+		
+		# Пропуск строк, не похожих на UDID:
+		if ($Udid -notmatch '^[0-9A-Fa-f-]{20,}$') { continue }
+		
+		# Получение имени устройства:
+		$DeviceName = (& "$script:ideviceidFilePath" $Udid 2>$null | Out-String).Trim()
+		if ([string]::IsNullOrWhiteSpace($DeviceName)) { $DeviceName = "Unknown" }
+		
+		$Devices += [PSCustomObject]@{
+			Num = $Devices.Count + 1
+			Name = $DeviceName
+			UDID = $Udid
+		}
+	}
+	
+	return $Devices
+}
+
 # Функция установки приложений из папки Apps:
 function Install-Apps {
 	if ([string]::IsNullOrWhiteSpace($script:ideviceinstallerFilePath)) {
@@ -1924,39 +1963,85 @@ function Install-Apps {
 		return
 	}
 	
-	$ipaFiles = Get-iOS-MinVersion
-	if ($null -ne $ipaFiles) {
-		while ($true) {
-			Separator
-			$SelectedIndices = Read-NumberSelection -PromptKey 'AskFileNum' -MaxCount $ipaFiles.Count
-			if ($null -eq $SelectedIndices) { return }
+	if ([string]::IsNullOrWhiteSpace($script:ideviceidFilePath)) {
+		Show-Error "ErrorideviceidNotFound"
+		return
+	}
+	
+	while ($true) {
+		# Поиск подключенных устройств:
+		$Devices = @(Get-ConnectedDevices)
+		if ($Devices.Count -eq 0) {
+			Show-Error "ErrorNoDevices"
+			return
+		}
+		
+		# Выбор устройств для установки:
+		Separator
+		Out-Table -Data $Devices -Headers (Get-Lang "HeaderNum"), (Get-Lang "HeaderDeviceName"), (Get-Lang "HeaderUDID") -Properties "Num", "Name", "UDID"
+		Separator
+		
+		$SelectedDeviceIndices = Read-NumberSelection -PromptKey 'AskDeviceNum' -MaxCount $Devices.Count
+		if ($null -eq $SelectedDeviceIndices) {
+			return
+		}
+		
+		# Получение списка приложений после выбора устройств:
+		$ipaFiles = Get-iOS-MinVersion
+		if ($null -eq $ipaFiles) {
+			return
+		}
+		
+		# Выбор приложений для установки:
+		Separator
+		$SelectedIndices = Read-NumberSelection -PromptKey 'AskFileNum' -MaxCount $ipaFiles.Count
+		if ($null -eq $SelectedIndices) {
+			return
+		}
+		
+		$InstallFailed = $false
+		
+		foreach ($Index in $SelectedIndices) {
+			$SelectedFile = $ipaFiles[$Index - 1]
 			
-			$InstallFailed = $false
-			foreach ($Index in $SelectedIndices) {
-				$SelectedFile = $ipaFiles[$Index - 1]
-				Separator
-				Write-Host "$(Get-Lang 'InstallApp') $($SelectedFile.Name)"
-				$TempFile = "$TempipaFilePath"
-				Copy-Item -Path $SelectedFile.FullName -Destination $TempFile -Force
-				try {
-					& "$script:ideviceinstallerFilePath" install $TempFile
+			Separator
+			Write-Host "$(Get-Lang 'InstallApp') $($SelectedFile.Name)"
+			
+			$TempFile = "$TempipaFilePath"
+			Copy-Item -Path $SelectedFile.FullName -Destination $TempFile -Force
+			
+			try {
+				foreach ($DeviceIndex in $SelectedDeviceIndices) {
+					$Device = $Devices[$DeviceIndex - 1]
+					$DeviceUdid = $Device.UDID
+					
+					Separator
+					Write-Host "$(Get-Lang 'InstallDevice') $($Device.Name) ($DeviceUdid)"
+					Separator
+					
+					& "$script:ideviceinstallerFilePath" --udid $DeviceUdid install $TempFile
 					
 					if ($LASTEXITCODE -ne 0) {
-						& "$script:ideviceinstallerFilePath" upgrade $TempFile
+						& "$script:ideviceinstallerFilePath" --udid $DeviceUdid upgrade $TempFile
 						
 						if ($LASTEXITCODE -ne 0) {
 							Show-Error "ErrorInstallipa"
 							$InstallFailed = $true
 						}
 					}
-				} finally {
-					Remove-Item -Path $TempFile -Force -ErrorAction SilentlyContinue
 				}
 			}
-			
-			# Возврат к выбору приложений для установки, если установка завершилась ошибкой:
-			if (!$InstallFailed) { return }
+			finally {
+				Remove-Item -Path $TempFile -Force -ErrorAction SilentlyContinue
+			}
 		}
+		
+		# Возврат к выбору устройств при ошибке установки:
+		if ($InstallFailed) {
+			continue
+		}
+		
+		return
 	}
 }
 
@@ -2659,10 +2744,13 @@ while ($true) {
 		Check-RequiredFiles -MissingFiles $MissingFiles
 		Set-ipatoolBinaryPaths -FolderPath $script:BinaryFolderPath
 		
-		# Поиск ideviceinstaller в системе (macOS и Linux):
+		# Поиск ideviceinstaller и idevice_id в системе (macOS и Linux):
 		if (-not $IsWin) {
 			$ideviceCmd = Get-Command ideviceinstaller* -ErrorAction SilentlyContinue | Select-Object -First 1
 			$script:ideviceinstallerFilePath = if ($ideviceCmd) { $ideviceCmd.Source } else { $null }
+			$ideviceidCmd = Get-Command idevice_id -ErrorAction SilentlyContinue | Select-Object -First 1
+			$script:ideviceidFilePath = if ($ideviceidCmd) { $ideviceidCmd.Source } else { $null }
+			
 			
 			if (-not $script:ideviceinstallerFilePath) {
 				Show-Error "ErrorideviceinstallerNotFound"
