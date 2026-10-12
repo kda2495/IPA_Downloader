@@ -352,7 +352,6 @@ eval "$(/opt/homebrew/bin/brew shellenv zsh)"
 * `Error: This Apple Account is temporarily unable to be used in the iTunes Store because it could not be found. Try again later.` - Необходимо заново авторизоваться в скрипте.
 * `Purchase error: app not found` - Покупка приложения не удалась, так как приложение удалено из App Store.
 * `Purchase error: item is temporarily unavailable` - Приложение не было приобретено на этом аккаунте Apple ранее, покупка не удалась, так как приложение удалено из App Store.
-* `Login error: GSA SRP exception: GSA complete error -27952: Update iCloud for Windows to the latest version to sign in` - Необходимо отключить расширенную защиту данных по пути: Настройки - Аккаунт Apple - iCloud - Расширенная защита данных.
 * `Login error: failed to initialize SAP signer: WinHttpSendRequest failed: 12029/12030` - Ошибка подключения, проверьте использование системой прокси-сервера, введя в командную строку Windows (cmd): `netsh winhttp show proxy` и нажмите Enter. При необходимости удалите неиспользуемый прокси-сервер, введя в командную строку Windows (запущенную от имени администратора): `netsh winhttp reset proxy` и нажмите Enter.
 * `No device found` - Устройство не найдено. Убедитесь, что драйвер AppleMobileDeviceSupport64 установлен (актуально для Windows).
 * `WARNING: could not locate Payload/App.app/SC_Info/App.sinf in archive!` - В устанавливаемом ipa файле не найдена подпись приложения.

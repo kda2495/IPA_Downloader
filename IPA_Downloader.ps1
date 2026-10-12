@@ -2,7 +2,7 @@
 Set-Location -Path $PSScriptRoot
 
 # Версия скрипта:
-$ScriptVersion = "4.2.0"
+$ScriptVersion = "4.2.1"
 
 # Переменная состояния keychain-passphrase:
 $script:KeychainEnabled = $false
@@ -147,6 +147,7 @@ $LangStrings = @{
 	"RU" = @{
 		"AccountAppsListLoad" = "Загрузка списка приложений из истории покупок аккаунта Apple.`nЭто может занять некоторое время..."
 		"AccountAppsListMenu" = "2. Список приложений из истории покупок аккаунта Apple"
+		"AccountAppsListUpdate" = "Обновление списка приложений из истории покупок аккаунта Apple (с {0} года).`nЭто может занять некоторое время..."
 		"AccountCleared" = "Готово. Данные аккаунта {0} удалены."
 		"AccountCurrent" = "(текущий)"
 		"AccountLoggedOut" = "Выполнен выход из аккаунта Apple: {0}"
@@ -188,9 +189,10 @@ $LangStrings = @{
 		"DownloaderMenu10" = "10. Операции с аккаунтом Apple"
 		"DownloaderMenu11" = "11. Банка для чаевых"
 		"DownloaderMenu12" = "12. Сменить язык (Change Language)"
+		"ErrorAppsListAccountLoad" = "Ошибка: Не удалось получить список приложений из истории покупок аккаунта Apple."
+		"ErrorAppsListAccountUpdate" = "Ошибка: Не удалось обновить список приложений из истории покупок аккаунта Apple.`nПоказан ранее сохраненный список."
 		"ErrorAppsListCustomEmpty" = "Ошибка: Пользовательский список приложений пуст.`nДобавьте приложения в Files/AppsListCustom.txt"
 		"ErrorAppsListLoad" = "Ошибка: Не удалось загрузить список приложений."
-		"ErrorAccountAppsLoad" = "Ошибка: Не удалось получить список приложений из истории покупок аккаунта Apple."
 		"ErrorAuthCheck" = "Ошибка: Не удалось подтвердить вход в аккаунт Apple."
 		"ErrorDeviceOSVersionTooLow" = "Ошибка: Версия iOS на устройстве ({0}) ниже минимальной версии iOS приложения ({1})."
 		"ErrorDownloadFiles" = "Ошибка: Не удалось загрузить файл:"
@@ -255,6 +257,7 @@ $LangStrings = @{
 	"EN" = @{
 		"AccountAppsListLoad" = "Loading the list of apps from the Apple account's purchase history.`nThis may take some time..."
 		"AccountAppsListMenu" = "2. List of apps from the Apple account purchase history"
+		"AccountAppsListUpdate" = "Updating the list of apps from the Apple account purchase history (since {0}).`nThis may take some time..."
 		"AccountCleared" = "Done. Account {0} data cleared."
 		"AccountCurrent" = "(current)"
 		"AccountLoggedOut" = "Successfully logged out of Apple account: {0}"
@@ -296,9 +299,10 @@ $LangStrings = @{
 		"DownloaderMenu10" = "10. Apple account operations"
 		"DownloaderMenu11" = "11. Tip Jar"
 		"DownloaderMenu12" = "12. Change Language (Сменить язык)"
+		"ErrorAppsListAccountLoad" = "Error: Failed to retrieve list of apps from the Apple account purchase history."
+		"ErrorAppsListAccountUpdate" = "Error: Failed to update the list of apps from the Apple account purchase history.`nShowing the previously saved list."
 		"ErrorAppsListCustomEmpty" = "Error: Custom apps list is empty.`nAdd apps to the Files/AppsListCustom.txt file."
 		"ErrorAppsListLoad" = "Error: Failed to load apps list."
-		"ErrorAccountAppsLoad" = "Error: Failed to retrieve list of apps from the Apple account purchase history."
 		"ErrorAuthCheck" = "Error: Failed to verify the Apple account login."
 		"ErrorDeviceOSVersionTooLow" = "Error: The iOS version on the device ({0}) is lower than the minimum iOS version required by the app ({1})."
 		"ErrorDownloadFiles" = "Error: Failed to download file:"
@@ -373,6 +377,7 @@ $script:reSpaces = New-Object System.Text.RegularExpressions.Regex('[\u00A0\u200
 $script:reDashes = New-Object System.Text.RegularExpressions.Regex('[\u2010-\u2015]', 'Compiled')
 $script:reHidden = New-Object System.Text.RegularExpressions.Regex('[\u200B-\u200F\u202A-\u202E\u2060\uFEFF\u00AD\p{Cc}\p{Cf}]', 'Compiled')
 $script:reWide = New-Object System.Text.RegularExpressions.Regex('[\u1100-\u115F\u2E80-\uA4CF\uAC00-\uD7A3\uF900-\uFAFF\uFF01-\uFF60]', 'Compiled')
+$script:reRTL = New-Object System.Text.RegularExpressions.Regex('[\u0590-\u08FF\uFB1D-\uFDFF\uFE70-\uFEFE]', 'Compiled')
 
 # Функция вывода данных в виде таблицы:
 function Out-Table {
@@ -397,6 +402,7 @@ function Out-Table {
 		
 		# Расчет ширины:
 		$VisualWidth = $CleanText.Length + $script:reWide.Matches($CleanText).Count
+		
 		return @{ Text = $CleanText; Width = $VisualWidth }
 	}
 	
@@ -913,7 +919,7 @@ function Initialize-Custom-List-File {
 	}
 }
 
-# Функция чтения и парсинга файла со списком приложений (Files/AppsList.txt, Files/AppsListCustom.txt):
+# Функция чтения и парсинга файла со списком приложений (Files/AppsList.txt, Files/AppsListCustom.txt, Files/AppsListAccount_*.txt):
 function Read-AppsListFile {
 	param ([string]$FilePath)
 	
@@ -931,10 +937,19 @@ function Read-AppsListFile {
 		}
 		
 		foreach ($Line in ($Raw -split "`r?`n")) {
-			if ($Line -match '^(.+?):\s*(\d+)') {
+			# Разбор строки в формате: Название: ID Дата покупки:
+			$LineMatch = [regex]::Match($Line, '^(.*):\s*(\d+)(?:[ \t]+(\d{1,2}\.\d{1,2}\.\d{4}))?\s*$')
+			
+			# Разбор строк с произвольным текстом после ID:
+			if (!$LineMatch.Success) {
+				$LineMatch = [regex]::Match($Line, '^(.*?):\s*(\d+)')
+			}
+			
+			if ($LineMatch.Success) {
 				$Result += [PSCustomObject]@{
-					Name = $Matches[1].Trim()
-					ID = $Matches[2].Trim()
+					Name = $LineMatch.Groups[1].Value.Trim()
+					ID = $LineMatch.Groups[2].Value.Trim()
+					PurchaseDate = $LineMatch.Groups[3].Value
 				}
 			}
 		}
@@ -945,7 +960,7 @@ function Read-AppsListFile {
 	return $Result
 }
 
-# Функция удаления дублей по ID с сохранением исходного порядка:
+# Функция удаления дублей приложений по ID с сохранением исходного порядка:
 function Remove-Duplicate-IDs {
 	param ([array]$Items)
 	
@@ -967,10 +982,249 @@ function Remove-Duplicate-IDs {
 function Get-Custom-List {
 	Initialize-Custom-List-File
 	
-	$List = @(Read-AppsListFile -FilePath $AppsListCustomPath)
+	# Игнорирование даты покупки в пользовательском списке приложений:
+	$List = @(Read-AppsListFile -FilePath $AppsListCustomPath | ForEach-Object {
+		[PSCustomObject]@{
+			Name = $_.Name
+			ID = $_.ID
+		}
+	})
 	
-	# Удаление дублей по ID внутри пользовательского списка приложений (Files/AppsListCustom.txt):
+	# Удаление дублей приложений по ID внутри пользовательского списка приложений (Files/AppsListCustom.txt):
 	return @(Remove-Duplicate-IDs -Items $List)
+}
+
+# Функция получения пути к списку приложений из истории покупок аккаунта Apple (Files/AppsListAccount_*.txt):
+function Get-Account-List-Path {
+	$SafeAccountName = $script:CurrentAppleAccount -replace '[\\/:*?"<>|]', '_'
+	return Join-Path -Path $FilesFolderPath -ChildPath "AppsListAccount_${SafeAccountName}.txt"
+}
+
+# Функция нормализации названия приложения из истории покупок аккаунта Apple:
+function ConvertTo-Account-AppName {
+	param ([string]$Name)
+	
+	$CleanName = [string]$Name
+	$CleanName = $CleanName -replace '[\r\n]+', ' '
+	$CleanName = $script:reHidden.Replace($CleanName, '')
+	$CleanName = $CleanName -replace '[\u0600-\u06FF\u0750-\u077F\u08A0-\u08FF\uFB50-\uFDFF\uFE70-\uFEFF]', ''
+	$CleanName = $CleanName -replace '^\s*[|¦‖]+\s*|\s*[|¦‖]+\s*$', ''
+	$CleanName = $CleanName -replace '\s{2,}', ' '
+	return $CleanName.Trim()
+}
+
+# Функция преобразования формата даты покупки:
+function Convert-PurchaseDate {
+	param ([string]$DateText)
+	
+	$MonthNumbers = @{ Jan = 1; Feb = 2; Mar = 3; Apr = 4; May = 5; Jun = 6; Jul = 7; Aug = 8; Sep = 9; Oct = 10; Nov = 11; Dec = 12 }
+	
+	$DateDay = $null
+	$DateMonthName = $null
+	$DateYear = $null
+	
+	if ($DateText -match '([A-Za-z]{3})[A-Za-z]*\.?\s+(\d{1,2})\D+?(\d{4})') {
+		# Формат даты в аккаунтах США:
+		$DateMonthName = $Matches[1]
+		$DateDay = [int]$Matches[2]
+		$DateYear = $Matches[3]
+	} elseif ($DateText -match '(\d{1,2})\D+?([A-Za-z]{3})[A-Za-z]*\D*?(\d{4})') {
+		# Формат даты в других аккаунтах:
+		$DateDay = [int]$Matches[1]
+		$DateMonthName = $Matches[2]
+		$DateYear = $Matches[3]
+	}
+	
+	if ($null -ne $DateMonthName -and $MonthNumbers.ContainsKey($DateMonthName)) {
+		return ("{0:D2}.{1:D2}.{2}" -f $DateDay, [int]$MonthNumbers[$DateMonthName], $DateYear)
+	}
+	
+	return $DateText
+}
+
+# Функция получения числового ключа даты покупки:
+function Get-PurchaseDateKey {
+	param ([string]$DateText)
+	
+	if ($DateText -match '^(\d{1,2})\.(\d{1,2})\.(\d{4})$') {
+		return (([int]$Matches[3] * 10000) + ([int]$Matches[2] * 100) + [int]$Matches[1])
+	}
+	
+	return 0
+}
+
+# Функция запроса списка приложений из истории покупок аккаунта Apple:
+function Get-Purchased-Apps {
+	param ([string[]]$ListArgs)
+	
+	$CommandOutput = Invoke-ipatool list-purchases @ListArgs | Out-String
+	$AppsMatch = [System.Text.RegularExpressions.Regex]::Match($CommandOutput, '(?m)\bapps=(\[.*\])')
+	if (!$AppsMatch.Success) {
+		return [PSCustomObject]@{ Success = $false; Output = $CommandOutput; Apps = @() }
+	}
+	
+	try {
+		$Apps = @($AppsMatch.Groups[1].Value | ConvertFrom-Json -ErrorAction Stop | ForEach-Object { $_ })
+	} catch {
+		return [PSCustomObject]@{ Success = $false; Output = ""; Apps = @() }
+	}
+	
+	$Apps = @(
+		$Apps |
+			Where-Object { $_.kind -eq 'iOS App' -and ![string]::IsNullOrWhiteSpace([string]$_.id) }
+	)
+	
+	# Порядок вывода списка приложений из истории покупок аккаунта Apple:
+	[array]::Reverse($Apps)
+	
+	$Result = @()
+	foreach ($App in $Apps) {
+		$Result += [PSCustomObject]@{
+			Name = ConvertTo-Account-AppName -Name ([string]$App.name)
+			ID = [string]$App.id
+			PurchaseDate = Convert-PurchaseDate -DateText ([string]$App.purchaseDate)
+		}
+	}
+	
+	return [PSCustomObject]@{ Success = $true; Output = $CommandOutput; Apps = $Result }
+}
+
+# Функция сортировки списка приложений из истории покупок аккаунта Apple по дате покупки:
+function Sort-Apps-By-Date {
+	param ([array]$Apps)
+	
+	if ($Apps.Count -eq 0) {
+		return @()
+	}
+	
+	$Keyed = @()
+	for ($i = 0; $i -lt $Apps.Count; $i++) {
+		$Keyed += [PSCustomObject]@{
+			Key = (Get-PurchaseDateKey -DateText ([string]$Apps[$i].PurchaseDate))
+			Index = $i
+			App = $Apps[$i]
+		}
+	}
+	
+	return @($Keyed | Sort-Object -Property Key, Index | ForEach-Object { $_.App })
+}
+
+# Функция сохранения списка приложений из истории покупок аккаунта Apple (Files/AppsListAccount_*.txt):
+function Save-Account-List {
+	param (
+		[string]$FilePath,
+		[array]$Apps
+	)
+	
+	if ($Apps.Count -eq 0) {
+		return
+	}
+	
+	$Lines = @()
+	foreach ($App in $Apps) {
+		$AppName = ConvertTo-Account-AppName -Name ([string]$App.Name)
+		$Lines += "${AppName}: $($App.ID) $($App.PurchaseDate)".TrimEnd()
+	}
+	
+	# Запись во временный файл и замена основного файла после успешной записи:
+	$TempPath = "${FilePath}.tmp"
+	try {
+		[System.IO.File]::WriteAllLines($TempPath, [string[]]$Lines, (New-Object System.Text.UTF8Encoding($false)))
+		Move-Item -LiteralPath $TempPath -Destination $FilePath -Force -ErrorAction Stop
+	}
+	catch {
+		if (Test-Path -LiteralPath $TempPath) {
+			Remove-Item -LiteralPath $TempPath -Force -ErrorAction SilentlyContinue
+		}
+	}
+}
+
+# Функция получения списка приложений из истории покупок аккаунта Apple с сохранением в файл (Files/AppsListAccount_*.txt):
+function Get-Account-Apps {
+	$CachePath = Get-Account-List-Path
+	$CachedApps = @(Read-AppsListFile -FilePath $CachePath)
+	
+	$CachedAppsChanged = $false
+	for ($i = 0; $i -lt $CachedApps.Count; $i++) {
+		$OriginalName = [string]$CachedApps[$i].Name
+		$CleanName = ConvertTo-Account-AppName -Name $OriginalName
+		if ($CleanName -cne $OriginalName) {
+			$CachedApps[$i].Name = $CleanName
+			$CachedAppsChanged = $true
+		}
+	}
+	if ($CachedAppsChanged) {
+		Save-Account-List -FilePath $CachePath -Apps $CachedApps
+	}
+	
+	# Определение года и ID последней покупки в сохраненном списке приложений:
+	$LastKey = 0
+	$LastID = ""
+	foreach ($CachedApp in $CachedApps) {
+		$DateKey = Get-PurchaseDateKey -DateText ([string]$CachedApp.PurchaseDate)
+		if ($DateKey -gt 0 -and $DateKey -ge $LastKey) {
+			$LastKey = $DateKey
+			$LastID = [string]$CachedApp.ID
+		}
+	}
+	$LastYear = [int][Math]::Floor($LastKey / 10000)
+	
+	# Повторная загрузка списка приложений, начиная с года последней покупки:
+	if ($LastYear -gt 0 -and $LastYear -le (Get-Date).Year) {
+		Separator
+		Write-Host ((Get-Lang "AccountAppsListUpdate") -f $LastYear)
+		
+		$UpdateResult = Get-Purchased-Apps -ListArgs @("--since-year", "$LastYear")
+		
+		# Проверка наличия последнего сохраненного приложения в ответе:
+		if ($UpdateResult.Success -and (@($UpdateResult.Apps | Where-Object { $_.ID -eq $LastID }).Count -gt 0)) {
+			$KnownIDs = @{}
+			foreach ($CachedApp in $CachedApps) {
+				$KnownIDs[[string]$CachedApp.ID] = $true
+			}
+			
+			# Добавление отсутствующих приложений в список:
+			$NewApps = @()
+			foreach ($UpdateApp in $UpdateResult.Apps) {
+				if (!$KnownIDs.ContainsKey($UpdateApp.ID)) {
+					$KnownIDs[$UpdateApp.ID] = $true
+					$NewApps += $UpdateApp
+				}
+			}
+			
+			if ($NewApps.Count -eq 0) {
+				return [PSCustomObject]@{ Success = $true; Apps = $CachedApps }
+			}
+			
+			$MergedApps = @(Sort-Apps-By-Date -Apps (@($CachedApps) + $NewApps))
+			Save-Account-List -FilePath $CachePath -Apps $MergedApps
+			return [PSCustomObject]@{ Success = $true; Apps = $MergedApps }
+		}
+	}
+	
+	# Загрузка полного списка приложений из истории покупок аккаунта Apple при первой загрузке или при ошибке повторной загрузки:
+	Separator
+	Write-Host (Get-Lang "AccountAppsListLoad")
+	$FullResult = Get-Purchased-Apps -ListArgs @("--all")
+	
+	if ($FullResult.Success) {
+		$FullApps = @(Sort-Apps-By-Date -Apps @(Remove-Duplicate-IDs -Items $FullResult.Apps))
+		Save-Account-List -FilePath $CachePath -Apps $FullApps
+		return [PSCustomObject]@{ Success = $true; Apps = $FullApps }
+	}
+	
+	if (![string]::IsNullOrWhiteSpace($FullResult.Output)) {
+		Write-Host $FullResult.Output.Trim()
+	}
+	
+	# Вывод ранее сохраненного списка приложений при ошибке загрузки полного списка приложений:
+	if ($CachedApps.Count -gt 0) {
+		Show-Error "ErrorAppsListAccountUpdate"
+		return [PSCustomObject]@{ Success = $true; Apps = $CachedApps }
+	}
+	
+	Show-Error "ErrorAppsListAccountLoad"
+	return [PSCustomObject]@{ Success = $false; Apps = @() }
 }
 
 # Функция предварительной загрузки списка популярных приложений (Files/AppsList.txt) и предупреждения (Files/Warning.txt):
@@ -1656,55 +1910,14 @@ function Get-Apps-From-List {
 		}
 	}
 	
-	# 2. Список приложений из истории покупок аккаунта Apple:
+	# 2. Список приложений из истории покупок аккаунта Apple (Files/AppsListAccount_*.txt):
 	elseif ($ListMode -ne "Purchase" -and $ListChoice -eq '2') {
-		Separator
-		Write-Host (Get-Lang "AccountAppsListLoad")
-		$CommandOutput = Invoke-ipatool list-purchases --all | Out-String
-		$AppsMatch = [System.Text.RegularExpressions.Regex]::Match($CommandOutput, '(?m)\bapps=(\[.*\])')
-		if (!$AppsMatch.Success) {
-			if (![string]::IsNullOrWhiteSpace($CommandOutput)) {
-				Write-Host $CommandOutput.Trim()
-			}
-			Show-Error "ErrorAccountAppsLoad"
+		$AccountResult = Get-Account-Apps
+		if (!$AccountResult.Success) {
 			return $null
 		}
 		
-		try {
-			$AccountApps = @($AppsMatch.Groups[1].Value | ConvertFrom-Json -ErrorAction Stop | ForEach-Object { $_ })
-		} catch {
-			Show-Error "ErrorAccountAppsLoad"
-			return $null
-		}
-		
-		$AccountApps = @(
-			$AccountApps |
-				Where-Object { $_.kind -eq 'iOS App' -and ![string]::IsNullOrWhiteSpace([string]$_.id) }
-		)
-		
-		# Порядок вывода списка приложений из истории покупок аккаунта Apple:
-		[array]::Reverse($AccountApps)
-		# Определение номеров месяцев для преобразования даты покупки:
-		$MonthNumbers = @{ Jan = 1; Feb = 2; Mar = 3; Apr = 4; May = 5; Jun = 6; Jul = 7; Aug = 8; Sep = 9; Oct = 10; Nov = 11; Dec = 12 }
-		
-		foreach ($App in $AccountApps) {
-			# Преобразование даты покупки из формата:
-			$PurchaseDateText = [string]$App.purchaseDate
-			if ($PurchaseDateText -match '(\d{1,2})\D+?([A-Za-z]{3})[A-Za-z]*\D*?(\d{4})') {
-				$DateDay = [int]$Matches[1]
-				$DateMonthName = $Matches[2]
-				$DateYear = $Matches[3]
-				if ($MonthNumbers.ContainsKey($DateMonthName)) {
-					$PurchaseDateText = "{0:D2}.{1:D2}.{2}" -f $DateDay, [int]$MonthNumbers[$DateMonthName], $DateYear
-				}
-			}
-			
-			$AppItems += [PSCustomObject]@{
-				Name = [string]$App.name
-				ID = [string]$App.id
-				PurchaseDate = $PurchaseDateText
-			}
-		}
+		$AppItems = @($AccountResult.Apps)
 		$ShowPurchaseDate = $true
 	}
 	
@@ -1726,10 +1939,15 @@ function Get-Apps-From-List {
 	# Подготовка строк таблицы:
 	$TableData = @(
 		for ($i = 0; $i -lt $AppItems.Count; $i++) {
+			$DisplayName = [string]$AppItems[$i].Name
+			if ($ShowPurchaseDate) {
+				$DisplayName = ConvertTo-Account-AppName -Name $DisplayName
+			}
+			
 			[PSCustomObject]@{
 				Num = $i + 1
 				Name = [string]$AppItems[$i].Name
-				DisplayName = Get-ShortText -Text ([string]$AppItems[$i].Name)
+				DisplayName = Get-ShortText -Text $DisplayName
 				ID = [string]$AppItems[$i].ID
 				PurchaseDate = [string]$AppItems[$i].PurchaseDate
 			}
@@ -1863,21 +2081,12 @@ function Get-MissingBinaryFiles {
 	
 	if ($IsWin) {
 		$RequiredPatterns = @(
-			"ideviceinstaller*.exe",
 			"idevice_id*.exe",
 			"ideviceinfo*.exe",
+			"ideviceinstaller*.exe",
 			"ipatool*.exe",
-			"libbz2-1.dll",
-			"libcrypto-3-x64.dll",
 			"libimobiledevice-1.0.dll",
-			"libimobiledevice-glue-1.0.dll",
-			"liblzma-5.dll",
-			"libplist-2.0.dll",
-			"libssl-3-x64.dll",
-			"libusbmuxd-2.0.dll",
-			"libzip.dll",
-			"libzstd.dll",
-			"zlib1.dll"
+			"libplist-2.0.dll"
 		)
 		
 		foreach ($Pattern in $RequiredPatterns) {

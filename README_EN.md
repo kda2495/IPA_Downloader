@@ -355,7 +355,6 @@ eval "$(/opt/homebrew/bin/brew shellenv zsh)"
 * `Error: This Apple Account is temporarily unable to be used in the iTunes Store because it could not be found. Try again later.` - You need to re‑log in to the script.
 * `Purchase error: app not found` - App purchase failed because the app has been removed from the App Store.
 * `Purchase error: item is temporarily unavailable` - The app was not previously purchased on this Apple account, the purchase failed because the app has been removed from the App Store.
-* `Login error: GSA SRP exception: GSA complete error -27952: Update iCloud for Windows to the latest version to sign in` - Advanced Data Protection needs to be disabled in `Settings - Apple Account - iCloud - Advanced Data Protection`.
 * `Login error: failed to initialize SAP signer: WinHttpSendRequest failed: 12029/12030` - Connection error, check the system’s use of a proxy server by entering the following into the Windows command line (cmd): `netsh winhttp show proxy` and press Enter. If necessary, remove the unused proxy server by entering the following into the Windows command line (run as an administrator): `netsh winhttp reset proxy` and press Enter.
 * `No device found` - Device not found. Make sure the AppleMobileDeviceSupport64 driver is installed (relevant for Windows).
 * `WARNING: could not locate Payload/App.app/SC_Info/App.sinf in archive!` - App signature not found in the installed ipa file.
