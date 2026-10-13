@@ -2,7 +2,7 @@
 Set-Location -Path $PSScriptRoot
 
 # Версия скрипта:
-$ScriptVersion = "4.2.1"
+$ScriptVersion = "4.2.2"
 
 # Переменная состояния keychain-passphrase:
 $script:KeychainEnabled = $false
@@ -146,7 +146,7 @@ $script:RepoParsedList = $null
 $LangStrings = @{
 	"RU" = @{
 		"AccountAppsListLoad" = "Загрузка списка приложений из истории покупок аккаунта Apple.`nЭто может занять некоторое время..."
-		"AccountAppsListMenu" = "2. Список приложений из истории покупок аккаунта Apple"
+		"AccountAppsListMenu" = "2. Список приложений из истории покупок аккаунта Apple (Files/AppsListAccount_.txt)"
 		"AccountAppsListUpdate" = "Обновление списка приложений из истории покупок аккаунта Apple (с {0} года).`nЭто может занять некоторое время..."
 		"AccountCleared" = "Готово. Данные аккаунта {0} удалены."
 		"AccountCurrent" = "(текущий)"
@@ -256,7 +256,7 @@ $LangStrings = @{
 	}
 	"EN" = @{
 		"AccountAppsListLoad" = "Loading the list of apps from the Apple account's purchase history.`nThis may take some time..."
-		"AccountAppsListMenu" = "2. List of apps from the Apple account purchase history"
+		"AccountAppsListMenu" = "2. List of apps from the Apple account purchase history (Files/AppsListAccount_.txt)"
 		"AccountAppsListUpdate" = "Updating the list of apps from the Apple account purchase history (since {0}).`nThis may take some time..."
 		"AccountCleared" = "Done. Account {0} data cleared."
 		"AccountCurrent" = "(current)"
@@ -377,7 +377,11 @@ $script:reSpaces = New-Object System.Text.RegularExpressions.Regex('[\u00A0\u200
 $script:reDashes = New-Object System.Text.RegularExpressions.Regex('[\u2010-\u2015]', 'Compiled')
 $script:reHidden = New-Object System.Text.RegularExpressions.Regex('[\u200B-\u200F\u202A-\u202E\u2060\uFEFF\u00AD\p{Cc}\p{Cf}]', 'Compiled')
 $script:reWide = New-Object System.Text.RegularExpressions.Regex('[\u1100-\u115F\u2E80-\uA4CF\uAC00-\uD7A3\uF900-\uFAFF\uFF01-\uFF60]', 'Compiled')
-$script:reRTL = New-Object System.Text.RegularExpressions.Regex('[\u0590-\u08FF\uFB1D-\uFDFF\uFE70-\uFEFE]', 'Compiled')
+$script:reSurrogates = New-Object System.Text.RegularExpressions.Regex('[\uD800-\uDBFF][\uDC00-\uDFFF]', 'Compiled')
+$script:reUnsafe = New-Object System.Text.RegularExpressions.Regex('[^\u0020-\u007E\u00A0-\u017F\u0400-\u045F\u0490\u0491\u2013\u2014\u2018-\u201E\u2022\u2026\u2116\u20AC\u2122]', 'Compiled')
+
+# Определение консоли Windows 7, 8 и 8.1:
+$script:LegacyConsole = $IsWin -and ([Environment]::OSVersion.Version.Major -lt 10)
 
 # Функция вывода данных в виде таблицы:
 function Out-Table {
@@ -399,6 +403,12 @@ function Out-Table {
 		$CleanText = $script:reDashes.Replace($CleanText, '-')
 		$CleanText = $script:reHidden.Replace($CleanText, '')
 		$CleanText = $CleanText.Normalize([System.Text.NormalizationForm]::FormC)
+		
+		# Замена знаков, которые не отображаются в консоли Windows 7, 8 и 8.1, на знак "?":
+		if ($script:LegacyConsole) {
+			$CleanText = $script:reSurrogates.Replace($CleanText, '?')
+			$CleanText = $script:reUnsafe.Replace($CleanText, '?')
+		}
 		
 		# Расчет ширины:
 		$VisualWidth = $CleanText.Length + $script:reWide.Matches($CleanText).Count
@@ -919,7 +929,7 @@ function Initialize-Custom-List-File {
 	}
 }
 
-# Функция чтения и парсинга файла со списком приложений (Files/AppsList.txt, Files/AppsListCustom.txt, Files/AppsListAccount_*.txt):
+# Функция чтения и парсинга файла со списком приложений (Files/AppsList.txt, Files/AppsListCustom.txt, Files/AppsListAccount_.txt):
 function Read-AppsListFile {
 	param ([string]$FilePath)
 	
@@ -994,7 +1004,7 @@ function Get-Custom-List {
 	return @(Remove-Duplicate-IDs -Items $List)
 }
 
-# Функция получения пути к списку приложений из истории покупок аккаунта Apple (Files/AppsListAccount_*.txt):
+# Функция получения пути к списку приложений из истории покупок аккаунта Apple (Files/AppsListAccount_.txt):
 function Get-Account-List-Path {
 	$SafeAccountName = $script:CurrentAppleAccount -replace '[\\/:*?"<>|]', '_'
 	return Join-Path -Path $FilesFolderPath -ChildPath "AppsListAccount_${SafeAccountName}.txt"
@@ -1004,13 +1014,29 @@ function Get-Account-List-Path {
 function ConvertTo-Account-AppName {
 	param ([string]$Name)
 	
+	$RtlPattern = '[\u0590-\u08FF\uFB1D-\uFDFF\uFE70-\uFEFE]'
+	
 	$CleanName = [string]$Name
 	$CleanName = $CleanName -replace '[\r\n]+', ' '
 	$CleanName = $script:reHidden.Replace($CleanName, '')
-	$CleanName = $CleanName -replace '[\u0600-\u06FF\u0750-\u077F\u08A0-\u08FF\uFB50-\uFDFF\uFE70-\uFEFF]', ''
+	
+	# Удаление текста справа налево, пустых скобок и разделителей вокруг него:
+	if ($CleanName -match $RtlPattern) {
+		$CleanName = $CleanName -replace $RtlPattern, ''
+		$CleanName = $CleanName -replace '\(\s*\)|\[\s*\]|\{\s*\}|«\s*»|"\s*"', ''
+		$CleanName = $CleanName -replace '^[\s|¦‖\-–—:]+|[\s|¦‖\-–—:]+$', ''
+	}
+	
 	$CleanName = $CleanName -replace '^\s*[|¦‖]+\s*|\s*[|¦‖]+\s*$', ''
 	$CleanName = $CleanName -replace '\s{2,}', ' '
-	return $CleanName.Trim()
+	$CleanName = $CleanName.Trim()
+	
+	# Название только из удаленных символов:
+	if ([string]::IsNullOrWhiteSpace($CleanName)) {
+		return "Unknown"
+	}
+	
+	return $CleanName
 }
 
 # Функция преобразования формата даты покупки:
@@ -1053,7 +1079,7 @@ function Get-PurchaseDateKey {
 	return 0
 }
 
-# Функция запроса списка приложений из истории покупок аккаунта Apple:
+# Функция запроса списка приложений из истории покупок аккаунта Apple (Files/AppsListAccount_.txt):
 function Get-Purchased-Apps {
 	param ([string[]]$ListArgs)
 	
@@ -1089,7 +1115,7 @@ function Get-Purchased-Apps {
 	return [PSCustomObject]@{ Success = $true; Output = $CommandOutput; Apps = $Result }
 }
 
-# Функция сортировки списка приложений из истории покупок аккаунта Apple по дате покупки:
+# Функция сортировки списка приложений из истории покупок аккаунта Apple (Files/AppsListAccount_.txt) по дате покупки:
 function Sort-Apps-By-Date {
 	param ([array]$Apps)
 	
@@ -1109,7 +1135,7 @@ function Sort-Apps-By-Date {
 	return @($Keyed | Sort-Object -Property Key, Index | ForEach-Object { $_.App })
 }
 
-# Функция сохранения списка приложений из истории покупок аккаунта Apple (Files/AppsListAccount_*.txt):
+# Функция сохранения списка приложений из истории покупок аккаунта Apple (Files/AppsListAccount_.txt):
 function Save-Account-List {
 	param (
 		[string]$FilePath,
@@ -1139,7 +1165,7 @@ function Save-Account-List {
 	}
 }
 
-# Функция получения списка приложений из истории покупок аккаунта Apple с сохранением в файл (Files/AppsListAccount_*.txt):
+# Функция получения списка приложений из истории покупок аккаунта Apple с сохранением в файл (Files/AppsListAccount_.txt):
 function Get-Account-Apps {
 	$CachePath = Get-Account-List-Path
 	$CachedApps = @(Read-AppsListFile -FilePath $CachePath)
@@ -1774,7 +1800,7 @@ function Search-Apps {
 				if ($SearchResult.apps) {
 					foreach ($Item in @($SearchResult.apps)) {
 						$FoundApps += [PSCustomObject]@{
-							Name = $Item.Name
+							Name = ConvertTo-Account-AppName -Name ([string]$Item.Name)Name = $Item.Name
 							ID = $Item.ID
 						}
 					}
@@ -1910,7 +1936,7 @@ function Get-Apps-From-List {
 		}
 	}
 	
-	# 2. Список приложений из истории покупок аккаунта Apple (Files/AppsListAccount_*.txt):
+	# 2. Список приложений из истории покупок аккаунта Apple (Files/AppsListAccount_.txt):
 	elseif ($ListMode -ne "Purchase" -and $ListChoice -eq '2') {
 		$AccountResult = Get-Account-Apps
 		if (!$AccountResult.Success) {

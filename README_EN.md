@@ -267,7 +267,7 @@ eval "$(/opt/homebrew/bin/brew shellenv zsh)"
 #### 5. Select an app list and download latest version:
 * Select the app list to display:
 1. Popular apps list (Files/AppsList.txt)
-2. List of apps from the Apple account purchase history
+2. List of apps from the Apple account purchase history (Files/AppsListAccount_.txt)
 3. Custom apps list (Files/AppsListCustom.txt)
 * Press Enter;
 * The selected list will be displayed;
@@ -277,7 +277,7 @@ eval "$(/opt/homebrew/bin/brew shellenv zsh)"
 #### 6. Select an app list and download (with version selection):
 * Select the app list to display:
 1. Popular apps list (Files/AppsList.txt)
-2. List of apps from the Apple account purchase history
+2. List of apps from the Apple account purchase history (Files/AppsListAccount_.txt)
 3. Custom apps list (Files/AppsListCustom.txt)
 * Press Enter;
 * The selected list will be displayed;
