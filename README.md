@@ -134,8 +134,9 @@ eval "$(/opt/homebrew/bin/brew shellenv zsh)"
 * При появлении запросов вводим `y` в Терминал и нажимаем Enter.
 #### Примечание:
 * Для удаления Homebrew и всех его компонентов, вводим в Терминал:  
-`/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/uninstall.sh)"`
-* Нажимаем Enter.
+`/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/uninstall.sh)"` и нажмите Enter.
+* На macOS 10.15 Catalina необходимо установить PowerShell версии 7.3.12, загрузив файл:
+[Ссылка для загрузки PowerShell 7.3.12](https://github.com/PowerShell/PowerShell/releases/download/v7.3.12/powershell-7.3.12-osx-x64.pkg)
 
 ### Как использовать (macOS):
 #### 1. Распаковываем архив IPA_Downloader.zip любым архиватором (Keka);
@@ -239,7 +240,7 @@ eval "$(/opt/homebrew/bin/brew shellenv zsh)"
 * Вводим порядковые номера (№) приложений для отображения ID версий;
 * Нажимаем Enter;
 * Отобразится список ID версий приложения (от первой к последней);
-* Вводим порядковые номера (№) ID версий приложения для отображения версий;
+* Вводим порядковые номера (№) ID версий или ID версий для отображения версий;
 * Нажимаем Enter;
 * Отобразится список версий приложения;
 * Вводим порядковые номера (№) версий приложения для загрузки;
@@ -247,7 +248,7 @@ eval "$(/opt/homebrew/bin/brew shellenv zsh)"
 
 * В случае ввода ID приложений:
 * Отобразится список ID версий приложения (от первой к последней);
-* Вводим порядковые номера (№) ID версий приложения для отображения версий;
+* Вводим порядковые номера (№) ID версий или ID версий для отображения версий;
 * Нажимаем Enter;
 * Отобразится список версий приложения;
 * Вводим порядковые номера (№) версий приложения для загрузки;
@@ -282,7 +283,7 @@ eval "$(/opt/homebrew/bin/brew shellenv zsh)"
 * Вводим порядковые номера (№) приложения для загрузки;
 * Нажимаем Enter;
 * Отобразится список ID версий приложения (от первой к последней);
-* Вводим порядковые номера (№) ID версий приложения для отображения версий;
+* Вводим порядковые номера (№) ID версий или ID версий для отображения версий;
 * Нажимаем Enter;
 * Отобразится список версий приложения;
 * Вводим порядковые номера (№) версий приложения для загрузки;
@@ -317,6 +318,8 @@ eval "$(/opt/homebrew/bin/brew shellenv zsh)"
 * Скрипт осуществит переход на страницу CloudTips.
 #### 12. Сменить язык (Change Language):
 * Скрипт осуществит смену языка скрипта.
+#### airinstall
+* Включение/отключение установки приложений по Wi-Fi.
 #### debug
 * Включение/отключение режима отладки.
 
@@ -339,6 +342,8 @@ eval "$(/opt/homebrew/bin/brew shellenv zsh)"
 * Скрипт осуществит смену языка скрипта.
 #### 5. Перейти в IPA_Downloader:
 * Скрипт осуществит смену режима на IPA_Downloader (загрузка и установка приложений).
+#### airinstall
+* Включение/отключение установки приложений по Wi-Fi.
 #### debug
 * Включение/отключение режима отладки.
 
@@ -352,7 +357,6 @@ eval "$(/opt/homebrew/bin/brew shellenv zsh)"
 * `Error: This Apple Account is temporarily unable to be used in the iTunes Store because it could not be found. Try again later.` - Необходимо заново авторизоваться в скрипте.
 * `Purchase error: app not found` - Покупка приложения не удалась, так как приложение удалено из App Store.
 * `Purchase error: item is temporarily unavailable` - Приложение не было приобретено на этом аккаунте Apple ранее, покупка не удалась, так как приложение удалено из App Store.
-* `Login error: failed to initialize SAP signer: WinHttpSendRequest failed: 12029/12030` - Ошибка подключения, проверьте использование системой прокси-сервера, введя в командную строку Windows (cmd): `netsh winhttp show proxy` и нажмите Enter. При необходимости удалите неиспользуемый прокси-сервер, введя в командную строку Windows (запущенную от имени администратора): `netsh winhttp reset proxy` и нажмите Enter.
 * `No device found` - Устройство не найдено. Убедитесь, что драйвер AppleMobileDeviceSupport64 установлен (актуально для Windows).
 * `WARNING: could not locate Payload/App.app/SC_Info/App.sinf in archive!` - В устанавливаемом ipa файле не найдена подпись приложения.
 * `ERROR: Install failed. Got error "APIInternalError" with code 0x00000000: Error Domain=IXErrorDomain Code=46` - Необходимо удалить приложение с устройства, перезагрузить устройство и попробовать установить еще раз.

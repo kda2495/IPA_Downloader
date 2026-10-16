@@ -133,8 +133,9 @@ eval "$(/opt/homebrew/bin/brew shellenv zsh)"
 * When prompted, type `y` in Terminal and press Enter.
 #### Note:
 * To uninstall Homebrew and all its components, type in Terminal:  
-`/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/uninstall.sh)"`
-* Press Enter.
+`/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/uninstall.sh)"` and press Enter.
+* On macOS 10.15 Catalina, you need to install PowerShell version 7.3.12 by downloading the file:
+[Link to download PowerShell 7.3.12](https://github.com/PowerShell/PowerShell/releases/download/v7.3.12/powershell-7.3.12-osx-x64.pkg)
 
 ### How to use (macOS):
 #### 1. Extract the IPA_Downloader.zip archive using any archiver (Keka);
@@ -239,7 +240,7 @@ eval "$(/opt/homebrew/bin/brew shellenv zsh)"
 * Enter the index numbers (#) of the apps to display app version IDs;
 * Press Enter;
 * A list of app version IDs will be displayed (from the first to the latest);
-* Enter the index numbers (#) of the app version IDs to display app versions;
+* Enter index numbers (#) of version IDs or version IDs to display app versions;
 * Press Enter;
 * A list of app versions will be displayed;
 * Enter the index numbers (#) of the app versions to download;
@@ -248,7 +249,7 @@ eval "$(/opt/homebrew/bin/brew shellenv zsh)"
 
 * If app IDs are entered:
 * A list of app version IDs will be displayed (from the first to the latest);
-* Enter the index numbers (#) of the app version IDs to display app versions;
+* Enter index numbers (#) of version IDs or version IDs to display app versions;
 * Press Enter;
 * A list of app versions will be displayed;
 * Enter the index numbers (#) of the app versions to download;
@@ -284,7 +285,7 @@ eval "$(/opt/homebrew/bin/brew shellenv zsh)"
 * Enter the index numbers (#) of the apps to download;
 * Press Enter;
 * A list of app version IDs will be displayed (from the first to the latest);
-* Enter the index numbers (#) of the app version IDs to display app versions;
+* Enter index numbers (#) of version IDs or version IDs to display app versions;
 * Press Enter;
 * A list of app versions will be displayed;
 * Enter the index numbers (#) of the app versions to download;
@@ -320,6 +321,8 @@ eval "$(/opt/homebrew/bin/brew shellenv zsh)"
 * The script will navigate to the CloudTips page.
 #### 12. Change Language (Сменить язык):
 * The script will change its interface language.
+#### airinstall
+* Enable/disable Wi‑Fi app installation.
 #### debug
 * Enable/disable debug mode.
 
@@ -342,6 +345,8 @@ eval "$(/opt/homebrew/bin/brew shellenv zsh)"
 * The script will change its interface language.
 #### 5. Switch to IPA_Downloader:
 * The script will switch the mode to IPA_Downloader (downloading and installing apps).
+#### airinstall
+* Enable/disable Wi‑Fi app installation.
 #### debug
 * Enable/disable debug mode.
 
@@ -355,7 +360,6 @@ eval "$(/opt/homebrew/bin/brew shellenv zsh)"
 * `Error: This Apple Account is temporarily unable to be used in the iTunes Store because it could not be found. Try again later.` - You need to re‑log in to the script.
 * `Purchase error: app not found` - App purchase failed because the app has been removed from the App Store.
 * `Purchase error: item is temporarily unavailable` - The app was not previously purchased on this Apple account, the purchase failed because the app has been removed from the App Store.
-* `Login error: failed to initialize SAP signer: WinHttpSendRequest failed: 12029/12030` - Connection error, check the system’s use of a proxy server by entering the following into the Windows command line (cmd): `netsh winhttp show proxy` and press Enter. If necessary, remove the unused proxy server by entering the following into the Windows command line (run as an administrator): `netsh winhttp reset proxy` and press Enter.
 * `No device found` - Device not found. Make sure the AppleMobileDeviceSupport64 driver is installed (relevant for Windows).
 * `WARNING: could not locate Payload/App.app/SC_Info/App.sinf in archive!` - App signature not found in the installed ipa file.
 * `ERROR: Install failed. Got error "APIInternalError" with code 0x00000000: Error Domain=IXErrorDomain Code=46` - You need to remove the app from the device, restart the device, and try installing it again.
