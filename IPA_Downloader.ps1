@@ -2,13 +2,13 @@
 Set-Location -Path $PSScriptRoot
 
 # Версия скрипта:
-$ScriptVersion = "4.2.3"
+$ScriptVersion = "4.2.4"
 
 # Переменная состояния keychain-passphrase:
 $script:KeychainEnabled = $false
 
-# Переменная состояния установки приложений по Wi-Fi:
-$script:AirInstallEnabled = $false
+# Переменная состояния подключения к устройству по Wi-Fi:
+$script:AirEnabled = $false
 
 # Виды покупок, отображаемые в списке приложений из истории покупок аккаунта Apple:
 $script:AccountAppKinds = @("iOS App", "Mac App")
@@ -22,6 +22,9 @@ $MainAppFolderPath = Join-Path -Path $PSScriptRoot -ChildPath "MainApp"
 $FilesFolderPath = Join-Path -Path $PSScriptRoot -ChildPath "Files"
 $SettingsFilePath = Join-Path -Path $FilesFolderPath -ChildPath "Settings.txt"
 
+# Список настроек, которые сохраняются и используются в скрипте:
+$script:SettingsKeys = @('Language', 'Mode', 'DebugEnabled', 'KeychainEnabled', 'AirEnabled')
+
 # Функция чтения настроек из Files/Settings.txt:
 function Get-Settings {
 	$Settings = [ordered]@{}
@@ -29,7 +32,10 @@ function Get-Settings {
 	if (Test-Path $SettingsFilePath) {
 		Get-Content $SettingsFilePath -ErrorAction SilentlyContinue | ForEach-Object {
 			if ($_ -match '^\s*([^=]+?)\s*=\s*(.*)$') {
-				$Settings[$Matches[1]] = $Matches[2].Trim()
+				# Пропуск некорректных настроек:
+				if ($script:SettingsKeys -contains $Matches[1]) {
+					$Settings[$Matches[1]] = $Matches[2].Trim()
+				}
 			}
 		}
 	}
@@ -44,6 +50,11 @@ function Set-Setting {
 		[string]$Value
 	)
 	
+	# Сохранение используемых настроек:
+	if ($script:SettingsKeys -notcontains $Key) {
+		return
+	}
+	
 	$Settings = Get-Settings
 	$Settings[$Key] = $Value
 	
@@ -54,13 +65,45 @@ function Set-Setting {
 	Set-Content -Path $SettingsFilePath -Value $Lines -Force
 }
 
+# Функция удаления некорректных данных из Files/Settings.txt:
+function Remove-UnusedSettings {
+	if (!(Test-Path $SettingsFilePath)) {
+		return
+	}
+	
+	$CurrentLines = @(Get-Content $SettingsFilePath -ErrorAction SilentlyContinue)
+	if ($CurrentLines.Count -eq 0) {
+		return
+	}
+	
+	$Settings = Get-Settings
+	
+	# Удаление файла, если в нем не осталось используемых настроек:
+	if ($Settings.Count -eq 0) {
+		Remove-Item -Path $SettingsFilePath -Force -ErrorAction SilentlyContinue
+		return
+	}
+	
+	$Lines = @(foreach ($K in $Settings.Keys) {
+		"$K=$($Settings[$K])"
+	})
+	
+	# Перезапись файла при наличии некорректных данных:
+	if (($Lines -join "`n") -ne ($CurrentLines -join "`n")) {
+		Set-Content -Path $SettingsFilePath -Value $Lines -Force
+	}
+}
+
+# Удаление некорректных данных из Files/Settings.txt при запуске:
+Remove-UnusedSettings
+
 # Загрузка сохраненных настроек (Files/Settings.txt) или значений по умолчанию:
 $SavedSettings = Get-Settings
 $script:CurrentLang = if ($SavedSettings['Language'] -match '^(RU|EN)$') { $SavedSettings['Language'] } else { "RU" }
 $script:WorkMode = if ($SavedSettings['Mode'] -in @('Downloader', 'Installer')) { $SavedSettings['Mode'] } else { $null }
 $script:IsDebugEnabled = if ($SavedSettings['DebugEnabled'] -eq 'True') { $true } else { $false }
 $script:KeychainEnabled = if ($SavedSettings['KeychainEnabled'] -in @('True', 'False')) { $SavedSettings['KeychainEnabled'] -eq 'True' } else { $script:KeychainEnabled }
-$script:AirInstallEnabled = if ($SavedSettings['AirInstallEnabled'] -in @('True', 'False')) { $SavedSettings['AirInstallEnabled'] -eq 'True' } else { $script:AirInstallEnabled }
+$script:AirEnabled = if ($SavedSettings['AirEnabled'] -in @('True', 'False')) { $SavedSettings['AirEnabled'] -eq 'True' } else { $script:AirEnabled }
 
 # Определение архитектуры macOS и Linux:
 if (-not $IsWin) {
@@ -164,13 +207,14 @@ $LangStrings = @{
 		"AccountMenu3" = "3. Выйти из аккаунта Apple"
 		"AccountMenuTitle" = "Операции с аккаунтом Apple"
 		"AccountSwitchMenuTitle" = "Выберите аккаунт Apple для перехода"
-		"AirInstallEnabled" = "Установка приложений по Wi-Fi включена."
-		"AirInstallDisabled" = "Установка приложений по Wi-Fi отключена."
+		"AirEnabled" = "Подключение к устройству по Wi-Fi включено."
+		"AirDisabled" = "Подключение к устройству по Wi-Fi отключено."
 		"AppsCleared" = "Готово. Приложения в папке Apps удалены."
 		"AskAppNumDownload" = "Введите порядковые номера (№) приложений для загрузки"
 		"AskAppNumPurchase" = "Введите порядковые номера (№) приложений для покупки"
 		"AskAppSearch" = "Введите название приложения или ID приложений"
 		"AskDeviceNum" = "Введите порядковые номера (№) устройств для установки"
+		"AskDeviceNumApps" = "Введите порядковый номер (№) устройства для получения списка приложений"
 		"AskFileNum" = "Введите порядковые номера (№) файлов для установки"
 		"AskVersionsDownloadNum" = "Введите порядковые номера (№) версий для загрузки"
 		"AskVersionsListNum" = "Введите порядковые номера (№) ID версий или ID версий для отображения версий"
@@ -183,6 +227,7 @@ $LangStrings = @{
 		"BatchHintVersionIDs" = "Доступен выбор нескольких ID версий приложения, например, при вводе: 1, 2 и/или 3-5."
 		"BatchHintVersions" = "Доступна загрузка нескольких версий приложения, например, при вводе: 1, 2 и/или 3-5."
 		"CancelStep" = "(0: Возврат в главное меню):"
+		"CancelStepList" = "(0: Возврат к выбору списка):"
 		"CancelStepVerID" = "(0: Возврат к вводу порядковых номеров (№) или ID версий):"
 		"ClearAccountMenuTitle" = "Выберите аккаунт Apple для очистки"
 		"ClearAllAccounts" = "Все аккаунты Apple"
@@ -190,8 +235,11 @@ $LangStrings = @{
 		"ClearMenu2" = "2. Приложения в папке Apps"
 		"ClearMenuTitle" = "Выберите данные для очистки"
 		"CustomAppsListMenu" = "3. Пользовательский список приложений (Files/AppsListCustom.txt)"
+		"CustomAppsListMenu4" = "4. Пользовательский список приложений (Files/AppsListCustom.txt)"
 		"DebugEnabled" = "Режим отладки включен."
 		"DebugDisabled" = "Режим отладки отключен."
+		"DeviceAppsListLoad" = "Получение списка приложений, установленных на устройстве..."
+		"DeviceAppsListMenu" = "3. Список приложений, установленных на устройстве"
 		"DownloaderMenu1" = "1. Поиск приложений по названию или ID и покупка (без загрузки)"
 		"DownloaderMenu2" = "2. Поиск приложений по названию или ID и загрузка последней версии"
 		"DownloaderMenu3" = "3. Поиск приложений по названию или ID и загрузка (с выбором версии)"
@@ -209,6 +257,7 @@ $LangStrings = @{
 		"ErrorAppsListCustomEmpty" = "Ошибка: Пользовательский список приложений пуст.`nДобавьте приложения в Files/AppsListCustom.txt"
 		"ErrorAppsListLoad" = "Ошибка: Не удалось загрузить список приложений."
 		"ErrorAuthCheck" = "Ошибка: Не удалось подтвердить вход в аккаунт Apple."
+		"ErrorDeviceAppsRead" = "Ошибка: Не удалось получить список приложений, установленных на устройстве."
 		"ErrorDeviceOSVersionTooLow" = "Ошибка: Версия iOS на устройстве ({0}) ниже минимальной версии iOS приложения ({1})."
 		"ErrorDownloadFiles" = "Ошибка: Не удалось загрузить файл:"
 		"ErrorideviceidNotFound" = "Ошибка: idevice_id не найден.`nПоиск подключенных устройств невозможен."
@@ -228,6 +277,7 @@ $LangStrings = @{
 		"FileSaved" = "Готово. Файл сохранен в папку Apps."
 		"HeaderAppID" = "ID:"
 		"HeaderAppName" = "Название:"
+		"HeaderBundleID" = "Bundle ID:"
 		"HeaderDeviceiOS" = "Версия iOS:"
 		"HeaderDeviceName" = "Имя устройства:"
 		"HeaderKind" = "Вид:"
@@ -284,13 +334,14 @@ $LangStrings = @{
 		"AccountMenu3" = "3. Log out of Apple account"
 		"AccountMenuTitle" = "Apple account operations"
 		"AccountSwitchMenuTitle" = "Select Apple account to switch to"
-		"AirInstallEnabled" = "Installing apps via Wi-Fi enabled."
-		"AirInstallDisabled" = "Installing apps via Wi-Fi disabled."
+		"AirEnabled" = "Connection to the device via Wi-Fi enabled."
+		"AirDisabled" = "Connection to the device via Wi-Fi disabled."
 		"AppsCleared" = "Done. Apps folder has been cleared."
 		"AskAppNumDownload" = "Enter index numbers (#) of apps to download"
 		"AskAppNumPurchase" = "Enter index numbers (#) of apps to purchase"
 		"AskAppSearch" = "Enter app name or app IDs"
 		"AskDeviceNum" = "Enter index numbers (#) of devices to install on"
+		"AskDeviceNumApps" = "Enter index number (#) of the device to get the apps list"
 		"AskFileNum" = "Enter index numbers (#) of files to install"
 		"AskVersionsDownloadNum" = "Enter index numbers (#) of app versions to download"
 		"AskVersionsListNum" = "Enter index numbers (#) of version IDs or version IDs to display app versions"
@@ -303,6 +354,7 @@ $LangStrings = @{
 		"BatchHintVersionIDs" = "Selecting multiple app version IDs is available, for example, by entering: 1, 2 and/or 3-5."
 		"BatchHintVersions" = "Downloading multiple app versions is available, for example, by entering: 1, 2 and/or 3-5."
 		"CancelStep" = "(0: Return to main menu):"
+		"CancelStepList" = "(0: Return to list selection):"
 		"CancelStepVerID" = "(0: Return to entering index numbers (#) or version IDs):"
 		"ClearAccountMenuTitle" = "Select Apple account to clear"
 		"ClearAllAccounts" = "All Apple accounts"
@@ -310,8 +362,11 @@ $LangStrings = @{
 		"ClearMenu2" = "2. Apps in Apps folder"
 		"ClearMenuTitle" = "Select data to clear"
 		"CustomAppsListMenu" = "3. Custom apps list (Files/AppsListCustom.txt)"
+		"CustomAppsListMenu4" = "4. Custom apps list (Files/AppsListCustom.txt)"
 		"DebugEnabled" = "Debug mode enabled."
 		"DebugDisabled" = "Debug mode disabled."
+		"DeviceAppsListLoad" = "Getting the list of apps installed on the device..."
+		"DeviceAppsListMenu" = "3. List of apps installed on the device"
 		"DownloaderMenu1" = "1. Search for apps by name or ID and purchase (without downloading)"
 		"DownloaderMenu2" = "2. Search for apps by name or ID and download latest version"
 		"DownloaderMenu3" = "3. Search for apps by name or ID and download (with version selection)"
@@ -329,6 +384,7 @@ $LangStrings = @{
 		"ErrorAppsListCustomEmpty" = "Error: Custom apps list is empty.`nAdd apps to the Files/AppsListCustom.txt file."
 		"ErrorAppsListLoad" = "Error: Failed to load apps list."
 		"ErrorAuthCheck" = "Error: Failed to verify the Apple account login."
+		"ErrorDeviceAppsRead" = "Error: Failed to get the list of apps installed on the device."
 		"ErrorDeviceOSVersionTooLow" = "Error: The iOS version on the device ({0}) is lower than the minimum iOS version required by the app ({1})."
 		"ErrorDownloadFiles" = "Error: Failed to download file:"
 		"ErrorideviceidNotFound" = "Error: idevice_id not found.`nScanning connected devices is impossible."
@@ -348,6 +404,7 @@ $LangStrings = @{
 		"FileSaved" = "Done. File saved to Apps folder."
 		"HeaderAppID" = "ID:"
 		"HeaderAppName" = "Name:"
+		"HeaderBundleID" = "Bundle ID:"
 		"HeaderDeviceiOS" = "iOS version:"
 		"HeaderDeviceName" = "Device Name:"
 		"HeaderKind" = "Kind:"
@@ -1698,15 +1755,42 @@ function Read-VersionIDSelection {
 	}
 }
 
+# Функция получения вида ID для приложения:
+function Get-AppReference {
+	param (
+		[string]$AppID,
+		[string]$BundleID
+	)
+	
+	# Приоритет использования ID:
+	if (![string]::IsNullOrWhiteSpace($AppID)) {
+		if (Test-NumericInput -InputValue $AppID) {
+			return @("-i", $AppID)
+		}
+		
+		return @()
+	}
+	
+	if ($BundleID -match '^[A-Za-z0-9._-]+$') {
+		return @("-b", $BundleID)
+	}
+	
+	return @()
+}
+
 # Функция загрузки приложений:
 function IPA-Download {
 	param (
 		[string]$AppID,
-		[string]$AppName
+		[string]$AppName,
+		[string]$BundleID
 	)
-	if (!(Test-NumericInput -InputValue $AppID)) { return }
+	
+	$AppRef = @(Get-AppReference -AppID $AppID -BundleID $BundleID)
+	if ($AppRef.Count -eq 0) { return }
+	
 	Separator
-	Invoke-ipatool download -i $AppID --purchase
+	Invoke-ipatool download @AppRef --purchase
 	Move-IPA-Files -AppID $AppID -AppName $AppName
 }
 
@@ -1714,11 +1798,14 @@ function IPA-Download {
 function IPA-Download-With-Version {
 	param (
 		[string]$AppID,
-		[string]$AppName
+		[string]$AppName,
+		[string]$BundleID
 	)
-	if (!(Test-NumericInput -InputValue $AppID)) { return }
 	
-	$RawOutput = Invoke-ipatool list-versions -i $AppID --purchase
+	$AppRef = @(Get-AppReference -AppID $AppID -BundleID $BundleID)
+	if ($AppRef.Count -eq 0) { return }
+	
+	$RawOutput = Invoke-ipatool list-versions @AppRef --purchase
 	
 	if ($RawOutput -match "Error:") {
 		Write-Host $RawOutput -ForegroundColor DarkRed
@@ -1770,7 +1857,7 @@ function IPA-Download-With-Version {
 		
 		# Запрос метаданных для выбранных ID:
 		foreach ($VersionID in $PreSelectedIDs) {
-			$Meta = Invoke-ipatool get-version-metadata -i $AppID --external-version-id $VersionID
+			$Meta = Invoke-ipatool get-version-metadata @AppRef --external-version-id $VersionID
 			$MetaText = ($Meta | Out-String)
 			
 			$DisplayVersion = if ($MetaText -match 'displayVersion=([^\s,]+)') { $Matches[1] } else { "NA" }
@@ -1817,7 +1904,7 @@ function IPA-Download-With-Version {
 			Write-Host "$VersionsCurrent/$VersionsTotal $(Get-Lang 'SelectedVersion') $($SelectedToDownload.Version)"
 			Separator
 			$FinalID = $SelectedToDownload.ID
-			Invoke-ipatool download -i $AppID --external-version-id $FinalID
+			Invoke-ipatool download @AppRef --external-version-id $FinalID
 			Move-IPA-Files -AppID $AppID -AppName $AppName
 		}
 		
@@ -1830,6 +1917,7 @@ function IPA-Download-With-Version {
 function Invoke-AppAction {
 	param (
 		[string]$AppID,
+		[string]$BundleID,
 		[string]$AppName,
 		[string]$DisplayName,
 		[ValidateSet("Purchase", "Download", "DownloadVersion")][string]$Action,
@@ -1840,7 +1928,10 @@ function Invoke-AppAction {
 	
 	# Счетчик выбранных приложений:
 	$CounterText = if ($Total -gt 0) { "$Current/$Total " } else { "" }
-	Write-Host "$CounterText$(Get-Lang 'SelectedApp') $DisplayName (ID: $AppID)"
+	
+	# ID приложения:
+	$AppIdentifier = if (![string]::IsNullOrWhiteSpace($AppID)) { "ID: $AppID" } else { "$(Get-Lang 'HeaderBundleID') $BundleID" }
+	Write-Host "$CounterText$(Get-Lang 'SelectedApp') $DisplayName ($AppIdentifier)"
 	switch ($Action) {
 		"Purchase" {
 			Separator
@@ -1848,10 +1939,10 @@ function Invoke-AppAction {
 			Save-Purchased-App -AppID $AppID -AppNameOnly $AppName
 		}
 		"Download" {
-			IPA-Download -AppID $AppID -AppName $AppName
+			IPA-Download -AppID $AppID -AppName $AppName -BundleID $BundleID
 		}
 		"DownloadVersion" {
-			IPA-Download-With-Version -AppID $AppID -AppName $AppName
+			IPA-Download-With-Version -AppID $AppID -AppName $AppName -BundleID $BundleID
 		}
 	}
 }
@@ -1869,7 +1960,7 @@ function Invoke-AppsBatch {
 	$AppsCurrent = 0
 	foreach ($App in @($Apps)) {
 		$AppsCurrent++
-		Invoke-AppAction -AppID $App.ID -AppName $App.Name -DisplayName $App.Display -Action $Action -Current $AppsCurrent -Total $AppsTotal
+		Invoke-AppAction -AppID $App.ID -BundleID $App.BundleID -AppName $App.Name -DisplayName $App.Display -Action $Action -Current $AppsCurrent -Total $AppsTotal
 	}
 }
 
@@ -2037,7 +2128,8 @@ function Get-Apps-From-List {
 		$MenuItems = @(
 			(Get-Lang 'PopularAppsListMenu')
 			(Get-Lang 'AccountAppsListMenu')
-			(Get-Lang 'CustomAppsListMenu')
+			(Get-Lang 'DeviceAppsListMenu')
+			(Get-Lang 'CustomAppsListMenu4')
 		)
 	}
 	
@@ -2050,6 +2142,7 @@ function Get-Apps-From-List {
 		
 		$AppItems = @()
 		$ShowPurchaseDate = $false
+		$ShowDeviceApps = $false
 		
 		# 1. Список популярных приложений:
 		if ($ListChoice -eq '1') {
@@ -2110,8 +2203,20 @@ function Get-Apps-From-List {
 			$ShowPurchaseDate = $true
 		}
 		
-		# 3. Пользовательский список приложений (Files/AppsListCustom.txt):
-		elseif ($ListChoice -eq '3') {
+		# 3. Список приложений, установленных на устройстве:
+		elseif ($ListMode -ne "Purchase" -and $ListChoice -eq '3') {
+			$DeviceResult = Get-DeviceApps
+			if ($DeviceResult.Status -ne "Ok") {
+				Separator
+				continue
+			}
+			
+			$AppItems = @($DeviceResult.Apps)
+			$ShowDeviceApps = $true
+		}
+		
+		# 3/4. Пользовательский список приложений (Files/AppsListCustom.txt):
+		elseif (($ListMode -eq "Purchase" -and $ListChoice -eq '3') -or ($ListMode -ne "Purchase" -and $ListChoice -eq '4')) {
 			$CustomList = @(Get-Custom-List)
 			if ($CustomList.Count -eq 0) {
 				Show-Error "ErrorAppsListCustomEmpty"
@@ -2140,6 +2245,8 @@ function Get-Apps-From-List {
 					Name = [string]$AppItems[$i].Name
 					DisplayName = Get-ShortText -Text $DisplayName
 					ID = [string]$AppItems[$i].ID
+					BundleID = [string]$AppItems[$i].BundleID
+					Version = [string]$AppItems[$i].Version
 					Kind = [string]$AppItems[$i].Kind
 					PurchaseDate = [string]$AppItems[$i].PurchaseDate
 				}
@@ -2149,6 +2256,8 @@ function Get-Apps-From-List {
 		Separator
 		if ($ShowPurchaseDate) {
 			Out-Table -Data $TableData -Headers (Get-Lang "HeaderNum"), (Get-Lang "HeaderAppName"), (Get-Lang "HeaderAppID"), (Get-Lang "HeaderKind"), (Get-Lang "HeaderPurchaseDate") -Properties "Num", "DisplayName", "ID", "Kind", "PurchaseDate"
+		} elseif ($ShowDeviceApps) {
+			Out-Table -Data $TableData -Headers (Get-Lang "HeaderNum"), (Get-Lang "HeaderAppName"), (Get-Lang "HeaderAppID"), (Get-Lang "HeaderBundleID"), (Get-Lang "HeaderVersion") -Properties "Num", "DisplayName", "ID", "BundleID", "Version"
 		} else {
 			Out-Table -Data $TableData -Headers (Get-Lang "HeaderNum"), (Get-Lang "HeaderAppName"), (Get-Lang "HeaderAppID") -Properties "Num", "DisplayName", "ID"
 		}
@@ -2162,11 +2271,11 @@ function Get-Apps-From-List {
 		$SelectedApps = @()
 		foreach ($Index in $SelectedIndices) {
 			$SelectedObject = $TableData[$Index - 1]
-			if (![string]::IsNullOrEmpty($SelectedObject.ID)) {
+			if (![string]::IsNullOrEmpty($SelectedObject.ID) -or ![string]::IsNullOrEmpty($SelectedObject.BundleID)) {
 				$SelectedAppName = [string]$SelectedObject.Name
 				
 				# Вывод названия приложения:
-				if ($ListMode -ne "Purchase" -and $ListChoice -eq '2') {
+				if ($ListMode -ne "Purchase" -and ($ListChoice -eq '2' -or $ListChoice -eq '3') -and ![string]::IsNullOrEmpty([string]$SelectedObject.ID)) {
 					$PreferredName = Get-Repo-AppName -AppID ([string]$SelectedObject.ID)
 					if (![string]::IsNullOrWhiteSpace($PreferredName)) {
 						$SelectedAppName = $PreferredName
@@ -2175,6 +2284,7 @@ function Get-Apps-From-List {
 				
 				$SelectedApps += [PSCustomObject]@{
 					ID = $SelectedObject.ID
+					BundleID = $SelectedObject.BundleID
 					Name = $SelectedAppName
 					Display = $SelectedAppName
 				}
@@ -2320,8 +2430,8 @@ function ConvertTo-iOSVersion {
 }
 
 # Функция получения аргументов idevice_id, ideviceinfo и ideviceinstaller для работы с устройствами по Wi-Fi:
-function Get-AirInstallArgs {
-	if ($script:AirInstallEnabled) {
+function Get-AirArgs {
+	if ($script:AirEnabled) {
 		return @("-n")
 	}
 	
@@ -2331,14 +2441,14 @@ function Get-AirInstallArgs {
 # Функция получения списка подключенных устройств:
 function Get-ConnectedDevices {
 	$Devices = @()
-	$NetworkArgs = @(Get-AirInstallArgs)
+	$NetworkArgs = @(Get-AirArgs)
 	
 	# Поиск устройств, подключенных по Wi-Fi (-n) или по USB (-l):
-	$DeviceListFlag = if ($script:AirInstallEnabled) { "-n" } else { "-l" }
+	$DeviceListFlag = if ($script:AirEnabled) { "-n" } else { "-l" }
 	$UDIDList = @(& "$script:ideviceidFilePath" $DeviceListFlag 2>$null)
 	
 	# Вид подключения устройств:
-	$ConnectionType = if ($script:AirInstallEnabled) { "Wi-Fi" } else { "USB" }
+	$ConnectionType = if ($script:AirEnabled) { "Wi-Fi" } else { "USB" }
 	
 	# Поиск ideviceinfo:
 	$ideviceinfoFilePath = $null
@@ -2386,6 +2496,304 @@ function Get-ConnectedDevices {
 	return $Devices
 }
 
+# Функция чтения целого числа из массива байт:
+function Read-BigEndianInt {
+	param (
+		[byte[]]$Bytes,
+		[int]$Offset,
+		[int]$Size
+	)
+	
+	$Value = [long]0
+	for ($i = 0; $i -lt $Size; $i++) {
+		$Value = ($Value -shl 8) + $Bytes[$Offset + $i]
+	}
+	
+	return $Value
+}
+
+# Функция чтения целого числа или строки из binary plist:
+function Read-BplistScalar {
+	param (
+		[byte[]]$Bytes,
+		[int]$Position
+	)
+	
+	$Marker = [int]$Bytes[$Position]
+	$Type = $Marker -shr 4
+	$Info = $Marker -band 0x0F
+	
+	# Целое число:
+	if ($Type -eq 1) {
+		$Size = 1 -shl $Info
+		if ($Size -gt 8) { return $null }
+		
+		return (Read-BigEndianInt -Bytes $Bytes -Offset ($Position + 1) -Size $Size)
+	}
+	
+	# Строка ASCII или UTF-16BE:
+	if ($Type -eq 5 -or $Type -eq 6) {
+		$Length = $Info
+		$Start = $Position + 1
+		
+		# Хранение длины отдельным целым числом, если не помещается в 4 бита:
+		if ($Info -eq 0x0F) {
+			$LengthSize = 1 -shl ([int]$Bytes[$Position + 1] -band 0x0F)
+			$Length = [int](Read-BigEndianInt -Bytes $Bytes -Offset ($Position + 2) -Size $LengthSize)
+			$Start = $Position + 2 + $LengthSize
+		}
+		
+		if ($Type -eq 5) {
+			return [System.Text.Encoding]::ASCII.GetString($Bytes, $Start, $Length)
+		}
+		
+		return [System.Text.Encoding]::BigEndianUnicode.GetString($Bytes, $Start, $Length * 2)
+	}
+	
+	return $null
+}
+
+# Функция получения itemId из iTunesMetadata:
+function Get-ItunesItemId {
+	param ([byte[]]$Bytes)
+	
+	if ($null -eq $Bytes -or $Bytes.Length -lt 8) { return $null }
+	
+	# XML plist:
+	if ([System.Text.Encoding]::ASCII.GetString($Bytes, 0, 8) -ne "bplist00") {
+		$Text = [System.Text.Encoding]::UTF8.GetString($Bytes)
+		if ($Text -match '<key>itemId</key>\s*<integer>(\d+)</integer>') {
+			return $Matches[1]
+		}
+		
+		return $null
+	}
+	
+	# Поиск ключа itemId в словаре верхнего уровня:
+	try {
+		$TrailerStart = $Bytes.Length - 32
+		if ($TrailerStart -lt 8) { return $null }
+		
+		$OffsetSize = [int]$Bytes[$TrailerStart + 6]
+		$RefSize = [int]$Bytes[$TrailerStart + 7]
+		if ($OffsetSize -lt 1 -or $OffsetSize -gt 8 -or $RefSize -lt 1 -or $RefSize -gt 8) { return $null }
+		
+		$TopObject = Read-BigEndianInt -Bytes $Bytes -Offset ($TrailerStart + 16) -Size 8
+		$TableOffset = Read-BigEndianInt -Bytes $Bytes -Offset ($TrailerStart + 24) -Size 8
+		
+		$TopPosition = [int](Read-BigEndianInt -Bytes $Bytes -Offset ([int]($TableOffset + $TopObject * $OffsetSize)) -Size $OffsetSize)
+		$Marker = [int]$Bytes[$TopPosition]
+		if (($Marker -shr 4) -ne 0xD) { return $null }
+		
+		# Количество пар ключ-значение:
+		$Count = $Marker -band 0x0F
+		$RefsStart = $TopPosition + 1
+		if ($Count -eq 0x0F) {
+			$CountSize = 1 -shl ([int]$Bytes[$TopPosition + 1] -band 0x0F)
+			$Count = [int](Read-BigEndianInt -Bytes $Bytes -Offset ($TopPosition + 2) -Size $CountSize)
+			$RefsStart = $TopPosition + 2 + $CountSize
+		}
+		
+		for ($i = 0; $i -lt $Count; $i++) {
+			# Чтение номера объекта ключа и его позиции:
+			$KeyRef = [long]0
+			$RefPosition = $RefsStart + $i * $RefSize
+			for ($j = 0; $j -lt $RefSize; $j++) {
+				$KeyRef = ($KeyRef -shl 8) + $Bytes[$RefPosition + $j]
+			}
+			
+			$KeyPosition = [long]0
+			$OffsetPosition = [int]($TableOffset + $KeyRef * $OffsetSize)
+			for ($j = 0; $j -lt $OffsetSize; $j++) {
+				$KeyPosition = ($KeyPosition -shl 8) + $Bytes[$OffsetPosition + $j]
+			}
+			$KeyPosition = [int]$KeyPosition
+			
+			# Проверка ключа:
+			if ($Bytes[$KeyPosition] -eq 0x56 -and $Bytes[$KeyPosition + 1] -eq 0x69 -and $Bytes[$KeyPosition + 2] -eq 0x74 -and $Bytes[$KeyPosition + 3] -eq 0x65 -and $Bytes[$KeyPosition + 4] -eq 0x6D -and $Bytes[$KeyPosition + 5] -eq 0x49 -and $Bytes[$KeyPosition + 6] -eq 0x64) {
+				$ValueRef = Read-BigEndianInt -Bytes $Bytes -Offset ($RefsStart + ($Count + $i) * $RefSize) -Size $RefSize
+				$ValuePosition = [int](Read-BigEndianInt -Bytes $Bytes -Offset ([int]($TableOffset + $ValueRef * $OffsetSize)) -Size $OffsetSize)
+				$ItemID = Read-BplistScalar -Bytes $Bytes -Position $ValuePosition
+				
+				if ($null -ne $ItemID) { return "$ItemID" }
+				return $null
+			}
+		}
+	} catch {
+		return $null
+	}
+	
+	return $null
+}
+
+# Функция запуска ideviceinstaller:
+function Invoke-ideviceinstallerCapture {
+	param ([string[]]$Arguments)
+	
+	$Process = $null
+	try {
+		$StartInfo = New-Object System.Diagnostics.ProcessStartInfo
+		$StartInfo.FileName = $script:ideviceinstallerFilePath
+		$StartInfo.Arguments = $Arguments -join " "
+		$StartInfo.UseShellExecute = $false
+		$StartInfo.CreateNoWindow = $true
+		$StartInfo.RedirectStandardOutput = $true
+		$StartInfo.RedirectStandardError = $true
+		$StartInfo.StandardOutputEncoding = [System.Text.Encoding]::UTF8
+		
+		$Process = [System.Diagnostics.Process]::Start($StartInfo)
+		
+		# Параллельное чтение stderr, чтобы процесс не завис при заполнении буфера:
+		$ErrorTask = $Process.StandardError.ReadToEndAsync()
+		$Output = $Process.StandardOutput.ReadToEnd()
+		$Process.WaitForExit()
+		$null = $ErrorTask.Result
+		
+		if ($Process.ExitCode -ne 0) { return $null }
+		return $Output
+	} catch {
+		return $null
+	} finally {
+		if ($null -ne $Process) { $Process.Dispose() }
+	}
+}
+
+# Функция чтения списка приложений, установленных на устройстве:
+function Read-DeviceApps {
+	param ($Device)
+	
+	$ErrorResult = [PSCustomObject]@{ Status = "Error"; Apps = @() }
+	$NetworkArgs = @(Get-AirArgs)
+	
+	# Запрос Bundle ID, версии, названия и iTunesMetadata одним вызовом:
+	$InstallerArgs = $NetworkArgs + @("--udid", $Device.UDID, "list", "--user", "--xml", "--attribute", "CFBundleIdentifier", "--attribute", "CFBundleShortVersionString", "--attribute", "CFBundleVersion", "--attribute", "CFBundleDisplayName", "--attribute", "iTunesMetadata")
+	$XmlOutput = Invoke-ideviceinstallerCapture -Arguments $InstallerArgs
+	if ([string]::IsNullOrWhiteSpace($XmlOutput)) {
+		return $ErrorResult
+	}
+	
+	try {
+		$Xml = New-Object System.Xml.XmlDocument
+		$Xml.XmlResolver = $null
+		$Xml.LoadXml($XmlOutput)
+	} catch {
+		return $ErrorResult
+	}
+	
+	$Apps = New-Object System.Collections.Generic.List[object]
+	foreach ($AppNode in $Xml.SelectNodes("/plist/array/dict")) {
+		# Чтение пар ключ-значение приложения:
+		$Values = @{}
+		$KeyNode = $AppNode.FirstChild
+		while ($null -ne $KeyNode) {
+			$ValueNode = $KeyNode.NextSibling
+			if ($KeyNode.LocalName -eq "key" -and $null -ne $ValueNode) {
+				$Values[$KeyNode.InnerText.Trim()] = $ValueNode
+				$KeyNode = $ValueNode.NextSibling
+			} else {
+				$KeyNode = $ValueNode
+			}
+		}
+		
+		if (-not $Values.ContainsKey("CFBundleIdentifier")) { continue }
+		$BundleID = $Values["CFBundleIdentifier"].InnerText.Trim()
+		if ([string]::IsNullOrWhiteSpace($BundleID)) { continue }
+		
+		# Версия приложения:
+		$AppVersion = ""
+		if ($Values.ContainsKey("CFBundleShortVersionString")) { $AppVersion = $Values["CFBundleShortVersionString"].InnerText.Trim() }
+		if ([string]::IsNullOrWhiteSpace($AppVersion) -and $Values.ContainsKey("CFBundleVersion")) { $AppVersion = $Values["CFBundleVersion"].InnerText.Trim() }
+		
+		$AppName = ""
+		if ($Values.ContainsKey("CFBundleDisplayName")) { $AppName = $Values["CFBundleDisplayName"].InnerText.Trim() }
+		if ([string]::IsNullOrWhiteSpace($AppName)) { $AppName = $BundleID }
+		
+		# Определение ID из iTunesMetadata:
+		$ItemID = $null
+		if ($Values.ContainsKey("iTunesMetadata")) {
+			$MetadataNode = $Values["iTunesMetadata"]
+			if ($MetadataNode.LocalName -eq "data") {
+				try {
+					$MetadataBytes = [System.Convert]::FromBase64String(($MetadataNode.InnerText -replace '\s', ''))
+					$ItemID = Get-ItunesItemId -Bytes $MetadataBytes
+				} catch {
+					$ItemID = $null
+				}
+			} elseif ($MetadataNode.LocalName -eq "dict") {
+				$ItemNode = $MetadataNode.SelectSingleNode("./key[normalize-space(.)='itemId']/following-sibling::*[1]")
+				if ($null -ne $ItemNode) { $ItemID = $ItemNode.InnerText.Trim() }
+			}
+		}
+		
+		$AppID = ""
+		if ($ItemID -match '^\d{6,}$') { $AppID = [string]$ItemID }
+		
+		$Apps.Add([PSCustomObject]@{
+			Name = $AppName
+			BundleID = $BundleID
+			Version = $AppVersion
+			ID = $AppID
+		})
+	}
+	
+	return [PSCustomObject]@{
+		Status = "Ok"
+		Apps = @($Apps | Sort-Object Name, BundleID)
+	}
+}
+
+# Функция получения списка приложений, установленных на устройстве:
+function Get-DeviceApps {
+	$ErrorResult = [PSCustomObject]@{ Status = "Error"; Apps = @() }
+	$CancelResult = [PSCustomObject]@{ Status = "Cancel"; Apps = @() }
+	
+	if ([string]::IsNullOrWhiteSpace($script:ideviceinstallerFilePath)) {
+		Show-Error "ErrorideviceinstallerNotFound"
+		return $ErrorResult
+	}
+	
+	if ([string]::IsNullOrWhiteSpace($script:ideviceidFilePath)) {
+		Show-Error "ErrorideviceidNotFound"
+		return $ErrorResult
+	}
+	
+	# Поиск подключенных устройств:
+	$Devices = @(Get-ConnectedDevices)
+	if ($Devices.Count -eq 0) {
+		Show-Error "ErrorNoDevices"
+		return $ErrorResult
+	}
+	
+	# Выбор устройства:
+	Separator
+	Out-Table -Data $Devices -Headers (Get-Lang "HeaderNum"), (Get-Lang "HeaderDeviceName"), (Get-Lang "HeaderDeviceiOS"), (Get-Lang "HeaderUDID"), (Get-Lang "HeaderKind") -Properties "Num", "Name", "iOSVersion", "DisplayUDID", "Connection"
+	Separator
+	
+	while ($true) {
+		$SelectedDeviceIndices = Read-NumberSelection -PromptKey 'AskDeviceNumApps' -MaxCount $Devices.Count -CancelKey 'CancelStepList'
+		if ($null -eq $SelectedDeviceIndices) { return $CancelResult }
+		
+		# Запрос списка приложений только у одного устройства:
+		if (@($SelectedDeviceIndices).Count -eq 1) { break }
+		
+		Show-Error "ErrorInvalidInput"
+		Separator
+	}
+	
+	$Device = $Devices[[int]@($SelectedDeviceIndices)[0] - 1]
+	
+	# Получение списка приложений:
+	Separator
+	Write-Host (Get-Lang "DeviceAppsListLoad")
+	$DeviceAppsResult = Read-DeviceApps -Device $Device
+	if ($DeviceAppsResult.Status -ne "Ok") {
+		Show-Error "ErrorDeviceAppsRead"
+		return $ErrorResult
+	}
+	
+	return $DeviceAppsResult
+}
+
 # Функция установки приложений из папки Apps:
 function Install-Apps {
 	if ([string]::IsNullOrWhiteSpace($script:ideviceinstallerFilePath)) {
@@ -2398,8 +2806,8 @@ function Install-Apps {
 		return
 	}
 	
-	# Аргументы для установки приложений на устройства, подключенные по Wi-Fi:
-	$NetworkArgs = @(Get-AirInstallArgs)
+	# Аргументы для взаимодействия с устройствами, подключенными по Wi-Fi:
+	$NetworkArgs = @(Get-AirArgs)
 	
 	while ($true) {
 		# Поиск подключенных устройств:
@@ -2583,16 +2991,16 @@ function Show-ModeBanner {
 	
 	Show-SystemInfo
 	
-	# Вывод сообщений о включенных режимах отладки и установки приложений по Wi-Fi:
-	if ($script:IsDebugEnabled -or $script:AirInstallEnabled) {
+	# Вывод сообщений о включенных режимах отладки и подключения к устройству по Wi-Fi:
+	if ($script:IsDebugEnabled -or $script:AirEnabled) {
 		Separator
 		
 		if ($script:IsDebugEnabled) {
 			Write-Host (Get-Lang "DebugEnabled")
 		}
 		
-		if ($script:AirInstallEnabled) {
-			Write-Host (Get-Lang "AirInstallEnabled")
+		if ($script:AirEnabled) {
+			Write-Host (Get-Lang "AirEnabled")
 		}
 	}
 }
@@ -2633,15 +3041,15 @@ function Switch-DebugMode {
 	}
 }
 
-# Функция включения/отключения установки приложений по Wi-Fi:
-function Switch-AirInstallMode {
-	$script:AirInstallEnabled = -not $script:AirInstallEnabled
-	Set-Setting -Key "AirInstallEnabled" -Value $script:AirInstallEnabled
+# Функция включения/отключения подключения к устройству по Wi-Fi:
+function Switch-AirMode {
+	$script:AirEnabled = -not $script:AirEnabled
+	Set-Setting -Key "AirEnabled" -Value $script:AirEnabled
 	Separator
-	if ($script:AirInstallEnabled) {
-		Write-Host (Get-Lang "AirInstallEnabled")
+	if ($script:AirEnabled) {
+		Write-Host (Get-Lang "AirEnabled")
 	} else {
-		Write-Host (Get-Lang "AirInstallDisabled")
+		Write-Host (Get-Lang "AirDisabled")
 	}
 }
 
@@ -2763,9 +3171,9 @@ $(Get-Lang 'InstallerMenu5')`n
 				Switch-DebugMode
 			}
 			
-			# Установка приложений по Wi-Fi:
-			"airinstall" {
-				Switch-AirInstallMode
+			# Подключение к устройству по Wi-Fi:
+			"air" {
+				Switch-AirMode
 			}
 			
 			# Неверный ввод:
@@ -2871,9 +3279,9 @@ $(Get-Lang 'LoginMenu3')`n
 					Switch-DebugMode
 				}
 				
-				# Установка приложений по Wi-Fi:
-				"airinstall" {
-					Switch-AirInstallMode
+				# Подключение к устройству по Wi-Fi:
+				"air" {
+					Switch-AirMode
 				}
 				
 				# Неверный ввод:
@@ -3070,9 +3478,9 @@ $(Get-Lang 'ClearMenu2')`n
 				Switch-DebugMode
 			}
 			
-			# Установка приложений по Wi-Fi:
-			"airinstall" {
-				Switch-AirInstallMode
+			# Подключение к устройству по Wi-Fi:
+			"air" {
+				Switch-AirMode
 			}
 			
 			# Неверный ввод:

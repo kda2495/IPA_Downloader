@@ -267,7 +267,8 @@ eval "$(/opt/homebrew/bin/brew shellenv zsh)"
 * Выбираем список приложений для отображения:
 1. Список популярных приложений (Files/AppsList.txt)
 2. Список приложений из истории покупок аккаунта Apple (Files/AppsListAccount_.txt)
-3. Пользовательский список приложений (Files/AppsListCustom.txt)
+3. Список приложений, установленных на устройстве
+4. Пользовательский список приложений (Files/AppsListCustom.txt)
 * Нажимаем Enter;
 * Отобразится выбранный список;
 * Вводим порядковые номера (№) приложений для загрузки;
@@ -277,7 +278,8 @@ eval "$(/opt/homebrew/bin/brew shellenv zsh)"
 * Выбираем список приложений для отображения:
 1. Список популярных приложений (Files/AppsList.txt)
 2. Список приложений из истории покупок аккаунта Apple (Files/AppsListAccount_.txt)
-3. Пользовательский список приложений (Files/AppsListCustom.txt)
+3. Список приложений, установленных на устройстве
+4. Пользовательский список приложений (Files/AppsListCustom.txt)
 * Нажимаем Enter;
 * Отобразится выбранный список;
 * Вводим порядковые номера (№) приложения для загрузки;
@@ -318,8 +320,8 @@ eval "$(/opt/homebrew/bin/brew shellenv zsh)"
 * Скрипт осуществит переход на страницу CloudTips.
 #### 12. Сменить язык (Change Language):
 * Скрипт осуществит смену языка скрипта.
-#### airinstall
-* Включение/отключение установки приложений по Wi-Fi.
+#### air
+* Включение/отключение подключения к устройству по Wi-Fi.
 #### debug
 * Включение/отключение режима отладки.
 
@@ -342,19 +344,20 @@ eval "$(/opt/homebrew/bin/brew shellenv zsh)"
 * Скрипт осуществит смену языка скрипта.
 #### 5. Перейти в IPA_Downloader:
 * Скрипт осуществит смену режима на IPA_Downloader (загрузка и установка приложений).
-#### airinstall
-* Включение/отключение установки приложений по Wi-Fi.
+#### air
+* Включение/отключение подключения к устройству по Wi-Fi.
 #### debug
 * Включение/отключение режима отладки.
 
 ## Возможные ошибки и их решение:
 ### Расшифровка ошибок:
 * `Обработка -File ./IPA_Downloader.ps1 завершилась сбоем: Access to the path is denied (macOS)` - Включите Терминалу доступ по пути: `Системные настройки - Конфиденциальность и безопасность - Доступ к диску`.
+* `Login error: failed to initialize SAP signer: curl: Timeout was reached.` - Не удалось подключиться к SAP, проверьте Ваше интернет-соединение.
 * `Error: account is disabled` - Аккаунт Apple временно заблокирован Apple (обычно из-за многократных попыток ввода неверных данных пароля или кода 2FA), требуется разблокировка аккаунта через устройство или на сайте `icloud.com`
 * `Download error: HTTP request failed: Couldn't resolve host name` - Не удалось подключиться к серверам Apple, проверьте Ваше интернет-соединение.
 * `Download error: HTTP request failed: Timeout was reached` - Не удалось подключиться к серверам Apple, проверьте Ваше интернет-соединение.
 * `Error: license is required` - Приложение не было приобретено на этом аккаунте Apple ранее.
-* `Error: This Apple Account is temporarily unable to be used in the iTunes Store because it could not be found. Try again later.` - Необходимо заново авторизоваться в скрипте.
+* `Error: This Apple Account is temporarily unable to be used in the iTunes Store because it could not be found. Try again later.` - Необходимо совершить любую бесплатную покупку в App Store.
 * `Purchase error: app not found` - Покупка приложения не удалась, так как приложение удалено из App Store.
 * `Purchase error: item is temporarily unavailable` - Приложение не было приобретено на этом аккаунте Apple ранее, покупка не удалась, так как приложение удалено из App Store.
 * `No device found` - Устройство не найдено. Убедитесь, что драйвер AppleMobileDeviceSupport64 установлен (актуально для Windows).

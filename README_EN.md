@@ -259,7 +259,8 @@ eval "$(/opt/homebrew/bin/brew shellenv zsh)"
 * Select the app list to display:
 1. Popular apps list (Files/AppsList.txt)
 2. List of popular apps not purchased by the script
-3. Custom apps list (Files/AppsListCustom.txt)
+3. List of apps installed on the device
+4. Custom apps list (Files/AppsListCustom.txt)
 * Press Enter;
 * The selected list will be displayed;
 * Enter the index numbers (#) of the apps to purchase;
@@ -269,7 +270,8 @@ eval "$(/opt/homebrew/bin/brew shellenv zsh)"
 * Select the app list to display:
 1. Popular apps list (Files/AppsList.txt)
 2. List of apps from the Apple account purchase history (Files/AppsListAccount_.txt)
-3. Custom apps list (Files/AppsListCustom.txt)
+3. List of apps installed on the device
+4. Custom apps list (Files/AppsListCustom.txt)
 * Press Enter;
 * The selected list will be displayed;
 * Enter the index numbers (#) of the apps to download;
@@ -321,8 +323,8 @@ eval "$(/opt/homebrew/bin/brew shellenv zsh)"
 * The script will navigate to the CloudTips page.
 #### 12. Change Language (Сменить язык):
 * The script will change its interface language.
-#### airinstall
-* Enable/disable Wi‑Fi app installation.
+#### air
+* Enabling/disabling connection to the device via Wi‑Fi.
 #### debug
 * Enable/disable debug mode.
 
@@ -345,19 +347,20 @@ eval "$(/opt/homebrew/bin/brew shellenv zsh)"
 * The script will change its interface language.
 #### 5. Switch to IPA_Downloader:
 * The script will switch the mode to IPA_Downloader (downloading and installing apps).
-#### airinstall
-* Enable/disable Wi‑Fi app installation.
+#### air
+* Enabling/disabling connection to the device via Wi‑Fi.
 #### debug
 * Enable/disable debug mode.
 
 ## Possible errors and solution:
 ### Troubleshooting errors:
 * `Processing -File ./IPA_Downloader.ps1 failed: Access to the path is denied (macOS)` - Allow Terminal access in `System Settings - Privacy & Security - Full Disk Access`.
+* `Login error: failed to initialize SAP signer: curl: Timeout was reached.` - Failed to connect to SAP, check your internet connection.
 * `Error: account is disabled` - Apple account is temporarily blocked by Apple (usually due to multiple attempts to enter incorrect password or 2FA code), account needs to be unblocked via the device or on the `icloud.com` website.
 * `Download error: HTTP request failed: Couldn't resolve host name` - Failed to connect to Apple servers, check your internet connection.
 * `Download error: HTTP request failed: Timeout was reached` - Failed to connect to Apple servers, check your internet connection.
 * `Error: license is required` - The app was not previously purchased on this Apple account.
-* `Error: This Apple Account is temporarily unable to be used in the iTunes Store because it could not be found. Try again later.` - You need to re‑log in to the script.
+* `Error: This Apple Account is temporarily unable to be used in the iTunes Store because it could not be found. Try again later.` - You need to make any free purchase in the App Store.
 * `Purchase error: app not found` - App purchase failed because the app has been removed from the App Store.
 * `Purchase error: item is temporarily unavailable` - The app was not previously purchased on this Apple account, the purchase failed because the app has been removed from the App Store.
 * `No device found` - Device not found. Make sure the AppleMobileDeviceSupport64 driver is installed (relevant for Windows).
