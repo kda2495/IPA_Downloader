@@ -138,12 +138,15 @@ Download the complete set of programs/updates for Windows 7/8.1 via the link:
 #### Install the required packages:
 #### Arch Linux / Manjaro:
 * Install PowerShell: `sudo pacman -S powershell-bin` (or via AUR: `yay -S powershell-bin`)
+* Install usbmuxd: `sudo pacman -S usbmuxd`
 * Enable usbmuxd service: `sudo systemctl enable --now usbmuxd`
 #### Ubuntu / Debian:
 * Install PowerShell: [Microsoft Instructions](https://learn.microsoft.com/powershell/scripting/install/install-ubuntu) or ``sudo snap install powershell --classic``
+* Install usbmuxd: `sudo apt install usbmuxd`
 * Enable usbmuxd service: `sudo systemctl enable --now usbmuxd`
 #### Fedora / RHEL:
 * Install PowerShell: `sudo dnf install powershell`
+* Install usbmuxd: `sudo dnf install usbmuxd`
 * Enable usbmuxd service: `sudo systemctl enable --now usbmuxd`
 
 ### How to use (Linux):

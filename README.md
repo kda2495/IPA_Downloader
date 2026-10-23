@@ -138,15 +138,15 @@ ipatool является неофициальным инструментом; с
 #### Устанавливаем необходимые пакеты:
 #### Arch Linux / Manjaro:
 * Устанавливаем PowerShell: `sudo pacman -S powershell-bin` (или через AUR: `yay -S powershell-bin`)
-* Устанавливаем usbmuxd для работы с iOS: `sudo pacman -S usbmuxd`
+* Устанавливаем usbmuxd: `sudo pacman -S usbmuxd`
 * Включаем службу usbmuxd: `sudo systemctl enable --now usbmuxd`
 #### Ubuntu / Debian:
 * Устанавливаем PowerShell: [Инструкция Microsoft](https://learn.microsoft.com/powershell/scripting/install/install-ubuntu) или `sudo snap install powershell --classic`
-* Устанавливаем usbmuxd для работы с iOS: `sudo apt install usbmuxd`
+* Устанавливаем usbmuxd: `sudo apt install usbmuxd`
 * Включаем службу usbmuxd: `sudo systemctl enable --now usbmuxd`
 #### Fedora / RHEL:
 * Устанавливаем PowerShell: `sudo dnf install powershell`
-* Устанавливаем usbmuxd для работы с iOS: `sudo dnf install usbmuxd`
+* Устанавливаем usbmuxd: `sudo dnf install usbmuxd`
 * Включаем службу usbmuxd: `sudo systemctl enable --now usbmuxd`
 
 ### Как использовать (Linux):
