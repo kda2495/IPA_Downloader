@@ -47,14 +47,14 @@ ipatool является неофициальным инструментом; с
 ## Использование на Windows:
 ### Требования для Windows:
 * Для установки загруженных приложений через скрипт требуется драйвер `AppleMobileDeviceSupport64` (входит в состав iTunes):  
-[Ссылка для загрузки iTunes с сайта Apple](https://www.apple.com/itunes/download/win64)
+- [Загрузить iTunes с сайта Apple](https://www.apple.com/itunes/download/win64)
 * Вместо полной установки iTunes можно выполнить выборочную установку `AppleMobileDeviceSupport64.msi`, распаковав установщик iTunes любым архиватором (7-Zip, WinRAR).
 * Скрипт работает без данного драйвера, однако он требуется для установки загруженных приложений на устройство.
 
 ### Требования для Windows 7 и 8.1:
 #### Все действия выполняются строго в нижеуказанной последовательности:
 Загружаем полный набор программ/обновлений для Windows 7/8.1 по ссылке:  
-[Ссылка для загрузки полного набора программ/обновлений](https://disk.yandex.ru/d/Fft0whzAz-C7Jg)  
+- [Загрузить полный набор программ/обновлений](https://disk.yandex.ru/d/Fft0whzAz-C7Jg)
 #### 1. Обновляем системные сертификаты через UpdRootsCert:
 * Запускаем файл UpdRootsCert.exe;
 * Отмечаем флажки: Корневые сертификаты системы, Добавить ежемесячную задачу в Планировщик заданий;
@@ -94,49 +94,12 @@ ipatool является неофициальным инструментом; с
 ## Использование на macOS:
 ### Требования для macOS:
 ### Все действия выполняются строго в нижеуказанной последовательности:
-### При установке на Mac с процессорами Apple Silicon:
-#### 1. Устанавливаем Xcode Command Line Tools:
-* Запускаем Терминал (Command + Пробел, затем ввести `Терминал` в поле поиска Spotlight);
-* Вводим в Терминал: `xcode-select --install`
-* Нажимаем Enter.
-#### 2. Устанавливаем менеджер пакетов Homebrew:
-* Вводим в Терминал: `/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"`
-* Нажимаем Enter;
-* В процессе установки Homebrew, может потребоваться ввод пароля;
-* После установки Homebrew внизу Терминала появится текст ==> Next steps.
-* Вводим в Терминал:
-```
-echo >> ~/.zprofile
-echo 'eval "$(/opt/homebrew/bin/brew shellenv zsh)"' >> ~/.zprofile
-eval "$(/opt/homebrew/bin/brew shellenv zsh)"
-```
-* Нажимаем Enter.
-#### 3. Устанавливаем пакеты ideviceinstaller, minizip и powershell:
-* Вводим в Терминал: `brew install ideviceinstaller minizip powershell`
-* Нажимаем Enter.
-* При появлении запросов вводим `y` в Терминал и нажимаем Enter.
-### При установке на Mac с процессорами Intel:
-#### 1. Устанавливаем Xcode Command Line Tools:
-* Запускаем Терминал (Command + Пробел, затем вводим `Терминал` в поле поиска Spotlight);
-* Нажимаем Enter;
-* Вводим в Терминал: `xcode-select --install`
-* Нажимаем Enter.
-#### 2. Устанавливаем менеджер пакетов MacPorts:
-* Нажимаем на логотип Apple () в левом верхнем углу экрана, выбираем `Об этом Mac` и смотрим поле `macOS`;
-* Загружаем установочный файл для своей версии macOS:  
-[Ссылка для загрузки MacPorts](https://github.com/macports/macports-base/releases)
-* Нажимаем `Show all assets` и ищем файл с расширением `.pkg` для своей версии macOS;
-* Производим установку MacPorts с помощью установочного файла.
-#### 3. Устанавливаем пакеты ideviceinstaller, minizip и powershell:
-* Запускаем `новый` Терминал (Command + Пробел, затем вводим `Терминал` в поле поиска Spotlight);
-* Вводим в Терминал: `sudo port install ideviceinstaller minizip powershell`
-* Нажимаем Enter;
-* При появлении запросов вводим `y` в Терминал и нажимаем Enter.
-#### Примечание:
-* Для удаления Homebrew и всех его компонентов, вводим в Терминал:  
-`/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/uninstall.sh)"` и нажмите Enter.
-* На macOS 10.15 Catalina необходимо установить PowerShell версии 7.3.12, загрузив файл:
-[Ссылка для загрузки PowerShell 7.3.12](https://github.com/PowerShell/PowerShell/releases/download/v7.3.12/powershell-7.3.12-osx-x64.pkg)
+#### 1. Загружаем PowerShell:
+`powershell-xxx-osx-arm64.pkg` для Apple Silicon или `powershell-xxx-osx-x64.pkg` для Intel:
+- [Загрузить последнюю версию PowerShell](https://github.com/PowerShell/PowerShell/releases)
+- [Загрузить PowerShell 7.4.21 для macOS 11 Big Sur](https://github.com/PowerShell/PowerShell/releases/tag/v7.4.21)
+- [Загрузить PowerShell 7.3.12 для macOS 10.15 Catalina](https://github.com/PowerShell/PowerShell/releases/download/v7.3.12/powershell-7.3.12-osx-x64.pkg)
+#### 2. Устанавливаем PowerShell
 
 ### Как использовать (macOS):
 #### 1. Распаковываем архив IPA_Downloader.zip любым архиватором (Keka);
@@ -175,15 +138,15 @@ eval "$(/opt/homebrew/bin/brew shellenv zsh)"
 #### Устанавливаем необходимые пакеты:
 #### Arch Linux / Manjaro:
 * Устанавливаем PowerShell: `sudo pacman -S powershell-bin` (или через AUR: `yay -S powershell-bin`)
-* Устанавливаем утилиты для работы с iOS: `sudo pacman -S ideviceinstaller usbmuxd`
+* Устанавливаем usbmuxd для работы с iOS: `sudo pacman -S usbmuxd`
 * Включаем службу usbmuxd: `sudo systemctl enable --now usbmuxd`
 #### Ubuntu / Debian:
-* Устанавливаем PowerShell: [Инструкция Microsoft](https://learn.microsoft.com/powershell/scripting/install/install-ubuntu) или `sudo apt install powershell`
-* Устанавливаем утилиты для работы с iOS: `sudo apt install ideviceinstaller usbmuxd`
+* Устанавливаем PowerShell: [Инструкция Microsoft](https://learn.microsoft.com/powershell/scripting/install/install-ubuntu) или `sudo snap install powershell --classic`
+* Устанавливаем usbmuxd для работы с iOS: `sudo apt install usbmuxd`
 * Включаем службу usbmuxd: `sudo systemctl enable --now usbmuxd`
 #### Fedora / RHEL:
 * Устанавливаем PowerShell: `sudo dnf install powershell`
-* Устанавливаем утилиты для работы с iOS: `sudo dnf install ideviceinstaller usbmuxd`
+* Устанавливаем usbmuxd для работы с iOS: `sudo dnf install usbmuxd`
 * Включаем службу usbmuxd: `sudo systemctl enable --now usbmuxd`
 
 ### Как использовать (Linux):
@@ -268,7 +231,8 @@ eval "$(/opt/homebrew/bin/brew shellenv zsh)"
 1. Список популярных приложений (Files/AppsList.txt)
 2. Список приложений из истории покупок аккаунта Apple (Files/AppsListAccount_.txt)
 3. Список приложений, установленных на устройстве
-4. Пользовательский список приложений (Files/AppsListCustom.txt)
+4. Список сгруженных приложений, установленных на устройстве
+5. Пользовательский список приложений (Files/AppsListCustom.txt)
 * Нажимаем Enter;
 * Отобразится выбранный список;
 * Вводим порядковые номера (№) приложений для загрузки;
@@ -279,7 +243,8 @@ eval "$(/opt/homebrew/bin/brew shellenv zsh)"
 1. Список популярных приложений (Files/AppsList.txt)
 2. Список приложений из истории покупок аккаунта Apple (Files/AppsListAccount_.txt)
 3. Список приложений, установленных на устройстве
-4. Пользовательский список приложений (Files/AppsListCustom.txt)
+4. Список сгруженных приложений, установленных на устройстве
+5. Пользовательский список приложений (Files/AppsListCustom.txt)
 * Нажимаем Enter;
 * Отобразится выбранный список;
 * Вводим порядковые номера (№) приложения для загрузки;
@@ -401,11 +366,11 @@ C:\Users\%username%\AppData\Roaming\Apple Computer\
 * На странице приложения выберите Select App с иконкой App Store и скопируйте число в конце адреса ссылки.  
 
 ### Отслеживание выхода новых приложений:
-[Тема на 4PDA](https://4pda.to/forum/index.php?showtopic=1046078)  
-[Сайт AppBank](https://pwa.appbank.pw)  
+- [Тема на 4PDA](https://4pda.to/forum/index.php?showtopic=1046078)
+- [Сайт AppBank](https://pwa.appbank.pw)
 
 ## Банка для чаевых:
 IPA_Downloader полностью бесплатен, однако, если вы хотите безвозмездно поддержать проект, то можно это сделать по ссылке ниже или через QR-код:  
-[Поддержать через CloudTips](https://pay.cloudtips.ru/p/93c0b094)  
+- [Поддержать через CloudTips](https://pay.cloudtips.ru/p/93c0b094)
 
 <img width="320" height="320" alt="qrCode" src="https://github.com/user-attachments/assets/1013fdce-2f18-4b5e-bd73-9237f691f51a" />

@@ -47,14 +47,14 @@ ipatool is an unofficial tool; therefore, using the script is only at your own r
 ## Using on Windows:
 ### Windows requirements:
 * To install downloaded apps via the script, the `AppleMobileDeviceSupport64` driver is required (included in iTunes):  
-[Link to download iTunes from the Apple website](https://www.apple.com/itunes/download/win64)
+- [Download iTunes from the Apple website](https://www.apple.com/itunes/download/win64)
 * Instead of a full iTunes installation, you can selectively install `AppleMobileDeviceSupport64.msi` by extracting the iTunes installer with any archiver (7-Zip, WinRAR).
 * The script works without this driver, but it is required to install downloaded apps on the device.
 
 ### Requirements for Windows 7 and 8.1:
 #### All steps must be performed strictly in the following order:
 Download the complete set of programs/updates for Windows 7/8.1 via the link:  
-[Link for the complete set of programs/updates](https://disk.yandex.ru/d/Fft0whzAz-C7Jg)
+- [Download the complete set of programs/updates](https://disk.yandex.ru/d/Fft0whzAz-C7Jg)
 #### 1. Update system certificates via UpdRootsCert:
 * Run the UpdRootsCert.exe file;
 * Check the boxes: System Root Certificates, Add a monthly task to the Task Scheduler;
@@ -93,49 +93,12 @@ Download the complete set of programs/updates for Windows 7/8.1 via the link:
 
 ### macOS requirements:
 ### All steps must be performed strictly in the following order:
-### On a Mac with Apple Silicon processors:
-#### 1. Install Xcode Command Line Tools:
-* Open Terminal (Command + Space, then type `Terminal` in the Spotlight search field);
-* Type in Terminal: `xcode-select --install`
-* Press Enter.
-#### 2. Install the Homebrew package manager:
-* Type in Terminal: `/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"`
-* Press Enter;
-* During the Homebrew installation, you may be prompted to enter your password;
-* After Homebrew is installed, the text ==> Next steps will appear at the bottom of the Terminal.
-* Type in Terminal:
-```
-echo >> ~/.zprofile
-echo 'eval "$(/opt/homebrew/bin/brew shellenv zsh)"' >> ~/.zprofile
-eval "$(/opt/homebrew/bin/brew shellenv zsh)"
-```
-* Press Enter.
-#### 3. Install the ideviceinstaller, minizip and powershell packages:
-* Type in Terminal: `brew install ideviceinstaller minizip powershell`
-* Press Enter.
-* When prompted, type `y` in Terminal and press Enter.
-### On a Mac with Intel processors:
-#### 1. Install Xcode Command Line Tools:
-* Open Terminal (Command + Space, then type `Terminal` in the Spotlight search field);
-* Press Enter;
-* Type in Terminal: `xcode-select --install`
-* Press Enter.
-#### 2. Install the MacPorts package manager:
-* Click the Apple logo () in the top-left corner of the screen, select `About This Mac`, and check the `macOS` field;
-* Download the installer for your macOS version:  
-[Link to download MacPorts](https://github.com/macports/macports-base/releases)
-* Click `Show all assets` and find the file with the `.pkg` extension for your macOS version;
-* Install MacPorts using the installer file.
-#### 3. Install the ideviceinstaller, minizip and powershell packages:
-* Open a `new` Terminal (Command + Space, then type `Terminal` in the Spotlight search field);
-* Type in Terminal: `sudo port install ideviceinstaller minizip powershell`
-* Press Enter;
-* When prompted, type `y` in Terminal and press Enter.
-#### Note:
-* To uninstall Homebrew and all its components, type in Terminal:  
-`/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/uninstall.sh)"` and press Enter.
-* On macOS 10.15 Catalina, you need to install PowerShell version 7.3.12 by downloading the file:
-[Link to download PowerShell 7.3.12](https://github.com/PowerShell/PowerShell/releases/download/v7.3.12/powershell-7.3.12-osx-x64.pkg)
+#### 1. Download PowerShell
+`powershell-xxx-osx-arm64.pkg` for Apple Silicon or `powershell-xxx-osx-x64.pkg` for Intel.
+- [Download the latest version of PowerShell](https://github.com/PowerShell/PowerShell/releases)
+- [Download PowerShell 7.4.21 for macOS 11 Big Sur](https://github.com/PowerShell/PowerShell/releases/tag/v7.4.21)
+- [Download PowerShell 7.3.12 for macOS 10.15 Catalina](https://github.com/PowerShell/PowerShell/releases/download/v7.3.12/powershell-7.3.12-osx-x64.pkg)
+#### 2. Install PowerShell
 
 ### How to use (macOS):
 #### 1. Extract the IPA_Downloader.zip archive using any archiver (Keka);
@@ -175,15 +138,12 @@ eval "$(/opt/homebrew/bin/brew shellenv zsh)"
 #### Install the required packages:
 #### Arch Linux / Manjaro:
 * Install PowerShell: `sudo pacman -S powershell-bin` (or via AUR: `yay -S powershell-bin`)
-* Install iOS utilities: `sudo pacman -S ideviceinstaller usbmuxd`
 * Enable usbmuxd service: `sudo systemctl enable --now usbmuxd`
 #### Ubuntu / Debian:
-* Install PowerShell: [Microsoft Instructions](https://learn.microsoft.com/powershell/scripting/install/install-ubuntu) or `sudo apt install powershell`
-* Install iOS utilities: `sudo apt install ideviceinstaller usbmuxd`
+* Install PowerShell: [Microsoft Instructions](https://learn.microsoft.com/powershell/scripting/install/install-ubuntu) or ``sudo snap install powershell --classic``
 * Enable usbmuxd service: `sudo systemctl enable --now usbmuxd`
 #### Fedora / RHEL:
 * Install PowerShell: `sudo dnf install powershell`
-* Install iOS utilities: `sudo dnf install ideviceinstaller usbmuxd`
 * Enable usbmuxd service: `sudo systemctl enable --now usbmuxd`
 
 ### How to use (Linux):
@@ -258,9 +218,10 @@ eval "$(/opt/homebrew/bin/brew shellenv zsh)"
 #### 4. Select an app list and purchase (without downloading):
 * Select the app list to display:
 1. Popular apps list (Files/AppsList.txt)
-2. List of popular apps not purchased by the script
+2. List of apps from the Apple account purchase history (Files/AppsListAccount_.txt)
 3. List of apps installed on the device
-4. Custom apps list (Files/AppsListCustom.txt)
+4. List of offloaded apps installed on the device
+5. Custom apps list (Files/AppsListCustom.txt)
 * Press Enter;
 * The selected list will be displayed;
 * Enter the index numbers (#) of the apps to purchase;
@@ -271,7 +232,8 @@ eval "$(/opt/homebrew/bin/brew shellenv zsh)"
 1. Popular apps list (Files/AppsList.txt)
 2. List of apps from the Apple account purchase history (Files/AppsListAccount_.txt)
 3. List of apps installed on the device
-4. Custom apps list (Files/AppsListCustom.txt)
+4. List of offloaded apps installed on the device
+5. Custom apps list (Files/AppsListCustom.txt)
 * Press Enter;
 * The selected list will be displayed;
 * Enter the index numbers (#) of the apps to download;
@@ -404,11 +366,11 @@ You can view the full list of purchased apps via the website [reportaproblem.app
 * On the app page, select Select App with the App Store icon and copy the value in the end of URL.
 
 ### Tracking new app releases:
-[The topic on the 4PDA](https://4pda.to/forum/index.php?showtopic=1046078)  
-[AppBank Website](https://pwa.appbank.pw)
+- [The topic on the 4PDA](https://4pda.to/forum/index.php?showtopic=1046078)
+- [AppBank Website](https://pwa.appbank.pw)
 
 ## Tip Jar:
 IPA_Downloader is completely free, however, if you want to support the project voluntarily, you can do so via the link below or using the QR code:  
-[Support via CloudTips](https://pay.cloudtips.ru/p/93c0b094)  
+- [Support via CloudTips](https://pay.cloudtips.ru/p/93c0b094)
 
 <img width="320" height="320" alt="qrCode" src="https://github.com/user-attachments/assets/1013fdce-2f18-4b5e-bd73-9237f691f51a" />

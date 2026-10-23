@@ -2,7 +2,7 @@
 Set-Location -Path $PSScriptRoot
 
 # Версия скрипта:
-$ScriptVersion = "4.2.4"
+$ScriptVersion = "4.3.0"
 
 # Переменная состояния keychain-passphrase:
 $script:KeychainEnabled = $false
@@ -218,8 +218,9 @@ $LangStrings = @{
 		"AskFileNum" = "Введите порядковые номера (№) файлов для установки"
 		"AskVersionsDownloadNum" = "Введите порядковые номера (№) версий для загрузки"
 		"AskVersionsListNum" = "Введите порядковые номера (№) ID версий или ID версий для отображения версий"
+		"AuthData" = "Данные текущего аккаунта:"
 		"AuthFail" = "Вход в аккаунт Apple не выполнен."
-		"AuthSuccess" = "Вход в аккаунт Apple выполнен.`nДанные аккаунта:"
+		"AuthSuccess" = "Вход в аккаунт Apple выполнен."
 		"BatchHintDownload" = "Доступна загрузка нескольких приложений, например, при вводе: 1, 2 и/или 3-5."
 		"BatchHintInstallApps" = "Доступна установка нескольких приложений, например, при вводе: 1, 2 и/или 3-5."
 		"BatchHintInstallDevices" = "Доступна установка на несколько устройств, например, при вводе: 1, 2 и/или 3-5."
@@ -235,7 +236,7 @@ $LangStrings = @{
 		"ClearMenu2" = "2. Приложения в папке Apps"
 		"ClearMenuTitle" = "Выберите данные для очистки"
 		"CustomAppsListMenu" = "3. Пользовательский список приложений (Files/AppsListCustom.txt)"
-		"CustomAppsListMenu4" = "4. Пользовательский список приложений (Files/AppsListCustom.txt)"
+		"CustomAppsListMenu5" = "5. Пользовательский список приложений (Files/AppsListCustom.txt)"
 		"DebugEnabled" = "Режим отладки включен."
 		"DebugDisabled" = "Режим отладки отключен."
 		"DeviceAppsListLoad" = "Получение списка приложений, установленных на устройстве..."
@@ -260,8 +261,6 @@ $LangStrings = @{
 		"ErrorDeviceAppsRead" = "Ошибка: Не удалось получить список приложений, установленных на устройстве."
 		"ErrorDeviceOSVersionTooLow" = "Ошибка: Версия iOS на устройстве ({0}) ниже минимальной версии iOS приложения ({1})."
 		"ErrorDownloadFiles" = "Ошибка: Не удалось загрузить файл:"
-		"ErrorideviceidNotFound" = "Ошибка: idevice_id не найден.`nПоиск подключенных устройств невозможен."
-		"ErrorideviceinstallerNotFound" = "Ошибка: ideviceinstaller не найден.`nУстановка приложений невозможна (только по AirDrop на macOS)."
 		"ErrorInstallipa" = "Ошибка: Не удалось установить/обновить приложение."
 		"ErrorInvalidInput" = "Ошибка: Неверный ввод."
 		"ErrorMissingFiles" = "Ошибка: Следующие файлы не найдены:"
@@ -311,7 +310,11 @@ $LangStrings = @{
 		"MenuTitle" = "Введите команду:"
 		"MinPlatformVersion" = "Минимальная версия {0} для установки:"
 		"NotPurchasedAppsListMenu" = "2. Список популярных приложений, не приобретенных скриптом"
+		"PlaceholderAppsListMenu" = "4. Список сгруженных приложений, установленных на устройстве"
 		"PopularAppsListMenu" = "1. Список популярных приложений (Files/AppsList.txt)"
+		"PurchaseAllAccountsMenu1" = "1. Да"
+		"PurchaseAllAccountsMenu2" = "2. Нет"
+		"PurchaseAllAccountsTitle" = "Осуществить покупку на все аккаунты, с которыми произведен вход?"
 		"PurchasedAppsListCleared" = "Готово. Список приложений, приобретенных скриптом (Files/PurchasedAppsList.json), очищен."
 		"SelectedApp" = "Выбрано приложение:"
 		"SelectedVersion" = "Выбрана версия:"
@@ -345,8 +348,9 @@ $LangStrings = @{
 		"AskFileNum" = "Enter index numbers (#) of files to install"
 		"AskVersionsDownloadNum" = "Enter index numbers (#) of app versions to download"
 		"AskVersionsListNum" = "Enter index numbers (#) of version IDs or version IDs to display app versions"
+		"AuthData" = "Account details:"
 		"AuthFail" = "Not authenticated with Apple account."
-		"AuthSuccess" = "Apple account login successful.`nAccount details:"
+		"AuthSuccess" = "Apple account login successful."
 		"BatchHintDownload" = "Downloading multiple apps is available, for example, by entering: 1, 2 and/or 3-5."
 		"BatchHintInstallApps" = "Installing multiple apps is available, for example, by entering: 1, 2 and/or 3-5."
 		"BatchHintInstallDevices" = "Installing on multiple devices is available, for example, by entering: 1, 2 and/or 3-5."
@@ -362,7 +366,7 @@ $LangStrings = @{
 		"ClearMenu2" = "2. Apps in Apps folder"
 		"ClearMenuTitle" = "Select data to clear"
 		"CustomAppsListMenu" = "3. Custom apps list (Files/AppsListCustom.txt)"
-		"CustomAppsListMenu4" = "4. Custom apps list (Files/AppsListCustom.txt)"
+		"CustomAppsListMenu5" = "5. Custom apps list (Files/AppsListCustom.txt)"
 		"DebugEnabled" = "Debug mode enabled."
 		"DebugDisabled" = "Debug mode disabled."
 		"DeviceAppsListLoad" = "Getting the list of apps installed on the device..."
@@ -387,8 +391,6 @@ $LangStrings = @{
 		"ErrorDeviceAppsRead" = "Error: Failed to get the list of apps installed on the device."
 		"ErrorDeviceOSVersionTooLow" = "Error: The iOS version on the device ({0}) is lower than the minimum iOS version required by the app ({1})."
 		"ErrorDownloadFiles" = "Error: Failed to download file:"
-		"ErrorideviceidNotFound" = "Error: idevice_id not found.`nScanning connected devices is impossible."
-		"ErrorideviceinstallerNotFound" = "Error: ideviceinstaller not found.`nInstalling apps is impossible (only via AirDrop on macOS)."
 		"ErrorInstallipa" = "Error: Failed to install/upgrade the app."
 		"ErrorInvalidInput" = "Error: Invalid input."
 		"ErrorMissingFiles" = "Error: Following files were not found:"
@@ -438,7 +440,11 @@ $LangStrings = @{
 		"MenuTitle" = "Enter a command:"
 		"MinPlatformVersion" = "Minimum {0} version required to install:"
 		"NotPurchasedAppsListMenu" = "2. List of popular apps not purchased by the script"
+		"PlaceholderAppsListMenu" = "4. List of offloaded apps installed on the device"
 		"PopularAppsListMenu" = "1. Popular apps list (Files/AppsList.txt)"
+		"PurchaseAllAccountsMenu1" = "1. Yes"
+		"PurchaseAllAccountsMenu2" = "2. No"
+		"PurchaseAllAccountsTitle" = "Make the purchase on all accounts that are signed in?"
 		"PurchasedAppsListCleared" = "Done. List of apps purchased by the script (Files/PurchasedAppsList.json) cleared."
 		"SelectedApp" = "Selected app:"
 		"SelectedVersion" = "Selected version:"
@@ -1964,6 +1970,67 @@ function Invoke-AppsBatch {
 	}
 }
 
+# Функция вывода данных текущего аккаунта Apple:
+function Show-AuthData {
+	Separator
+	Write-Host (Get-Lang "AuthData")
+	Invoke-ipatool auth info
+}
+
+# Функция массовой покупки выбранных приложений:
+function Invoke-PurchaseBatch {
+	param ($Apps)
+	
+	if ($null -eq $Apps) { return }
+	
+	# Исходный аккаунт и список аккаунтов для покупки:
+	$OriginalAccount = $script:CurrentAppleAccount
+	$SavedAccounts = @(Get-SavedAppleAccounts)
+	$AccountsToProcess = @($OriginalAccount)
+	
+	# Запрос покупки на всех аккаунтах, если вход произведен больше чем в один аккаунт:
+	if ($SavedAccounts.Count -gt 0) {
+		Separator
+		$PurchaseMenu = "$(Get-Lang 'PurchaseAllAccountsTitle')`n$(Get-Lang 'PurchaseAllAccountsMenu1')`n$(Get-Lang 'PurchaseAllAccountsMenu2')`n"
+		$PurchaseChoice = Read-MenuChoice -MenuText $PurchaseMenu -OptionsCount 2
+		
+		if ($PurchaseChoice -eq '1') {
+			$AccountsToProcess += $SavedAccounts
+		}
+	}
+	
+	try {
+		foreach ($Account in $AccountsToProcess) {
+			# Переход на другой аккаунт:
+			if ($Account -ne $script:CurrentAppleAccount) {
+				Switch-AppleAccount -Account $Account
+				
+				# Сохранение названия аккаунта, если получить его данные не удалось:
+				if ($script:CurrentAppleAccount -eq "UnknownAccount") {
+					$script:CurrentAppleAccount = $Account
+				}
+			}
+			
+			# Вывод данных текущего аккаунта:
+			Show-AuthData
+			
+			# Пропуск аккаунта, если проверка авторизации не пройдена:
+			if (-not $script:AuthSuccess) {
+				Show-Error "ErrorAuthCheck"
+				continue
+			}
+			
+			Invoke-AppsBatch -Apps $Apps -Action "Purchase"
+		}
+	}
+	finally {
+		# Возврат в исходный аккаунт:
+		if ($script:CurrentAppleAccount -ne $OriginalAccount) {
+			Switch-AppleAccount -Account $OriginalAccount
+		}
+	}
+}
+
 # Функция поиска приложений по названию или ID приложений:
 function Search-Apps {
 	param (
@@ -2129,7 +2196,8 @@ function Get-Apps-From-List {
 			(Get-Lang 'PopularAppsListMenu')
 			(Get-Lang 'AccountAppsListMenu')
 			(Get-Lang 'DeviceAppsListMenu')
-			(Get-Lang 'CustomAppsListMenu4')
+			(Get-Lang 'PlaceholderAppsListMenu')
+			(Get-Lang 'CustomAppsListMenu5')
 		)
 	}
 	
@@ -2203,9 +2271,9 @@ function Get-Apps-From-List {
 			$ShowPurchaseDate = $true
 		}
 		
-		# 3. Список приложений, установленных на устройстве:
-		elseif ($ListMode -ne "Purchase" -and $ListChoice -eq '3') {
-			$DeviceResult = Get-DeviceApps
+		# 3. Список приложений, установленных на устройстве и 4. Список сгруженных приложений, установленных на устройстве:
+		elseif ($ListMode -ne "Purchase" -and ($ListChoice -eq '3' -or $ListChoice -eq '4')) {
+			$DeviceResult = Get-DeviceApps -OnlyPlaceholders:($ListChoice -eq '4')
 			if ($DeviceResult.Status -ne "Ok") {
 				Separator
 				continue
@@ -2215,8 +2283,8 @@ function Get-Apps-From-List {
 			$ShowDeviceApps = $true
 		}
 		
-		# 3/4. Пользовательский список приложений (Files/AppsListCustom.txt):
-		elseif (($ListMode -eq "Purchase" -and $ListChoice -eq '3') -or ($ListMode -ne "Purchase" -and $ListChoice -eq '4')) {
+		# 3/5. Пользовательский список приложений (Files/AppsListCustom.txt):
+		elseif (($ListMode -eq "Purchase" -and $ListChoice -eq '3') -or ($ListMode -ne "Purchase" -and $ListChoice -eq '5')) {
 			$CustomList = @(Get-Custom-List)
 			if ($CustomList.Count -eq 0) {
 				Show-Error "ErrorAppsListCustomEmpty"
@@ -2275,7 +2343,7 @@ function Get-Apps-From-List {
 				$SelectedAppName = [string]$SelectedObject.Name
 				
 				# Вывод названия приложения:
-				if ($ListMode -ne "Purchase" -and ($ListChoice -eq '2' -or $ListChoice -eq '3') -and ![string]::IsNullOrEmpty([string]$SelectedObject.ID)) {
+				if ($ListMode -ne "Purchase" -and ($ListChoice -eq '2' -or $ListChoice -eq '3' -or $ListChoice -eq '4') -and ![string]::IsNullOrEmpty([string]$SelectedObject.ID)) {
 					$PreferredName = Get-Repo-AppName -AppID ([string]$SelectedObject.ID)
 					if (![string]::IsNullOrWhiteSpace($PreferredName)) {
 						$SelectedAppName = $PreferredName
@@ -2355,32 +2423,44 @@ function Update-PathFolder {
 	}
 }
 
-# Функция установки путей к ipatool/ideviceinstaller/idevice_id и применения PATH/прав запуска:
+# Функция установки путей к ipatool/ideviceinstaller/idevice_id/ideviceinfo и применения PATH/прав запуска:
 function Set-ipatoolBinaryPaths {
 	param ([string]$FolderPath)
 	
+	# Маска имен файлов:
+	$FileMask = if ($IsWin) { "*.exe" } else { "*" }
+	
+	$ipatoolFile = Get-ChildItem -Path $FolderPath -Filter "ipatool$FileMask" -File -ErrorAction SilentlyContinue | Select-Object -First 1
+	$ideviceinstallerFile = Get-ChildItem -Path $FolderPath -Filter "ideviceinstaller$FileMask" -File -ErrorAction SilentlyContinue | Select-Object -First 1
+	$ideviceidFile = Get-ChildItem -Path $FolderPath -Filter "idevice_id$FileMask" -File -ErrorAction SilentlyContinue | Select-Object -First 1
+	$ideviceinfoFile = Get-ChildItem -Path $FolderPath -Filter "ideviceinfo$FileMask" -File -ErrorAction SilentlyContinue | Select-Object -First 1
+	
+	if ($ipatoolFile) { $script:ipatoolFilePath = $ipatoolFile.FullName }
+	if ($ideviceinstallerFile) { $script:ideviceinstallerFilePath = $ideviceinstallerFile.FullName }
+	if ($ideviceidFile) { $script:ideviceidFilePath = $ideviceidFile.FullName }
+	if ($ideviceinfoFile) { $script:ideviceinfoFilePath = $ideviceinfoFile.FullName }
+	
 	if ($IsWin) {
-		$ipatoolFile = Get-ChildItem -Path $FolderPath -Filter "ipatool*.exe" -File -ErrorAction SilentlyContinue | Select-Object -First 1
-		$ideviceinstallerFile = Get-ChildItem -Path $FolderPath -Filter "ideviceinstaller*.exe" -File -ErrorAction SilentlyContinue | Select-Object -First 1
-		$ideviceidFile = Get-ChildItem -Path $FolderPath -Filter "idevice_id*.exe" -File -ErrorAction SilentlyContinue | Select-Object -First 1
-		
-		if ($ipatoolFile) { $script:ipatoolFilePath = $ipatoolFile.FullName }
-		if ($ideviceinstallerFile) { $script:ideviceinstallerFilePath = $ideviceinstallerFile.FullName }
-		if ($ideviceidFile) { $script:ideviceidFilePath = $ideviceidFile.FullName }
-		
 		# Добавление папки с ipatool в PATH текущего процесса:
 		Update-PathFolder -NewFolder $FolderPath
 	} else {
-		$ipatoolFile = Get-ChildItem -Path $FolderPath -Filter "ipatool*" -File -ErrorAction SilentlyContinue | Select-Object -First 1
+		# Снятие карантина на macOS:
+		if ($IsMac) {
+			xattr -cr "$FolderPath" 2>$null
+		}
 		
-		if ($ipatoolFile) {
-			$script:ipatoolFilePath = $ipatoolFile.FullName
-			
-			# Снятие карантина (macOS) и выдача прав на запуск:
-			if ($IsMac) {
-				xattr -cr "$FolderPath" 2>$null
+		# Выдача прав на запуск на macOS и Linux:
+		foreach ($BinaryFilePath in @($script:ipatoolFilePath, $script:ideviceinstallerFilePath, $script:ideviceidFilePath, $script:ideviceinfoFilePath)) {
+			if ($BinaryFilePath) {
+				chmod +x "$BinaryFilePath" 2>$null
 			}
-			chmod +x "$script:ipatoolFilePath" 2>$null
+		}
+		
+		# Добавление папки с библиотеками в путь поиска библиотек текущего процесса:
+		if ($IsMac) {
+			$env:DYLD_LIBRARY_PATH = if ($env:DYLD_LIBRARY_PATH) { $FolderPath + ":" + $env:DYLD_LIBRARY_PATH } else { $FolderPath }
+		} else {
+			$env:LD_LIBRARY_PATH = if ($env:LD_LIBRARY_PATH) { $FolderPath + ":" + $env:LD_LIBRARY_PATH } else { $FolderPath }
 		}
 	}
 }
@@ -2391,26 +2471,23 @@ function Get-MissingBinaryFiles {
 	
 	$MissingFiles = @()
 	
-	if ($IsWin) {
-		$RequiredPatterns = @(
-			"idevice_id*.exe",
-			"ideviceinfo*.exe",
-			"ideviceinstaller*.exe",
-			"ipatool*.exe",
-			"libimobiledevice-1.0.dll",
-			"libplist-2.0.dll"
-		)
-		
-		foreach ($Pattern in $RequiredPatterns) {
-			$Found = Get-ChildItem -Path $FolderPath -Filter $Pattern -File -ErrorAction SilentlyContinue
-			if (-not $Found) {
-				$MissingFiles += $Pattern
-			}
-		}
-	} else {
-		$Foundipatool = Get-ChildItem -Path $FolderPath -Filter "ipatool*" -File -ErrorAction SilentlyContinue
-		if (-not $Foundipatool) {
-			$MissingFiles += "ipatool*"
+	# Маска имен исполняемых файлов:
+	$FileMask = if ($IsWin) { "*.exe" } else { "*" }
+	
+	# Список необходимых файлов:
+	$RequiredPatterns = @(
+		"idevice_id$FileMask",
+		"ideviceinfo$FileMask",
+		"ideviceinstaller$FileMask",
+		"ipatool$FileMask",
+		"libimobiledevice-1.0*",
+		"libplist-2.0*"
+	)
+	
+	foreach ($Pattern in $RequiredPatterns) {
+		$Found = Get-ChildItem -Path $FolderPath -Filter $Pattern -File -ErrorAction SilentlyContinue
+		if (-not $Found) {
+			$MissingFiles += $Pattern
 		}
 	}
 	
@@ -2450,15 +2527,8 @@ function Get-ConnectedDevices {
 	# Вид подключения устройств:
 	$ConnectionType = if ($script:AirEnabled) { "Wi-Fi" } else { "USB" }
 	
-	# Поиск ideviceinfo:
-	$ideviceinfoFilePath = $null
-	if ($IsWin) {
-		$ideviceinfoFile = Get-ChildItem -Path (Split-Path -Path $script:ideviceidFilePath -Parent) -Filter "ideviceinfo*.exe" -File -ErrorAction SilentlyContinue | Select-Object -First 1
-		if ($ideviceinfoFile) { $ideviceinfoFilePath = $ideviceinfoFile.FullName }
-	} else {
-		$ideviceinfoCommand = Get-Command ideviceinfo -ErrorAction SilentlyContinue | Select-Object -First 1
-		if ($ideviceinfoCommand) { $ideviceinfoFilePath = $ideviceinfoCommand.Source }
-	}
+	# Путь к ideviceinfo:
+	$ideviceinfoFilePath = $script:ideviceinfoFilePath
 	
 	foreach ($UDID in $UDIDList) {
 		$UDID = "$UDID".Trim()
@@ -2665,8 +2735,8 @@ function Read-DeviceApps {
 	$ErrorResult = [PSCustomObject]@{ Status = "Error"; Apps = @() }
 	$NetworkArgs = @(Get-AirArgs)
 	
-	# Запрос Bundle ID, версии, названия и iTunesMetadata одним вызовом:
-	$InstallerArgs = $NetworkArgs + @("--udid", $Device.UDID, "list", "--user", "--xml", "--attribute", "CFBundleIdentifier", "--attribute", "CFBundleShortVersionString", "--attribute", "CFBundleVersion", "--attribute", "CFBundleDisplayName", "--attribute", "iTunesMetadata")
+	# Запрос Bundle ID, версии, названия, признака сгруженного приложения и iTunesMetadata:
+	$InstallerArgs = $NetworkArgs + @("--udid", $Device.UDID, "list", "--user", "--placeholders", "--xml", "--attribute", "CFBundleIdentifier", "--attribute", "CFBundleShortVersionString", "--attribute", "CFBundleVersion", "--attribute", "CFBundleDisplayName", "--attribute", "IsPlaceholder", "--attribute", "iTunesMetadata")
 	$XmlOutput = Invoke-ideviceinstallerCapture -Arguments $InstallerArgs
 	if ([string]::IsNullOrWhiteSpace($XmlOutput)) {
 		return $ErrorResult
@@ -2708,6 +2778,9 @@ function Read-DeviceApps {
 		if ($Values.ContainsKey("CFBundleDisplayName")) { $AppName = $Values["CFBundleDisplayName"].InnerText.Trim() }
 		if ([string]::IsNullOrWhiteSpace($AppName)) { $AppName = $BundleID }
 		
+		# Признак сгруженного приложения:
+		$IsPlaceholder = $Values.ContainsKey("IsPlaceholder") -and $Values["IsPlaceholder"].LocalName -eq "true"
+		
 		# Определение ID из iTunesMetadata:
 		$ItemID = $null
 		if ($Values.ContainsKey("iTunesMetadata")) {
@@ -2733,6 +2806,7 @@ function Read-DeviceApps {
 			BundleID = $BundleID
 			Version = $AppVersion
 			ID = $AppID
+			IsPlaceholder = $IsPlaceholder
 		})
 	}
 	
@@ -2744,18 +2818,10 @@ function Read-DeviceApps {
 
 # Функция получения списка приложений, установленных на устройстве:
 function Get-DeviceApps {
+	param ([switch]$OnlyPlaceholders)
+	
 	$ErrorResult = [PSCustomObject]@{ Status = "Error"; Apps = @() }
 	$CancelResult = [PSCustomObject]@{ Status = "Cancel"; Apps = @() }
-	
-	if ([string]::IsNullOrWhiteSpace($script:ideviceinstallerFilePath)) {
-		Show-Error "ErrorideviceinstallerNotFound"
-		return $ErrorResult
-	}
-	
-	if ([string]::IsNullOrWhiteSpace($script:ideviceidFilePath)) {
-		Show-Error "ErrorideviceidNotFound"
-		return $ErrorResult
-	}
 	
 	# Поиск подключенных устройств:
 	$Devices = @(Get-ConnectedDevices)
@@ -2791,21 +2857,19 @@ function Get-DeviceApps {
 		return $ErrorResult
 	}
 	
+	# Выбор сгруженных приложений:
+	if ($OnlyPlaceholders) {
+		return [PSCustomObject]@{
+			Status = "Ok"
+			Apps = @($DeviceAppsResult.Apps | Where-Object { $_.IsPlaceholder })
+		}
+	}
+	
 	return $DeviceAppsResult
 }
 
 # Функция установки приложений из папки Apps:
 function Install-Apps {
-	if ([string]::IsNullOrWhiteSpace($script:ideviceinstallerFilePath)) {
-		Show-Error "ErrorideviceinstallerNotFound"
-		return
-	}
-	
-	if ([string]::IsNullOrWhiteSpace($script:ideviceidFilePath)) {
-		Show-Error "ErrorideviceidNotFound"
-		return
-	}
-	
 	# Аргументы для взаимодействия с устройствами, подключенными по Wi-Fi:
 	$NetworkArgs = @(Get-AirArgs)
 	
@@ -3302,6 +3366,7 @@ $(Get-Lang 'LoginMenu3')`n
 		# Вывод данных текущего аккаунта Apple:
 		Separator
 		Write-Host (Get-Lang "AuthSuccess")
+		Write-Host (Get-Lang "AuthData")
 		Invoke-ipatool auth info
 		
 		# Вывод меню IPA_Downloader:
@@ -3327,7 +3392,7 @@ $(Get-Lang 'DownloaderMenu12')`n
 			
 			# 1. Поиск приложений по названию или ID и покупка (без загрузки):
 			"1" {
-				Invoke-AppsBatch -Apps (Search-Apps -PromptKey 'AskAppNumPurchase') -Action "Purchase"
+				Invoke-PurchaseBatch -Apps (Search-Apps -PromptKey 'AskAppNumPurchase')
 			}
 			
 			# 2. Поиск приложений по названию или ID и загрузка последней версии:
@@ -3343,7 +3408,7 @@ $(Get-Lang 'DownloaderMenu12')`n
 			# 4. Выбор списка приложений и покупка (без загрузки):
 			"4" {
 				Separator
-				Invoke-AppsBatch -Apps (Get-Apps-From-List -ListMode "Purchase") -Action "Purchase"
+				Invoke-PurchaseBatch -Apps (Get-Apps-From-List -ListMode "Purchase")
 			}
 			
 			# 5. Выбор списка приложений и загрузка последней версии:
@@ -3521,18 +3586,6 @@ while ($true) {
 		$MissingFiles = Get-MissingBinaryFiles -FolderPath $script:BinaryFolderPath
 		Check-RequiredFiles -MissingFiles $MissingFiles
 		Set-ipatoolBinaryPaths -FolderPath $script:BinaryFolderPath
-		
-		# Поиск ideviceinstaller и idevice_id в системе (macOS и Linux):
-		if (-not $IsWin) {
-			$ideviceCommand = Get-Command ideviceinstaller* -ErrorAction SilentlyContinue | Select-Object -First 1
-			$script:ideviceinstallerFilePath = if ($ideviceCommand) { $ideviceCommand.Source } else { $null }
-			$ideviceidCommand = Get-Command idevice_id -ErrorAction SilentlyContinue | Select-Object -First 1
-			$script:ideviceidFilePath = if ($ideviceidCommand) { $ideviceidCommand.Source } else { $null }
-			
-			if (-not $script:ideviceinstallerFilePath) {
-				Show-Error "ErrorideviceinstallerNotFound"
-			}
-		}
 		$script:DependenciesChecked = $true
 	}
 	
