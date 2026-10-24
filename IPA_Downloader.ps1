@@ -2,7 +2,7 @@
 Set-Location -Path $PSScriptRoot
 
 # Версия скрипта:
-$ScriptVersion = "4.3.0"
+$ScriptVersion = "4.3.1"
 
 # Переменная состояния keychain-passphrase:
 $script:KeychainEnabled = $false
@@ -221,6 +221,8 @@ $LangStrings = @{
 		"AuthData" = "Данные текущего аккаунта:"
 		"AuthFail" = "Вход в аккаунт Apple не выполнен."
 		"AuthSuccess" = "Вход в аккаунт Apple выполнен."
+		"BatchAllAccountsTitleDownload" = "Осуществить загрузку на все аккаунты, с которыми произведен вход?"
+		"BatchAllAccountsTitlePurchase" = "Осуществить покупку на все аккаунты, с которыми произведен вход?"
 		"BatchHintDownload" = "Доступна загрузка нескольких приложений, например, при вводе: 1, 2 и/или 3-5."
 		"BatchHintInstallApps" = "Доступна установка нескольких приложений, например, при вводе: 1, 2 и/или 3-5."
 		"BatchHintInstallDevices" = "Доступна установка на несколько устройств, например, при вводе: 1, 2 и/или 3-5."
@@ -307,22 +309,19 @@ $LangStrings = @{
 		"LoginMenu2" = "2. Перейти в режим IPA_Installer"
 		"LoginMenu3" = "3. Сменить язык (Change Language)"
 		"LogoutAllAccounts" = "Выйти из всех аккаунтов Apple и сбросить настройки скрипта"
+		"Menu1Yes" = "1. Да"
+		"Menu2No" = "2. Нет"
 		"MenuTitle" = "Введите команду:"
 		"MinPlatformVersion" = "Минимальная версия {0} для установки:"
 		"NotPurchasedAppsListMenu" = "2. Список популярных приложений, не приобретенных скриптом"
 		"PlaceholderAppsListMenu" = "4. Список сгруженных приложений, установленных на устройстве"
 		"PopularAppsListMenu" = "1. Список популярных приложений (Files/AppsList.txt)"
-		"PurchaseAllAccountsMenu1" = "1. Да"
-		"PurchaseAllAccountsMenu2" = "2. Нет"
-		"PurchaseAllAccountsTitle" = "Осуществить покупку на все аккаунты, с которыми произведен вход?"
 		"PurchasedAppsListCleared" = "Готово. Список приложений, приобретенных скриптом (Files/PurchasedAppsList.json), очищен."
 		"SelectedApp" = "Выбрано приложение:"
 		"SelectedVersion" = "Выбрана версия:"
 		"SelectedVersionsList" = "Выбраны следующие версии:"
 		"TipJar" = "Спасибо за поддержку!"
 		"UpdateAvailableTitle" = "Доступно обновление (версия {0}). Перейти на страницу репозитория для загрузки обновления?"
-		"UpdateMenu1" = "1. Да"
-		"UpdateMenu2" = "2. Нет"
 	}
 	"EN" = @{
 		"AccountAppsListLoad" = "Loading the list of apps from the Apple account's purchase history.`nThis may take some time..."
@@ -351,6 +350,8 @@ $LangStrings = @{
 		"AuthData" = "Account details:"
 		"AuthFail" = "Not authenticated with Apple account."
 		"AuthSuccess" = "Apple account login successful."
+		"BatchAllAccountsTitleDownload" = "Download on all accounts that are signed in?"
+		"BatchAllAccountsTitlePurchase" = "Make the purchase on all accounts that are signed in?"
 		"BatchHintDownload" = "Downloading multiple apps is available, for example, by entering: 1, 2 and/or 3-5."
 		"BatchHintInstallApps" = "Installing multiple apps is available, for example, by entering: 1, 2 and/or 3-5."
 		"BatchHintInstallDevices" = "Installing on multiple devices is available, for example, by entering: 1, 2 and/or 3-5."
@@ -437,22 +438,19 @@ $LangStrings = @{
 		"LoginMenu2" = "2. Switch to IPA_Installer mode"
 		"LoginMenu3" = "3. Change Language (Сменить язык)"
 		"LogoutAllAccounts" = "Log out of all Apple accounts and reset script settings"
+		"Menu1Yes" = "1. Yes"
+		"Menu2No" = "2. No"
 		"MenuTitle" = "Enter a command:"
 		"MinPlatformVersion" = "Minimum {0} version required to install:"
 		"NotPurchasedAppsListMenu" = "2. List of popular apps not purchased by the script"
 		"PlaceholderAppsListMenu" = "4. List of offloaded apps installed on the device"
 		"PopularAppsListMenu" = "1. Popular apps list (Files/AppsList.txt)"
-		"PurchaseAllAccountsMenu1" = "1. Yes"
-		"PurchaseAllAccountsMenu2" = "2. No"
-		"PurchaseAllAccountsTitle" = "Make the purchase on all accounts that are signed in?"
 		"PurchasedAppsListCleared" = "Done. List of apps purchased by the script (Files/PurchasedAppsList.json) cleared."
 		"SelectedApp" = "Selected app:"
 		"SelectedVersion" = "Selected version:"
 		"SelectedVersionsList" = "Selected versions:"
 		"TipJar" = "Thanks for your support!"
 		"UpdateAvailableTitle" = "Update available (version {0}). Open the repository page to download the update?"
-		"UpdateMenu1" = "1. Yes"
-		"UpdateMenu2" = "2. No"
 	}
 }
 
@@ -1977,24 +1975,28 @@ function Show-AuthData {
 	Invoke-ipatool auth info
 }
 
-# Функция массовой покупки выбранных приложений:
-function Invoke-PurchaseBatch {
-	param ($Apps)
+# Функция массовой покупки или загрузки выбранных приложений:
+function Invoke-AccountsBatch {
+	param (
+		$Apps,
+		[ValidateSet("Purchase", "Download")][string]$Action
+	)
 	
 	if ($null -eq $Apps) { return }
 	
-	# Исходный аккаунт и список аккаунтов для покупки:
+	# Исходный аккаунт и список аккаунтов для выполнения действия:
 	$OriginalAccount = $script:CurrentAppleAccount
 	$SavedAccounts = @(Get-SavedAppleAccounts)
 	$AccountsToProcess = @($OriginalAccount)
 	
-	# Запрос покупки на всех аккаунтах, если вход произведен больше чем в один аккаунт:
+	# Запрос выполнения действия на всех аккаунтах, если вход произведен больше чем в один аккаунт:
 	if ($SavedAccounts.Count -gt 0) {
 		Separator
-		$PurchaseMenu = "$(Get-Lang 'PurchaseAllAccountsTitle')`n$(Get-Lang 'PurchaseAllAccountsMenu1')`n$(Get-Lang 'PurchaseAllAccountsMenu2')`n"
-		$PurchaseChoice = Read-MenuChoice -MenuText $PurchaseMenu -OptionsCount 2
+		# Заголовок запроса:
+		$AccountsMenu = "$(Get-Lang "BatchAllAccountsTitle$Action")`n$(Get-Lang 'Menu1Yes')`n$(Get-Lang 'Menu2No')`n"
+		$AccountsChoice = Read-MenuChoice -MenuText $AccountsMenu -OptionsCount 2
 		
-		if ($PurchaseChoice -eq '1') {
+		if ($AccountsChoice -eq '1') {
 			$AccountsToProcess += $SavedAccounts
 		}
 	}
@@ -2020,7 +2022,7 @@ function Invoke-PurchaseBatch {
 				continue
 			}
 			
-			Invoke-AppsBatch -Apps $Apps -Action "Purchase"
+			Invoke-AppsBatch -Apps $Apps -Action $Action
 		}
 	}
 	finally {
@@ -3010,8 +3012,8 @@ function Check-Update {
 				Separator
 				$UpdateMenuText = @"
 $((Get-Lang 'UpdateAvailableTitle') -f $LatestRelease.tag_name)
-$(Get-Lang 'UpdateMenu1')
-$(Get-Lang 'UpdateMenu2')`n
+$(Get-Lang 'Menu1Yes')
+$(Get-Lang 'Menu2No')`n
 "@
 				$Choice = Read-MenuChoice -MenuText $UpdateMenuText -OptionsCount 2
 				if ($Choice -eq '1') {
@@ -3392,12 +3394,12 @@ $(Get-Lang 'DownloaderMenu12')`n
 			
 			# 1. Поиск приложений по названию или ID и покупка (без загрузки):
 			"1" {
-				Invoke-PurchaseBatch -Apps (Search-Apps -PromptKey 'AskAppNumPurchase')
+				Invoke-AccountsBatch -Apps (Search-Apps -PromptKey 'AskAppNumPurchase') -Action "Purchase"
 			}
 			
 			# 2. Поиск приложений по названию или ID и загрузка последней версии:
 			"2" {
-				Invoke-AppsBatch -Apps (Search-Apps -PromptKey 'AskAppNumDownload') -Action "Download"
+				Invoke-AccountsBatch -Apps (Search-Apps -PromptKey 'AskAppNumDownload') -Action "Download"
 			}
 			
 			# 3. Поиск приложений по названию или ID и загрузка (с выбором версии):
@@ -3408,13 +3410,13 @@ $(Get-Lang 'DownloaderMenu12')`n
 			# 4. Выбор списка приложений и покупка (без загрузки):
 			"4" {
 				Separator
-				Invoke-PurchaseBatch -Apps (Get-Apps-From-List -ListMode "Purchase")
+				Invoke-AccountsBatch -Apps (Get-Apps-From-List -ListMode "Purchase") -Action "Purchase"
 			}
 			
 			# 5. Выбор списка приложений и загрузка последней версии:
 			"5" {
 				Separator
-				Invoke-AppsBatch -Apps (Get-Apps-From-List -ListMode "Download") -Action "Download"
+				Invoke-AccountsBatch -Apps (Get-Apps-From-List -ListMode "Download") -Action "Download"
 			}
 			
 			# 6. Выбор списка приложений и загрузка (с выбором версии):
