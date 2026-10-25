@@ -97,7 +97,7 @@ ipatool является неофициальным инструментом; с
 #### 1. Загружаем PowerShell:
 `powershell-xxx-osx-arm64.pkg` для Apple Silicon или `powershell-xxx-osx-x64.pkg` для Intel:
 - [Загрузить последнюю версию PowerShell](https://github.com/PowerShell/PowerShell/releases)
-- [Загрузить PowerShell 7.4.21 для macOS 11 Big Sur](https://github.com/PowerShell/PowerShell/releases/tag/v7.4.21)
+- [Загрузить PowerShell 7.4.22 для macOS 11 Big Sur](https://github.com/PowerShell/PowerShell/releases/tag/v7.4.22)
 - [Загрузить PowerShell 7.3.12 для macOS 10.15 Catalina](https://github.com/PowerShell/PowerShell/releases/download/v7.3.12/powershell-7.3.12-osx-x64.pkg)
 #### 2. Устанавливаем PowerShell
 

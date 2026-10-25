@@ -96,7 +96,7 @@ Download the complete set of programs/updates for Windows 7/8.1 via the link:
 #### 1. Download PowerShell
 `powershell-xxx-osx-arm64.pkg` for Apple Silicon or `powershell-xxx-osx-x64.pkg` for Intel.
 - [Download the latest version of PowerShell](https://github.com/PowerShell/PowerShell/releases)
-- [Download PowerShell 7.4.21 for macOS 11 Big Sur](https://github.com/PowerShell/PowerShell/releases/tag/v7.4.21)
+- [Download PowerShell 7.4.22 for macOS 11 Big Sur](https://github.com/PowerShell/PowerShell/releases/tag/v7.4.22)
 - [Download PowerShell 7.3.12 for macOS 10.15 Catalina](https://github.com/PowerShell/PowerShell/releases/download/v7.3.12/powershell-7.3.12-osx-x64.pkg)
 #### 2. Install PowerShell
 
