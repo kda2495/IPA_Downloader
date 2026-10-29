@@ -19,17 +19,17 @@ ipatool is an unofficial tool; therefore, using the script is only at your own r
 * An Apple account with previously downloaded apps.
 ### Script Features:
 #### IPA_Downloader (downloading and installing apps):
-* Search for apps by name or ID and purchase (without downloading)
-* Search for apps by name or ID and download latest version
-* Search for apps by name or ID and download (with version selection)
-* Select an app list and purchase (without downloading)
-* Select an app list and download latest version
-* Select an app list and download (with version selection)
-* Check the minimum iOS version for apps in the Apps folder
-* Install apps from Apps folder
+* Search for apps by name or ID and purchase (without downloading);
+* Search for apps by name or ID and download latest version;
+* Search for apps by name or ID and download (with version selection);
+* Select an app list and purchase (without downloading);
+* Select an app list and download latest version;
+* Select an app list and download (with version selection);
+* Check the minimum iOS version for apps in the Apps folder;
+* Install apps from Apps folder.
 
 #### IPA_Installer (installing apps):
-* Check the minimum iOS version for apps in the Apps folder
+* Check the minimum iOS version for apps in the Apps folder;
 * Install apps from Apps folder.
 
 #### The script CANNOT:
