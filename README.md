@@ -64,10 +64,10 @@ ipatool является неофициальным инструментом; с
 - [Загрузить .NET Framework 4.8](https://go.microsoft.com/fwlink/?linkid=2088631)
 * Запускаем файл NDP48-x86-x64-AllOS-ENU.exe;
 * Устанавливаем .NET Framework 4.8 следуя инструкциям мастера установки.
-#### 3. Устанавливаем обновление KB3191566 (для добавления поддержки PowerShell 5.1):
+#### 3. Устанавливаем обновление KB3191564/KB3191566 (для добавления поддержки PowerShell 5.1):
 * Загружаем обновление KB3191566 по ссылке:
 - [Загрузить KB3191566 для Windows 7](https://download.microsoft.com/download/6/f/5/6f5ff66c-6775-42b0-86c4-47d41f2da187/Win7AndW2K8R2-KB3191566-x64.zip)
-- [Загрузить KB3191566 для Windows 8.1](https://download.microsoft.com/download/6/f/5/6f5ff66c-6775-42b0-86c4-47d41f2da187/Win8.1AndW2K12R2-KB3191564-x64.msu)
+- [Загрузить KB3191564 для Windows 8.1](https://download.microsoft.com/download/6/f/5/6f5ff66c-6775-42b0-86c4-47d41f2da187/Win8.1AndW2K12R2-KB3191564-x64.msu)
 * Запускаем файлы: Win7AndW2K8R2-KB3191566-x64.msu (для Windows 7) или Win8.1AndW2K12R2-KB3191564-x64.msu (для Windows 8.1);
 * Устанавливаем обновление KB3191566 следуя инструкциям мастера установки.
 #### 4. Устанавливаем обновление KB2999226:
