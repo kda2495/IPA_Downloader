@@ -11,6 +11,12 @@ A script for purchasing/downloading any available App Store apps, as well as res
 ## Information about the script:
 ### Important:
 ipatool is an unofficial tool; therefore, using the script is only at your own risk.
+### General requirements for use:
+* Windows 7 - 11 (x64);
+* macOS starting from 10.15 Catalina (both Apple Silicon and Intel are supported);
+* Linux (x64 and ARM64: Arch Linux, Ubuntu, Debian, Fedora, etc.);
+* Stable internet connection;
+* An Apple account with previously downloaded apps.
 ### Script Features:
 #### IPA_Downloader (downloading and installing apps):
 * Search for apps by name or ID and purchase (without downloading)
@@ -36,13 +42,6 @@ ipatool is an unofficial tool; therefore, using the script is only at your own r
 * It is recommended to disable security keys and switch to standard two-factor authentication;
 * The script supports bulk purchasing/downloading/installing apps. Simply enter the index numbers (#) of the apps/versions from the tables, separated by commas or hyphens. For example, entering 1, 2, 3-5 will purchase/download/installing the apps with index numbers (#) 1, 2, 3, 4, and 5;
 * It is possible to create a custom list of applications; you just need to add data in the format `App name: its ID`, for example: `Google: 284815942` to the file Files/AppsListCustom.txt.
-
-### General requirements for use:
-* Windows 7 - 11 (x64);
-* macOS starting from 10.15 Catalina (both Apple Silicon and Intel are supported);
-* Linux (x64 and ARM64: Arch Linux, Ubuntu, Debian, Fedora, etc.);
-* Stable internet connection;
-* An Apple account with previously downloaded apps.
 
 ## Using on Windows:
 ### Windows requirements:
