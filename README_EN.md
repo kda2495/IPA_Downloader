@@ -55,7 +55,7 @@ ipatool is an unofficial tool; therefore, using the script is only at your own r
 #### All steps must be performed strictly in the following order:
 #### 1. Update system certificates via UpdRootsCert:
 * Download UpdRootsCert.exe file via the link:
-- [Download .NET Framework 4.8](https://go.microsoft.com/fwlink/?linkid=2088631)
+- [Download UpdRootsCert.exe](https://disk.yandex.ru/d/SdHMgwJ55MTQRg)
 * Run the UpdRootsCert.exe file;
 * Check the boxes: System Root Certificates, Add a monthly task to the Task Scheduler;
 * Click the Install button.
