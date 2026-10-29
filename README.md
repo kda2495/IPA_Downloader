@@ -69,7 +69,7 @@ ipatool является неофициальным инструментом; с
 - [Загрузить KB3191566 для Windows 7](https://download.microsoft.com/download/6/f/5/6f5ff66c-6775-42b0-86c4-47d41f2da187/Win7AndW2K8R2-KB3191566-x64.zip)
 - [Загрузить KB3191564 для Windows 8.1](https://download.microsoft.com/download/6/f/5/6f5ff66c-6775-42b0-86c4-47d41f2da187/Win8.1AndW2K12R2-KB3191564-x64.msu)
 * Запускаем файлы: Win7AndW2K8R2-KB3191566-x64.msu (для Windows 7) или Win8.1AndW2K12R2-KB3191564-x64.msu (для Windows 8.1);
-* Устанавливаем обновление KB3191566 следуя инструкциям мастера установки.
+* Устанавливаем обновление KB3191564/KB3191566 следуя инструкциям мастера установки.
 #### 4. Устанавливаем обновление KB2999226:
 * Загружаем обновление KB2999226 по ссылке:
 - [Загрузить KB2999226 для Windows 7](https://download.microsoft.com/download/1/1/5/11565a9a-ea09-4f0a-a57e-520d5d138140/Windows6.1-KB2999226-x64.msu)
