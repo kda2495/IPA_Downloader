@@ -53,20 +53,28 @@ ipatool is an unofficial tool; therefore, using the script is only at your own r
 
 ### Requirements for Windows 7 and 8.1:
 #### All steps must be performed strictly in the following order:
-Download the complete set of programs/updates for Windows 7/8.1 via the link:  
-- [Download the complete set of programs/updates](https://disk.yandex.ru/d/Fft0whzAz-C7Jg)
 #### 1. Update system certificates via UpdRootsCert:
+* Download UpdRootsCert.exe file via the link:
+- [Download .NET Framework 4.8](https://go.microsoft.com/fwlink/?linkid=2088631)
 * Run the UpdRootsCert.exe file;
 * Check the boxes: System Root Certificates, Add a monthly task to the Task Scheduler;
 * Click the Install button.
 #### 2. Install .NET Framework 4.8:
+* Download NDP48-x86-x64-AllOS-ENU.exe file via the link:
+- [Download .NET Framework 4.8](https://go.microsoft.com/fwlink/?linkid=2088631)
 * Run the NDP48-x86-x64-AllOS-ENU.exe file;
 * Install .NET Framework 4.8 following the installation wizard instructions.
 #### 3. Install the KB3191566 update (to add PowerShell 5.1 support):
-* Run the files: Win7AndW2K8R2-KB3191566-x64.msu (for Windows 7) or Win8.1AndW2K12R2-KB3191564-x64.msu (for Windows 8.1);
+* Download KB3191566 update via the link:
+- [Download KB3191566 for Windows 7](https://download.microsoft.com/download/6/f/5/6f5ff66c-6775-42b0-86c4-47d41f2da187/Win7AndW2K8R2-KB3191566-x64.zip)
+- [Download KB3191566 for Windows 8.1](https://download.microsoft.com/download/6/f/5/6f5ff66c-6775-42b0-86c4-47d41f2da187/Win8.1AndW2K12R2-KB3191564-x64.msu)
+* Run the files: Win7AndW2K8R2-KB3191566-x64.msu (for Windows 7) или Win8.1AndW2K12R2-KB3191564-x64.msu (for Windows 8.1);
 * Install the KB3191566 update following the installation wizard instructions.
 #### 4. Install the KB2999226 update:
-* Run the files: Windows7-KB2999226-x64 (for Windows 7) or Windows8.1-KB2999226-x64 (for Windows 8.1);
+* Download KB2999226 update via the link:
+- [Download KB2999226 for Windows 7](https://download.microsoft.com/download/1/1/5/11565a9a-ea09-4f0a-a57e-520d5d138140/Windows6.1-KB2999226-x64.msu)
+- [Download KB2999226 for Windows 8.1](https://download.microsoft.com/download/9/6/f/96fd0525-3ddf-423d-8845-5f92f4a6883e/Windows8.1-KB2999226-x64.msu)
+* Run the files: Windows6.1-KB2999226-x64.msu (for Windows 7) или windows8.1-kb2999226-x64.msu (for Windows 8.1);
 * Install the KB2999226 update following the installation wizard instructions.
 
 ### How to use (Windows):
