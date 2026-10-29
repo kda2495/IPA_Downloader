@@ -65,11 +65,11 @@ ipatool is an unofficial tool; therefore, using the script is only at your own r
 * Run the NDP48-x86-x64-AllOS-ENU.exe file;
 * Install .NET Framework 4.8 following the installation wizard instructions.
 #### 3. Install the KB3191564/KB3191566 update (to add PowerShell 5.1 support):
-* Download KB3191566 update via the link:
+* Download KB3191564/KB3191566 update via the link:
 - [Download KB3191566 for Windows 7](https://download.microsoft.com/download/6/f/5/6f5ff66c-6775-42b0-86c4-47d41f2da187/Win7AndW2K8R2-KB3191566-x64.zip)
 - [Download KB3191564 for Windows 8.1](https://download.microsoft.com/download/6/f/5/6f5ff66c-6775-42b0-86c4-47d41f2da187/Win8.1AndW2K12R2-KB3191564-x64.msu)
 * Run the files: Win7AndW2K8R2-KB3191566-x64.msu (for Windows 7) или Win8.1AndW2K12R2-KB3191564-x64.msu (for Windows 8.1);
-* Install the KB3191566 update following the installation wizard instructions.
+* Install the KB3191564/KB3191566 update following the installation wizard instructions.
 #### 4. Install the KB2999226 update:
 * Download KB2999226 update via the link:
 - [Download KB2999226 for Windows 7](https://download.microsoft.com/download/1/1/5/11565a9a-ea09-4f0a-a57e-520d5d138140/Windows6.1-KB2999226-x64.msu)
