@@ -327,6 +327,7 @@ ipatool is an unofficial tool; therefore, using the script is only at your own r
 ## Possible errors and solution:
 ### Troubleshooting errors:
 * `Processing -File ./IPA_Downloader.ps1 failed: Access to the path is denied (macOS)` - Allow Terminal access in `System Settings - Privacy & Security - Full Disk Access`.
+* `Script authorization issues (Windows)` — You need to disable the `Control flow guard (CFG)` option in: `Settings → Update & Security - Windows Security - App & browser control - Exploit protection - Exploit protection settings - Control flow guard (CFG)`.
 * `Login error: failed to initialize SAP signer: curl: Timeout was reached.` - Failed to connect to SAP, check your internet connection.
 * `Error: account is disabled` - Apple account is temporarily blocked by Apple (usually due to multiple attempts to enter incorrect password or 2FA code), account needs to be unblocked via the device or on the `icloud.com` website.
 * `Download error: HTTP request failed: Couldn't resolve host name` - Failed to connect to Apple servers, check your internet connection.
