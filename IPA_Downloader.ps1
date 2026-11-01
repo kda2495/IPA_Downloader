@@ -316,6 +316,7 @@ $LangStrings = @{
 		"NotPurchasedAppsListMenu" = "2. Список популярных приложений, не приобретенных скриптом"
 		"PlaceholderAppsListMenu" = "4. Список сгруженных приложений, установленных на устройстве"
 		"PopularAppsListMenu" = "1. Список популярных приложений (Files/AppsList.txt)"
+		"ProxyUsed" = "Используется системный прокси-сервер:"
 		"PurchasedAppsListCleared" = "Готово. Список приложений, приобретенных скриптом (Files/PurchasedAppsList.json), очищен."
 		"SelectedApp" = "Выбрано приложение:"
 		"SelectedVersion" = "Выбрана версия:"
@@ -445,6 +446,7 @@ $LangStrings = @{
 		"NotPurchasedAppsListMenu" = "2. List of popular apps not purchased by the script"
 		"PlaceholderAppsListMenu" = "4. List of offloaded apps installed on the device"
 		"PopularAppsListMenu" = "1. Popular apps list (Files/AppsList.txt)"
+		"ProxyUsed" = "Using the system proxy server:"
 		"PurchasedAppsListCleared" = "Done. List of apps purchased by the script (Files/PurchasedAppsList.json) cleared."
 		"SelectedApp" = "Selected app:"
 		"SelectedVersion" = "Selected version:"
@@ -1156,7 +1158,7 @@ function ConvertTo-Account-AppName {
 	$CleanName = $CleanName -replace '\s{2,}', ' '
 	$CleanName = $CleanName.Trim()
 	
-	# Название только из удаленных символов:
+	# Название полностью из удаленных символов:
 	if ([string]::IsNullOrWhiteSpace($CleanName)) {
 		return "Unknown"
 	}
@@ -1414,7 +1416,7 @@ function Initialize-RemoteFiles {
 			
 			# Проверка наличия временного файла:
 			if (Test-Path $RemoteFile.Temp) {
-				# Замена файла только после успешной загрузки:
+				# Замена файла после успешной загрузки:
 				Move-Item -Path $RemoteFile.Temp -Destination $RemoteFile.Final -Force -ErrorAction Stop
 			}
 		}
@@ -2841,7 +2843,7 @@ function Get-DeviceApps {
 		$SelectedDeviceIndices = Read-NumberSelection -PromptKey 'AskDeviceNumApps' -MaxCount $Devices.Count -CancelKey 'CancelStepList'
 		if ($null -eq $SelectedDeviceIndices) { return $CancelResult }
 		
-		# Запрос списка приложений только у одного устройства:
+		# Запрос списка приложений у одного устройства:
 		if (@($SelectedDeviceIndices).Count -eq 1) { break }
 		
 		Show-Error "ErrorInvalidInput"
@@ -3250,6 +3252,85 @@ $(Get-Lang 'InstallerMenu5')`n
 	}
 }
 
+# Функция проверки доступности прокси-сервера:
+function Test-ProxyReachable {
+	param ([string]$ProxyUrl)
+	
+	$Client = New-Object System.Net.Sockets.TcpClient
+	
+	try {
+		$ProxyUri = [System.Uri]$ProxyUrl
+		$Port = if ($ProxyUri.Port -gt 0) { $ProxyUri.Port } else { 1080 }
+		
+		# Ожидание подключения:
+		$Connect = $Client.BeginConnect($ProxyUri.Host, $Port, $null, $null)
+		if (-not $Connect.AsyncWaitHandle.WaitOne(1000)) {
+			return $false
+		}
+		
+		# Завершение подключения:
+		$Client.EndConnect($Connect)
+		return $true
+	} catch {
+		return $false
+	} finally {
+		$Client.Close()
+	}
+}
+
+# Функция определения прокси-сервера:
+function Get-SystemProxyUrl {
+	# Прокси-сервер в переменных окружения:
+	foreach ($Name in @("HTTPS_PROXY", "https_proxy", "ALL_PROXY", "all_proxy")) {
+		if (![string]::IsNullOrWhiteSpace([Environment]::GetEnvironmentVariable($Name))) {
+			return $null
+		}
+	}
+	
+	# Адрес Apple, для которого определяется необходимость использования прокси-сервера:
+	$ProbeUri = [System.Uri]"https://buy.itunes.apple.com/"
+	$ProxyUrl = $null
+	
+	try {
+		# Системный прокси-сервер:
+		$ProxyUri = [System.Net.WebRequest]::GetSystemWebProxy().GetProxy($ProbeUri)
+		
+		# Использование исходного адреса при отключенном прокси-сервере:
+		if ($ProxyUri -and $ProxyUri.Host -ne $ProbeUri.Host) {
+			$Scheme = if ($ProxyUri.Scheme -like "socks*") { "socks5h" } else { $ProxyUri.Scheme }
+			$ProxyUrl = "${Scheme}://$($ProxyUri.Authority)"
+		}
+	} catch {
+		$ProxyUrl = $null
+	}
+	
+	# SOCKS-прокси:
+	if (-not $ProxyUrl -and $IsWin) {
+		try {
+			$InetSettings = Get-ItemProperty -Path "HKCU:\Software\Microsoft\Windows\CurrentVersion\Internet Settings" -ErrorAction Stop
+			
+			if ($InetSettings.ProxyEnable -eq 1 -and $InetSettings.ProxyServer -match '(?:^|;)socks=(?:\w+://)?([^;\s]+)') {
+				$SocksServer = $Matches[1]
+				
+				# Исключения из списка ProxyOverride не проксируются:
+				$BypassList = @("$($InetSettings.ProxyOverride)" -split ";" | Where-Object { $_.Trim() -and ($ProbeUri.Host -like $_.Trim()) })
+				if ($BypassList.Count -eq 0) {
+					$ProxyUrl = "socks5h://$SocksServer"
+				}
+			}
+		} catch {
+			$ProxyUrl = $null
+		}
+	}
+	
+	# Использование прокси-сервера при его доступности:
+	if ($ProxyUrl -and (Test-ProxyReachable $ProxyUrl)) {
+		return $ProxyUrl
+	}
+	
+	return $null
+}
+
 # Функция запуска ipatool c аргументами:
 function Invoke-ipatool {
 	$ipatoolArgs = @($args)
@@ -3264,8 +3345,35 @@ function Invoke-ipatool {
 		$ipatoolArgs += "--debug"
 	}
 	
-	# Запуск ipatool с переданными аргументами:
-	& "$script:ipatoolFilePath" @ipatoolArgs
+	# Определение прокси-сервера:
+	$IsLocalCommand = $ipatoolArgs.Count -ge 2 -and $ipatoolArgs[0] -eq "auth" -and $ipatoolArgs[1] -in @("info", "revoke")
+	$ProxyUrl = if ($IsLocalCommand) { $null } else { Get-SystemProxyUrl }
+	
+	# Имена переменных окружения с прокси-сервером:
+	$ProxyVars = if ($IsWin) { @("HTTPS_PROXY", "HTTP_PROXY") } else { @("https_proxy", "http_proxy") }
+	$OldValues = @{}
+	
+	try {
+		# Передача прокси-сервера:
+		if ($ProxyUrl) {
+			if ($script:IsDebugEnabled) {
+				Write-Host "$(Get-Lang "ProxyUsed") $ProxyUrl"
+			}
+			
+			foreach ($Name in $ProxyVars) {
+				$OldValues[$Name] = [Environment]::GetEnvironmentVariable($Name)
+				[Environment]::SetEnvironmentVariable($Name, $ProxyUrl)
+			}
+		}
+		
+		# Запуск ipatool с переданными аргументами:
+		& "$script:ipatoolFilePath" @ipatoolArgs
+	} finally {
+		# Возврат прежних значений переменных окружения:
+		foreach ($Name in $OldValues.Keys) {
+			[Environment]::SetEnvironmentVariable($Name, $OldValues[$Name])
+		}
+	}
 }
 
 # Функция режима IPA_Downloader:
@@ -3358,7 +3466,7 @@ $(Get-Lang 'LoginMenu3')`n
 		}
 	}
 	
-	# Сохранение настроек режима IPA_Downloader только после успешной авторизации с аккаунтом Apple:
+	# Сохранение настроек режима IPA_Downloader после успешной авторизации с аккаунтом Apple:
 	Set-Setting -Key "Language" -Value $script:CurrentLang
 	Set-Setting -Key "Mode" -Value "Downloader"
 	Set-Setting -Key "KeychainEnabled" -Value $script:KeychainEnabled
@@ -3454,7 +3562,7 @@ $(Get-Lang 'ClearMenu2')`n
 						} else {
 							$RawData = Get-Content "$PurchasedAppsListFilePath" -Raw -Encoding UTF8
 							
-							# Очистка, если файл пуст или содержит только пустые скобки {}:
+							# Очистка, если файл пуст или содержит пустые скобки {}:
 							if ([string]::IsNullOrWhiteSpace($RawData) -or $RawData.Trim() -eq '{}') {
 								Remove-Item "$PurchasedAppsListFilePath" -Force -ErrorAction SilentlyContinue
 								Show-Error "ErrorPurchasedAppsListEmpty"
