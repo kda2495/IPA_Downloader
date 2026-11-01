@@ -3349,6 +3349,15 @@ function Invoke-ipatool {
 	$IsLocalCommand = $ipatoolArgs.Count -ge 2 -and $ipatoolArgs[0] -eq "auth" -and $ipatoolArgs[1] -in @("info", "revoke")
 	$ProxyUrl = if ($IsLocalCommand) { $null } else { Get-SystemProxyUrl }
 	
+	# Вывод информации о прокси-сервере:
+	if (-not $IsLocalCommand) {
+		if ($ProxyUrl) {
+			Separator
+			Write-Host "$(Get-Lang "ProxyUsed") $ProxyUrl"
+			Separator
+		}
+	}
+	
 	# Имена переменных окружения с прокси-сервером:
 	$ProxyVars = if ($IsWin) { @("HTTPS_PROXY", "HTTP_PROXY") } else { @("https_proxy", "http_proxy") }
 	$OldValues = @{}
@@ -3356,10 +3365,6 @@ function Invoke-ipatool {
 	try {
 		# Передача прокси-сервера:
 		if ($ProxyUrl) {
-			if ($script:IsDebugEnabled) {
-				Write-Host "$(Get-Lang "ProxyUsed") $ProxyUrl"
-			}
-			
 			foreach ($Name in $ProxyVars) {
 				$OldValues[$Name] = [Environment]::GetEnvironmentVariable($Name)
 				[Environment]::SetEnvironmentVariable($Name, $ProxyUrl)
