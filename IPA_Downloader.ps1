@@ -2,7 +2,7 @@
 Set-Location -Path $PSScriptRoot
 
 # Версия скрипта:
-$ScriptVersion = "4.3.2"
+$ScriptVersion = "4.3.3"
 
 # Переменная состояния keychain-passphrase:
 $script:KeychainEnabled = $false
