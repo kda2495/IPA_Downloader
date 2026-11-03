@@ -335,7 +335,7 @@ ipatool является неофициальным инструментом; с
 * `No device found` - Устройство не найдено. Убедитесь, что драйвер AppleMobileDeviceSupport64 установлен (актуально для Windows).
 * `WARNING: could not locate Payload/App.app/SC_Info/App.sinf in archive!` - В устанавливаемом ipa файле не найдена подпись приложения.
 * `ERROR: Install failed. Got error "APIInternalError" with code 0x00000000: Error Domain=IXErrorDomain Code=46` - Необходимо удалить приложение с устройства, перезагрузить устройство и попробовать установить еще раз.
-* `Could not connect to lockdownd: Invalid HostID. Exiting.` - Удаляем нижеуказанные папки, затем удаляем iTunes, AppleMobileDeviceSupport64 и устанавливаем iTunes или AppleMobileDeviceSupport64 заново, подключаем устройство и нажимаем `Доверять` при запросе `Доверять этому компьютеру?`
+* `Could not connect to lockdownd: Invalid HostID. Exiting.` - Удаляем iTunes, AppleMobileDeviceSupport64, затем удаляем нижеуказанные папки и устанавливаем iTunes или AppleMobileDeviceSupport64 заново, подключаем устройство и нажимаем `Доверять` при запросе `Доверять этому компьютеру?`
 ```
 C:\ProgramData\Apple\
 C:\ProgramData\Apple\Apple Computer\
