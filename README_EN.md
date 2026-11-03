@@ -39,7 +39,7 @@ ipatool is an unofficial tool; therefore, using the script is only at your own r
 #### Note:
 * To purchase or download apps, they must be previously acquired in the App Store;
 * Apps are downloaded directly from the App Store;
-* It is recommended to disable security keys and switch to standard two-factor authentication;
+* It is recommended to disable security keys and switch to standard two-factor authentication (2FA);
 * The script supports bulk purchasing/downloading/installing apps. Simply enter the index numbers (#) of the apps/versions from the tables, separated by commas or hyphens. For example, entering 1, 2, 3-5 will purchase/download/installing the apps with index numbers (#) 1, 2, 3, 4, and 5;
 * It is possible to create a custom list of applications; you just need to add data in the format `App name: its ID`, for example: `Google: 284815942` to the file Files/AppsListCustom.txt.
 
@@ -327,6 +327,7 @@ ipatool is an unofficial tool; therefore, using the script is only at your own r
 ## Possible errors and solution:
 ### Troubleshooting errors:
 * `Processing -File ./IPA_Downloader.ps1 failed: Access to the path is denied (macOS)` - Allow Terminal access in `System Settings - Privacy & Security - Full Disk Access`.
+* `Two-factor authentication (2FA) code not received or login issues` - The password was entered incorrectly. Try signing in to `icloud.com` website using your Apple account.
 * `Login error: failed to initialize SAP signer: curl: Timeout was reached.` - Failed to connect to SAP, check your internet connection.
 * `Error: account is disabled` - Apple account is temporarily blocked by Apple (usually due to multiple attempts to enter incorrect password or 2FA code), account needs to be unblocked via the device or on the `icloud.com` website.
 * `Download error: HTTP request failed: Couldn't resolve host name` - Failed to connect to Apple servers, check your internet connection.
@@ -335,10 +336,8 @@ ipatool is an unofficial tool; therefore, using the script is only at your own r
 * `Error: This Apple Account is temporarily unable to be used in the iTunes Store because it could not be found. Try again later.` - You need to make any free purchase in the App Store.
 * `Purchase error: app not found` - App purchase failed because the app has been removed from the App Store.
 * `Purchase error: item is temporarily unavailable` - The app was not previously purchased on this Apple account, the purchase failed because the app has been removed from the App Store.
-* `No device found` - Device not found. Make sure the AppleMobileDeviceSupport64 driver is installed (relevant for Windows).
-* `WARNING: could not locate Payload/App.app/SC_Info/App.sinf in archive!` - App signature not found in the installed ipa file.
-* `ERROR: Install failed. Got error "APIInternalError" with code 0x00000000: Error Domain=IXErrorDomain Code=46` - You need to remove the app from the device, restart the device, and try installing it again.
-* `Could not connect to lockdownd: Invalid HostID. Exiting.` - Uninstall iTunes and AppleMobileDeviceSupport64, then delete the folders listed below and reinstall iTunes or AppleMobileDeviceSupport64, connect the device and tap `Trust` when the `Trust This Computer?` prompt appears.
+* `No device found` - Device not found. Make sure the AppleMobileDeviceSupport64 driver is installed.
+* `Could not connect to lockdownd` - Issues with connecting to an Apple device. Uninstall iTunes and AppleMobileDeviceSupport64, then delete the folders listed below and reinstall iTunes or AppleMobileDeviceSupport64, connect the device and tap `Trust` when the `Trust This Computer?` prompt appears.
 ```
 C:\ProgramData\Apple\
 C:\ProgramData\Apple\Apple Computer\
@@ -346,8 +345,9 @@ C:\Users\%username%\AppData\Local\Apple Computer\
 C:\Users\%username%\AppData\Local\Apple Inc\
 C:\Users\%username%\AppData\Roaming\Apple Computer\
 ```
-* If you encounter any issues with authorization, try logging in to your Apple account on the `icloud.com` website.
-* If the app immediately closes when launched after installation, log in to the App Store using the account from which it was downloaded, and install any free/paid app. After that, launch the problematic app again.
+* `WARNING: could not locate Payload/App.app/SC_Info/App.sinf in archive!` - App signature not found in the installed ipa file.
+* `ERROR: Install failed. Got error "APIInternalError" with code 0x00000000: Error Domain=IXErrorDomain Code=46` - You need to remove the app from the device, restart the device, and try installing the app again.
+* `The app immediately closes when launched after installation` - Log in to the App Store using the account from which it was downloaded, and install any free/paid app. After that, launch the problematic app again.
 
 ### If you encounter an issue:
 #### Please provide the following information:
