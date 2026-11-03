@@ -338,7 +338,7 @@ ipatool is an unofficial tool; therefore, using the script is only at your own r
 * `No device found` - Device not found. Make sure the AppleMobileDeviceSupport64 driver is installed (relevant for Windows).
 * `WARNING: could not locate Payload/App.app/SC_Info/App.sinf in archive!` - App signature not found in the installed ipa file.
 * `ERROR: Install failed. Got error "APIInternalError" with code 0x00000000: Error Domain=IXErrorDomain Code=46` - You need to remove the app from the device, restart the device, and try installing it again.
-* `Could not connect to lockdownd: Invalid HostID. Exiting.` - Delete the folders listed below, then uninstall iTunes and AppleMobileDeviceSupport64, and reinstall iTunes or AppleMobileDeviceSupport64, connect the device and tap `Trust` when the `Trust This Computer?` prompt appears.
+* `Could not connect to lockdownd: Invalid HostID. Exiting.` - Uninstall iTunes and AppleMobileDeviceSupport64, then delete the folders listed below and reinstall iTunes or AppleMobileDeviceSupport64, connect the device and tap `Trust` when the `Trust This Computer?` prompt appears.
 ```
 C:\ProgramData\Apple\
 C:\ProgramData\Apple\Apple Computer\
