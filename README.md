@@ -6,7 +6,7 @@
 
 # IPA_Downloader
 [![English README](https://img.shields.io/badge/README-English-blue.svg)](README_EN.md)  
-Скрипт для покупки/загрузки любых доступных в App Store приложений, а также восстановления удалённых - при условии, что они были приобретены ранее с вашим аккаунтом Apple (работает на базе [ipatool-cpp](https://github.com/Sorvigolova/ipatool)).
+Скрипт для загрузки приложений, приобретённых ранее в App Store, включая удалённые (работает на базе [ipatool-cpp](https://github.com/Sorvigolova/ipatool)).
 
 ## Информация о скрипте:
 ### Важно:
@@ -67,6 +67,7 @@ ipatool является неофициальным инструментом; с
 * Загружаем обновление KB3191564/KB3191566 по ссылке:
 - [Загрузить KB3191566 для Windows 7](https://download.microsoft.com/download/6/f/5/6f5ff66c-6775-42b0-86c4-47d41f2da187/Win7AndW2K8R2-KB3191566-x64.zip)
 - [Загрузить KB3191564 для Windows 8.1](https://download.microsoft.com/download/6/f/5/6f5ff66c-6775-42b0-86c4-47d41f2da187/Win8.1AndW2K12R2-KB3191564-x64.msu)
+* После загрузки KB3191566 для Windows 7 дополнительно распаковываем архив Win7AndW2K8R2-KB3191566-x64.zip;
 * Запускаем файлы: Win7AndW2K8R2-KB3191566-x64.msu (для Windows 7) или Win8.1AndW2K12R2-KB3191564-x64.msu (для Windows 8.1);
 * Устанавливаем обновление KB3191564/KB3191566 следуя инструкциям мастера установки.
 #### 4. Устанавливаем обновление KB2999226:
@@ -75,6 +76,7 @@ ipatool является неофициальным инструментом; с
 - [Загрузить KB2999226 для Windows 8.1](https://download.microsoft.com/download/9/6/f/96fd0525-3ddf-423d-8845-5f92f4a6883e/Windows8.1-KB2999226-x64.msu)
 * Запускаем файлы: Windows6.1-KB2999226-x64.msu (для Windows 7) или windows8.1-kb2999226-x64.msu (для Windows 8.1);
 * Устанавливаем обновление KB2999226 следуя инструкциям мастера установки.
+#### 5. Перезагружаем ПК/ноутбук.
 
 ### Как использовать (Windows):
 #### 1. Распаковываем архив IPA_Downloader.zip любым архиватором (7-Zip, WinRAR);
