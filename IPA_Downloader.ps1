@@ -2,7 +2,7 @@
 Set-Location -Path $PSScriptRoot
 
 # Версия скрипта:
-$ScriptVersion = "4.3.3"
+$ScriptVersion = "4.4.0"
 
 # Переменная состояния keychain-passphrase:
 $script:KeychainEnabled = $false
@@ -136,7 +136,7 @@ $PurchasedAppsListFilePath = Join-Path -Path $FilesFolderPath -ChildPath "Purcha
 $AppsFolderPath = Join-Path -Path $PSScriptRoot -ChildPath "Apps"
 $ipatoolHomePath = Join-Path -Path $HOME -ChildPath ".ipatool"
 $LoginFilePath = Join-Path -Path $ipatoolHomePath -ChildPath "login"
-$AuthFileNames = @("account", "cookies", "login")
+$AuthFileNames = @("account", "adi-state", "cookies", "login")
 $TempFolderPath = [System.IO.Path]::GetTempPath()
 $TempipaFilePath = Join-Path -Path $TempFolderPath -ChildPath "Temp.ipa"
 $AppsListPath = Join-Path -Path $FilesFolderPath -ChildPath "AppsList.txt"
@@ -221,8 +221,8 @@ $LangStrings = @{
 		"AuthData" = "Данные текущего аккаунта:"
 		"AuthFail" = "Вход в аккаунт Apple не выполнен."
 		"AuthSuccess" = "Вход в аккаунт Apple выполнен."
-		"BatchAllAccountsTitleDownload" = "Осуществить загрузку на все аккаунты, с которыми произведен вход?"
-		"BatchAllAccountsTitlePurchase" = "Осуществить покупку на все аккаунты, с которыми произведен вход?"
+		"BatchAllAccountsTitleDownload" = "Осуществить загрузку на всех аккаунтах, с которыми произведен вход?"
+		"BatchAllAccountsTitlePurchase" = "Осуществить покупку на всех аккаунтах, с которыми произведен вход?"
 		"BatchHintDownload" = "Доступна загрузка нескольких приложений, например, при вводе: 1, 2 и/или 3-5."
 		"BatchHintInstallApps" = "Доступна установка нескольких приложений, например, при вводе: 1, 2 и/или 3-5."
 		"BatchHintInstallDevices" = "Доступна установка на несколько устройств, например, при вводе: 1, 2 и/или 3-5."
@@ -295,7 +295,7 @@ $LangStrings = @{
 		"InstallerMenu2" = "2. Установка приложений из папки Apps"
 		"InstallerMenu3" = "3. Банка для чаевых"
 		"InstallerMenu4" = "4. Сменить язык (Change Language)"
-		"InstallerMenu5" = "5. Перейти в IPA_Downloader"
+		"InstallerMenu5" = "5. Перейти в режим IPA_Downloader (загрузка и установка приложений)"
 		"KbSyncGeneration" = "Формирование kbsync. Это может занять некоторое время..."
 		"LanguageChanged" = "Язык успешно изменен на русский."
 		"LanguageMenu1" = "1. Русский"
@@ -306,7 +306,7 @@ $LangStrings = @{
 		"LoadingVersionsIDList" = "Загрузка списка ID версий приложения..."
 		"LoggedOut" = "Выполнен выход из аккаунта Apple."
 		"LoginMenu1" = "1. Войти в аккаунт Apple"
-		"LoginMenu2" = "2. Перейти в режим IPA_Installer"
+		"LoginMenu2" = "2. Перейти в режим IPA_Installer (только установка приложений)"
 		"LoginMenu3" = "3. Сменить язык (Change Language)"
 		"LogoutAllAccounts" = "Выйти из всех аккаунтов Apple и сбросить настройки скрипта"
 		"Menu1Yes" = "1. Да"
@@ -425,7 +425,7 @@ $LangStrings = @{
 		"InstallerMenu2" = "2. Install apps from Apps folder"
 		"InstallerMenu3" = "3. Tip Jar"
 		"InstallerMenu4" = "4. Change Language (Сменить язык)"
-		"InstallerMenu5" = "5. Switch to IPA_Downloader"
+		"InstallerMenu5" = "5. Switch to IPA_Downloader mode (download and install apps)"
 		"KbSyncGeneration" = "Generation of kbsync. This may take some time..."
 		"LanguageChanged" = "Language successfully changed to English."
 		"LanguageMenu1" = "1. Русский"
@@ -436,7 +436,7 @@ $LangStrings = @{
 		"LoadingVersionsIDList" = "Loading list of app version IDs..."
 		"LoggedOut" = "Successfully logged out of Apple account."
 		"LoginMenu1" = "1. Log in to Apple account"
-		"LoginMenu2" = "2. Switch to IPA_Installer mode"
+		"LoginMenu2" = "2. Switch to IPA_Installer mode (install apps only)"
 		"LoginMenu3" = "3. Change Language (Сменить язык)"
 		"LogoutAllAccounts" = "Log out of all Apple accounts and reset script settings"
 		"Menu1Yes" = "1. Yes"
@@ -533,7 +533,7 @@ function Out-Table {
 			$Cells += $CellInfo
 		}
 		# Добавление массива ячеек:
-		$CleanRows += , $Cells 
+		$CleanRows += , $Cells
 	}
 	
 	# Формирование элементов рамок:
@@ -949,6 +949,47 @@ function ConvertTo-PlatformName {
 	return $null
 }
 
+# Функция получения значений ключей из Info.plist:
+function Get-InfoPlistValues {
+	param ([byte[]]$Bytes)
+	
+	# Значения ключей для метаданных:
+	$Keys = @("CFBundleName", "CFBundleDisplayName", "CFBundleShortVersionString", "CFBundleVersion", "MinimumOSVersion", "DTPlatformName", "CFBundleSupportedPlatforms")
+	
+	# Binary plist:
+	if (Test-BinaryPlist -Bytes $Bytes) {
+		return (Get-BplistStringValues -Bytes $Bytes -Keys $Keys)
+	}
+	
+	# XML plist:
+	$Values = @{}
+	$Content = ""
+	$Stream = $null
+	$Reader = $null
+	try {
+		$Stream = New-Object System.IO.MemoryStream(, $Bytes)
+		$Reader = New-Object System.IO.StreamReader($Stream, [System.Text.Encoding]::UTF8)
+		$Content = $Reader.ReadToEnd()
+	} finally {
+		if ($null -ne $Reader) { $Reader.Dispose() }
+		if ($null -ne $Stream) { $Stream.Dispose() }
+	}
+	
+	foreach ($Key in $Keys) {
+		if ($Key -eq "CFBundleSupportedPlatforms") {
+			$Pattern = '<key>' + $Key + '</key>\s*<array>\s*<string>([^<]+)</string>'
+		} else {
+			$Pattern = '<key>' + $Key + '</key>\s*<string>([^<]+)</string>'
+		}
+		
+		if ($Content -match $Pattern) {
+			$Values[$Key] = [System.Net.WebUtility]::HtmlDecode($Matches[1])
+		}
+	}
+	
+	return $Values
+}
+
 # Функция извлечения метаданных из ipa:
 function Get-IPA-Metadata {
 	param ([string]$ipaPath)
@@ -965,35 +1006,46 @@ function Get-IPA-Metadata {
 		$Zip = [System.IO.Compression.ZipFile]::OpenRead($ipaPath)
 		$PlistEntry = $Zip.Entries | Where-Object { $_.FullName -match '^Payload/[^/]+\.app/Info\.plist$' } | Select-Object -First 1
 		if ($PlistEntry) {
+			# Чтение Info.plist в массив байт:
 			$Stream = $null
+			$PlistMemory = $null
+			$PlistBytes = $null
 			try {
 				$Stream = $PlistEntry.Open()
-				$Reader = New-Object System.IO.StreamReader($Stream, [System.Text.Encoding]::UTF8)
-				$Content = $Reader.ReadToEnd()
+				$PlistMemory = New-Object System.IO.MemoryStream
+				$Stream.CopyTo($PlistMemory)
+				$PlistBytes = $PlistMemory.ToArray()
 			} finally {
-				if ($null -ne $Reader) { $Reader.Dispose() }
+				if ($null -ne $PlistMemory) { $PlistMemory.Dispose() }
 				if ($null -ne $Stream) { $Stream.Dispose() }
 			}
 			
-			if ($Content -match '<key>CFBundleName</key>\s*<string>([^<]+)</string>') {
-				$Metadata.AppName = $Matches[1]
-			}
-			if (($Metadata.AppName -eq "App") -and ($Content -match '<key>CFBundleDisplayName</key>\s*<string>([^<]+)</string>')) {
-				$Metadata.AppName = $Matches[1]
-			}
-			if ($Content -match '<key>CFBundleShortVersionString</key>\s*<string>([^<]+)</string>') {
-				$Metadata.Version = $Matches[1]
-			}
-			if ($Content -match '<key>MinimumOSVersion</key>\s*<string>([^<]+)</string>') {
-				$Metadata.MinIOS = $Matches[1]
+			$PlistValues = Get-InfoPlistValues -Bytes $PlistBytes
+			
+			if ($PlistValues.ContainsKey("CFBundleName")) {
+				$Metadata.AppName = $PlistValues["CFBundleName"]
 			}
 			
-			# Название платформы берется из DTPlatformName, при его отсутствии из CFBundleSupportedPlatforms:
+			if (($Metadata.AppName -eq "App") -and $PlistValues.ContainsKey("CFBundleDisplayName")) {
+				$Metadata.AppName = $PlistValues["CFBundleDisplayName"]
+			}
+			
+			if ($PlistValues.ContainsKey("CFBundleShortVersionString")) {
+				$Metadata.Version = $PlistValues["CFBundleShortVersionString"]
+			} elseif ($PlistValues.ContainsKey("CFBundleVersion")) {
+				$Metadata.Version = $PlistValues["CFBundleVersion"]
+			}
+			
+			if ($PlistValues.ContainsKey("MinimumOSVersion")) {
+				$Metadata.MinIOS = $PlistValues["MinimumOSVersion"]
+			}
+			
+			# Название платформы:
 			$PlatformValue = $null
-			if ($Content -match '<key>DTPlatformName</key>\s*<string>([^<]+)</string>') {
-				$PlatformValue = $Matches[1]
-			} elseif ($Content -match '<key>CFBundleSupportedPlatforms</key>\s*<array>\s*<string>([^<]+)</string>') {
-				$PlatformValue = $Matches[1]
+			if ($PlistValues.ContainsKey("DTPlatformName")) {
+				$PlatformValue = $PlistValues["DTPlatformName"]
+			} elseif ($PlistValues.ContainsKey("CFBundleSupportedPlatforms")) {
+				$PlatformValue = $PlistValues["CFBundleSupportedPlatforms"]
 			}
 			
 			if ($PlatformValue) {
@@ -1010,8 +1062,8 @@ function Get-IPA-Metadata {
 	}
 	
 	$Metadata.AppName = $Metadata.AppName -replace '[\\/:*?"<>|]', ''
-	return $Metadata
-}
+	$Metadata.Version = $Metadata.Version -replace '[\\/:*?"<>|]', ''
+	return $Metadata}
 
 # Функция инициализации и кэширования списка популярных приложений (Files/AppsList.txt):
 function Initialize-Repo-List {
@@ -1636,8 +1688,8 @@ function Parse-NumberSelection {
 	foreach ($Part in $Parts) {
 		$Part = $Part.Trim()
 		
-		if ([string]::IsNullOrWhiteSpace($Part)) { 
-			continue 
+		if ([string]::IsNullOrWhiteSpace($Part)) {
+			continue
 		}
 		
 		if ($Part -match '^\d+-\d+$') {
@@ -1856,7 +1908,7 @@ function IPA-Download-With-Version {
 		$PreSelectedIDs = Read-VersionIDSelection -VersionMapping $VersionMapping
 		
 		# Ввод 0: возврат в главное меню:
-		if ($null -eq $PreSelectedIDs) { return } 
+		if ($null -eq $PreSelectedIDs) { return }
 		
 		$DetailedMapping = @()
 		$DetailCounter = 1
@@ -1915,7 +1967,7 @@ function IPA-Download-With-Version {
 		}
 		
 		# Выход из цикла после успешной загрузки:
-		break 
+		break
 	}
 }
 
@@ -2379,7 +2431,7 @@ function Get-iOS-MinVersion {
 	$Counter = 1
 	
 	# Присваивание вывода цикла переменной:
-	$TableData = foreach ($File in @($FilesToProcess)) { 
+	$TableData = foreach ($File in @($FilesToProcess)) {
 		$Meta = Get-IPA-Metadata -ipaPath $File.FullName
 		$MinOs = if ($Meta) { "$($Meta.MinIOS)" } else { "Error" }
 		
@@ -2698,6 +2750,148 @@ function Get-ItunesItemId {
 	}
 	
 	return $null
+}
+
+# Функция проверки формата binary plist:
+function Test-BinaryPlist {
+	param ([byte[]]$Bytes)
+	
+	# Минимальный размер:
+	if ($null -eq $Bytes -or $Bytes.Length -lt 40) { return $false }
+	
+	return ([System.Text.Encoding]::ASCII.GetString($Bytes, 0, 8) -eq "bplist00")
+}
+
+# Функция получения позиции объекта в binary plist по номеру объекта:
+function Get-BplistObjectPosition {
+	param (
+		[byte[]]$Bytes,
+		[long]$TableOffset,
+		[int]$OffsetSize,
+		[long]$ObjectIndex
+	)
+	
+	return [int](Read-BigEndianInt -Bytes $Bytes -Offset ([int]($TableOffset + $ObjectIndex * $OffsetSize)) -Size $OffsetSize)
+}
+
+# Функция получения строковых значений ключей верхнего уровня из binary plist:
+function Get-BplistStringValues {
+	param (
+		[byte[]]$Bytes,
+		[string[]]$Keys
+	)
+	
+	$Values = @{}
+	
+	try {
+		$TrailerStart = $Bytes.Length - 32
+		$OffsetSize = [int]$Bytes[$TrailerStart + 6]
+		$RefSize = [int]$Bytes[$TrailerStart + 7]
+		if ($OffsetSize -lt 1 -or $OffsetSize -gt 8 -or $RefSize -lt 1 -or $RefSize -gt 8) { return $Values }
+		
+		$ObjectCount = Read-BigEndianInt -Bytes $Bytes -Offset ($TrailerStart + 8) -Size 8
+		$TopObject = Read-BigEndianInt -Bytes $Bytes -Offset ($TrailerStart + 16) -Size 8
+		$TableOffset = Read-BigEndianInt -Bytes $Bytes -Offset ($TrailerStart + 24) -Size 8
+		if ($TopObject -lt 0 -or $TopObject -ge $ObjectCount) { return $Values }
+		if ($TableOffset -lt 8 -or ($TableOffset + $ObjectCount * $OffsetSize) -gt $TrailerStart) { return $Values }
+		
+		$TopPosition = Get-BplistObjectPosition -Bytes $Bytes -TableOffset $TableOffset -OffsetSize $OffsetSize -ObjectIndex $TopObject
+		if ($TopPosition -lt 8 -or $TopPosition -ge $TableOffset) { return $Values }
+		
+		$Marker = [int]$Bytes[$TopPosition]
+		if (($Marker -shr 4) -ne 0xD) { return $Values }
+		
+		# Количество пар ключ-значение и позиция списка ссылок:
+		$Count = $Marker -band 0x0F
+		$RefsStart = $TopPosition + 1
+		if ($Count -eq 0x0F) {
+			$CountSize = 1 -shl ([int]$Bytes[$TopPosition + 1] -band 0x0F)
+			if ($CountSize -gt 4) { return $Values }
+			
+			$Count = [int](Read-BigEndianInt -Bytes $Bytes -Offset ($TopPosition + 2) -Size $CountSize)
+			$RefsStart = $TopPosition + 2 + $CountSize
+		}
+		if (($RefsStart + 2 * $Count * $RefSize) -gt $TableOffset) { return $Values }
+		
+		$WantedKeys = @{}
+		foreach ($Key in $Keys) { $WantedKeys[$Key] = $true }
+		
+		for ($i = 0; $i -lt $Count; $i++) {
+			# Номер объекта ключа:
+			$KeyRef = [long]0
+			$RefPosition = $RefsStart + $i * $RefSize
+			for ($j = 0; $j -lt $RefSize; $j++) {
+				$KeyRef = ($KeyRef -shl 8) + $Bytes[$RefPosition + $j]
+			}
+			if ($KeyRef -ge $ObjectCount) { continue }
+			
+			# Позиция ключа:
+			$KeyPosition = [long]0
+			$OffsetPosition = [int]($TableOffset + $KeyRef * $OffsetSize)
+			for ($j = 0; $j -lt $OffsetSize; $j++) {
+				$KeyPosition = ($KeyPosition -shl 8) + $Bytes[$OffsetPosition + $j]
+			}
+			$KeyPosition = [int]$KeyPosition
+			if ($KeyPosition -lt 8 -or $KeyPosition -ge $TableOffset) { continue }
+			
+			# Ключ:
+			$KeyMarker = [int]$Bytes[$KeyPosition]
+			if (($KeyMarker -shr 4) -ne 5) { continue }
+			
+			$KeyLength = $KeyMarker -band 0x0F
+			$KeyStart = $KeyPosition + 1
+			if ($KeyLength -eq 0x0F) {
+				$LengthSize = 1 -shl ([int]$Bytes[$KeyPosition + 1] -band 0x0F)
+				if ($LengthSize -gt 4) { continue }
+				
+				$KeyLength = 0
+				for ($j = 0; $j -lt $LengthSize; $j++) {
+					$KeyLength = ($KeyLength -shl 8) + $Bytes[$KeyPosition + 2 + $j]
+				}
+				$KeyStart = $KeyPosition + 2 + $LengthSize
+			}
+			
+			$KeyName = [System.Text.Encoding]::ASCII.GetString($Bytes, $KeyStart, $KeyLength)
+			if (!$WantedKeys.ContainsKey($KeyName)) { continue }
+			
+			# Позиция значения:
+			$ValueRef = Read-BigEndianInt -Bytes $Bytes -Offset ($RefsStart + ($Count + $i) * $RefSize) -Size $RefSize
+			if ($ValueRef -ge $ObjectCount) { continue }
+			
+			$ValuePosition = Get-BplistObjectPosition -Bytes $Bytes -TableOffset $TableOffset -OffsetSize $OffsetSize -ObjectIndex $ValueRef
+			if ($ValuePosition -lt 8 -or $ValuePosition -ge $TableOffset) { continue }
+			
+			# Значение из массива:
+			$ValueMarker = [int]$Bytes[$ValuePosition]
+			if (($ValueMarker -shr 4) -eq 0xA) {
+				$ItemCount = $ValueMarker -band 0x0F
+				$ItemRefsStart = $ValuePosition + 1
+				if ($ItemCount -eq 0x0F) {
+					$ItemCountSize = 1 -shl ([int]$Bytes[$ValuePosition + 1] -band 0x0F)
+					if ($ItemCountSize -gt 4) { continue }
+					
+					$ItemCount = [int](Read-BigEndianInt -Bytes $Bytes -Offset ($ValuePosition + 2) -Size $ItemCountSize)
+					$ItemRefsStart = $ValuePosition + 2 + $ItemCountSize
+				}
+				if ($ItemCount -lt 1) { continue }
+				
+				$ItemRef = Read-BigEndianInt -Bytes $Bytes -Offset $ItemRefsStart -Size $RefSize
+				if ($ItemRef -ge $ObjectCount) { continue }
+				
+				$ValuePosition = Get-BplistObjectPosition -Bytes $Bytes -TableOffset $TableOffset -OffsetSize $OffsetSize -ObjectIndex $ItemRef
+				if ($ValuePosition -lt 8 -or $ValuePosition -ge $TableOffset) { continue }
+			}
+			
+			# Строка ASCII или UTF-16BE:
+			$Text = Read-BplistScalar -Bytes $Bytes -Position $ValuePosition
+			if ($Text -is [string] -and ![string]::IsNullOrWhiteSpace($Text)) {
+				$Values[$KeyName] = $Text
+			}
+		}
+	} catch {
+	}
+	
+	return $Values
 }
 
 # Функция запуска ideviceinstaller:
@@ -3228,7 +3422,7 @@ $(Get-Lang 'InstallerMenu5')`n
 				Switch-Language
 			}
 			
-			# 5. Перейти в IPA_Downloader:
+			# 5. Перейти в режим IPA_Downloader (загрузка и установка приложений):
 			"5" {
 				$script:WorkMode = "Downloader"
 				return
@@ -3441,7 +3635,7 @@ $(Get-Lang 'LoginMenu3')`n
 					Connect-AppleAccount
 				}
 				
-				# 2. Перейти в режим IPA_Installer:
+				# 2. Перейти в режим IPA_Installer (только установка приложений):
 				"2" {
 					$script:WorkMode = "Installer"
 					Set-Setting -Key "Mode" -Value "Installer"
