@@ -342,7 +342,7 @@ ipatool является неофициальным инструментом; с
 **1. Обработка `-File ./IPA_Downloader.ps1` завершилась сбоем: Access to the path is denied (macOS):**  
 Включите Терминалу доступ по пути: `Системные настройки - Конфиденциальность и безопасность - Доступ к диску`.
 
-**2. Не приходит код двухфакторной аутентификации (2FA) или проблемы с авторизацией:**  
+**2. Login error: Did you forget your password?:**  
 Неверно введен пароль.  
 Попробуйте войти с аккаунтом Apple на сайте `icloud.com`
 
@@ -362,27 +362,30 @@ ipatool является неофициальным инструментом; с
 **7. Download error: HTTP request failed: Timeout was reached:**  
 Не удалось подключиться к серверам Apple, проверьте ваше интернет-соединение.
 
-**8. Error: license is required:**  
+**8. Download failed after retries: Failure when receiving data from the peer:**  
+Не удалось подключиться к серверам Apple, проверьте ваше интернет-соединение.
+Либо попробуйте заново авторизоваться в скрипте с аккаунтом Apple.
+
+**9. Error: license is required:**  
 Приложение не было приобретено на этом аккаунте Apple ранее.
 
-**9. Purchase error: app not found:**  
+**10. Purchase error: app not found:**  
 Покупка приложения не удалась, так как приложение удалено из App Store.
 
-**10. Purchase error: item is temporarily unavailable:**  
+**11. Purchase error: item is temporarily unavailable:**  
 Приложение не было приобретено на этом аккаунте Apple ранее.  
 Покупка не удалась, так как приложение удалено из App Store.
 
-**11. Error: This Apple Account is temporarily unable to be used in the iTunes Store because it could not be found. Try again later:**  
+**12. Error: This Apple Account is temporarily unable to be used in the iTunes Store because it could not be found. Try again later:**  
 Необходимо совершить любую бесплатную покупку в App Store.
 
-**12. No device found:**  
+**13. No device found:**  
 Устройство не найдено.  
 Убедитесь, что драйвер AppleMobileDeviceSupport64 установлен.
 
-**13. Could not connect to lockdownd:**  
+**14. Could not connect to lockdownd:**  
 Проблемы с подключением к устройству Apple.  
 Удалите iTunes и AppleMobileDeviceSupport64, затем удалите нижеуказанные папки и установите iTunes или AppleMobileDeviceSupport64 заново.  
-
 ```
 C:\ProgramData\Apple\
 C:\ProgramData\Apple\Apple Computer\
@@ -392,13 +395,13 @@ C:\Users\%username%\AppData\Roaming\Apple Computer\
 ```
 Подключите устройство и нажмите `Доверять` при запросе `Доверять этому компьютеру?`
 
-**14. WARNING: could not locate Payload/App.app/SC_Info/App.sinf in archive:**  
+**15. WARNING: could not locate Payload/App.app/SC_Info/App.sinf in archive:**  
 В устанавливаемом .ipa файле не найдена подпись приложения.
 
-**15. ERROR: Install failed. Got error "APIInternalError" with code 0x00000000: Error Domain=IXErrorDomain Code=46:**  
+**16. ERROR: Install failed. Got error "APIInternalError" with code 0x00000000: Error Domain=IXErrorDomain Code=46:**  
 Необходимо удалить приложение с устройства, перезагрузить устройство и попробовать установить приложение еще раз.
 
-**16. После установки приложение сразу сворачивается при запуске:**  
+**17. После установки приложение сразу сворачивается при запуске:**  
 Войдите в App Store под аккаунтом, с которого оно было загружено, и установите любое бесплатное приложение. После этого запустите проблемное приложение снова.
 
 ### При возникновении проблем:

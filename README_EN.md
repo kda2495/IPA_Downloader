@@ -344,7 +344,7 @@ ipatool is an unofficial tool; therefore, using the script is only at your own r
 **1. Processing -File ./IPA_Downloader.ps1 failed: Access to the path is denied (macOS):**  
 Allow Terminal access in `System Settings - Privacy & Security - Full Disk Access`.
 
-**2. Two-factor authentication (2FA) code not received or login issues:**  
+**2. Login error: Did you forget your password?:**  
 The password was entered incorrectly.  
 Try signing in to `icloud.com` website using Apple account.
 
@@ -364,24 +364,28 @@ Failed to connect to Apple servers, check your internet connection.
 **7. Download error: HTTP request failed: Timeout was reached:**  
 Failed to connect to Apple servers, check your internet connection.
 
-**8. Error: license is required:**  
+**8. Download failed after retries: Failure when receiving data from the peer:**  
+Failed to connect to Apple servers, check your internet connection.
+Or re-log in to the script using Apple account.
+
+**9. Error: license is required:**  
 The app was not previously purchased on this Apple account.
 
-**9. Purchase error: app not found:**  
+**10. Purchase error: app not found:**  
 App purchase failed because the app has been removed from the App Store.
 
-**10. Purchase error: item is temporarily unavailable:**  
+**11. Purchase error: item is temporarily unavailable:**  
 The app was not previously purchased on this Apple account.  
 The purchase failed because the app has been removed from the App Store.
 
-**11. Error: This Apple Account is temporarily unable to be used in the iTunes Store because it could not be found. Try again later:**  
+**12. Error: This Apple Account is temporarily unable to be used in the iTunes Store because it could not be found. Try again later:**  
 Make any free purchase in the App Store.
 
-**12. No device found:**  
+**13. No device found:**  
 Device not found.  
 Make sure the AppleMobileDeviceSupport64 driver is installed.
 
-**13. Could not connect to lockdownd:**  
+**14. Could not connect to lockdownd:**  
 Issues with connecting to an Apple device.  
 Uninstall iTunes and AppleMobileDeviceSupport64, then delete the folders listed below and reinstall iTunes or AppleMobileDeviceSupport64.  
 ```
@@ -393,13 +397,13 @@ C:\Users\%username%\AppData\Roaming\Apple Computer\
 ```
 Connect the device and tap `Trust` when the `Trust This Computer?` prompt appears.
 
-**14. WARNING: could not locate Payload/App.app/SC_Info/App.sinf in archive:**  
+**15. WARNING: could not locate Payload/App.app/SC_Info/App.sinf in archive:**  
 App signature not found in the installed .ipa file.
 
-**15. ERROR: Install failed. Got error "APIInternalError" with code 0x00000000: Error Domain=IXErrorDomain Code=46:**  
+**16. ERROR: Install failed. Got error "APIInternalError" with code 0x00000000: Error Domain=IXErrorDomain Code=46:**  
 Remove the app from the device, restart the device, and try installing the app again.
 
-**16. The app immediately closes when launched after installation:**  
+**17. The app immediately closes when launched after installation:**  
 Log in to the App Store using the account from which it was downloaded, and install any free app. After that, launch the problematic app again.
 
 ### If you encounter an issue:
