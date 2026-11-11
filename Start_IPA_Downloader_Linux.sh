@@ -3,44 +3,29 @@ cd "$(dirname "$0")" || exit
 
 SYSTEM_LANG="${LANG:0:2}"
 
+case "$SYSTEM_LANG" in
+	ru)
+		NO_PWSH_MSG="Ошибка: PowerShell (pwsh) не установлен."
+		PROMPT_MSG="Нажмите любую клавишу для выхода..."
+		;;
+	*)
+		NO_PWSH_MSG="Error: PowerShell (pwsh) is not installed."
+		PROMPT_MSG="Press any key to exit..."
+		;;
+esac
+
 if ! command -v pwsh &>/dev/null; then
-    echo ""
-    case "$SYSTEM_LANG" in
-        ru)
-            echo "Ошибка: PowerShell (pwsh) не найден в системе."
-            echo "Пожалуйста, установите PowerShell:"
-            echo "  - Arch Linux: sudo pacman -S powershell-bin (или через AUR: yay -S powershell-bin)"
-            echo "  - Ubuntu/Debian: sudo apt install powershell"
-            echo "  - Fedora: sudo dnf install powershell"
-            PROMPT_MSG="Нажмите любую клавишу для выхода..."
-            ;;
-        *)
-            echo "Error: PowerShell (pwsh) not found in your system."
-            echo "Please install PowerShell:"
-            echo "  - Arch Linux: sudo pacman -S powershell-bin (or via AUR: yay -S powershell-bin)"
-            echo "  - Ubuntu/Debian: sudo apt install powershell"
-            echo "  - Fedora: sudo dnf install powershell"
-            PROMPT_MSG="Press any key to exit..."
-            ;;
-    esac
-    echo ""
-    echo -n "$PROMPT_MSG"
-    read -n 1 -s -r
-    echo ""
-    exit 1
+	echo ""
+	echo "$NO_PWSH_MSG"
+	echo ""
+	echo -n "$PROMPT_MSG"
+	read -n 1 -s -r
+	echo ""
+	exit 1
 fi
 
 pwsh -File "./IPA_Downloader.ps1"
 echo ""
-
-case "$SYSTEM_LANG" in
-    ru)
-        PROMPT_MSG="Нажмите любую клавишу для выхода..."
-        ;;
-    *)
-        PROMPT_MSG="Press any key to exit..."
-        ;;
-esac
 echo -n "$PROMPT_MSG"
 read -n 1 -s -r
 echo ""

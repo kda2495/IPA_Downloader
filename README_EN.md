@@ -59,6 +59,7 @@ ipatool is an unofficial tool; therefore, using the script is only at your own r
 ### Windows requirements:
 * To install downloaded apps via the script, the `AppleMobileDeviceSupport64` driver is required (included in iTunes and Apple Devices):
 - [Download iTunes from the Apple website](https://www.apple.com/itunes/download/win64)
+- [Download iTunes from the Microsoft Store](https://apps.microsoft.com/detail/9pb2mz1zmb1s)
 - [Download Apple Devices from the Microsoft Store](https://apps.microsoft.com/detail/9np83lwlpz9k)
 * Instead of a full iTunes installation, you can selectively install `AppleMobileDeviceSupport64.msi` by extracting the iTunes installer with any archiver (for example: [7-Zip](https://www.7-zip.org))
 * The script works without this driver, but it is required to install downloaded apps on the device
@@ -342,8 +343,8 @@ ipatool is an unofficial tool; therefore, using the script is only at your own r
 
 ## Possible errors and solutions:
 ### Troubleshooting errors:
-**1. command not found: pwsh (macOS):**
-* PowerShell isn't installed.
+**1. command not found: pwsh:**
+* PowerShell (pwsh) is not installed.
 
 **2. Processing -File ./IPA_Downloader.ps1 failed: Access to the path is denied (macOS):**
 * Allow Terminal access in `System Settings - Privacy & Security - Full Disk Access`.

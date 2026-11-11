@@ -59,6 +59,7 @@ ipatool является неофициальным инструментом; с
 ### Требования для Windows:
 * Для установки загруженных приложений через скрипт требуется драйвер `AppleMobileDeviceSupport64` (входит в состав iTunes и Apple Devices (Устройства Apple)):
 - [Загрузить iTunes с сайта Apple](https://www.apple.com/itunes/download/win64)
+- [Загрузить iTunes из Microsoft Store](https://apps.microsoft.com/detail/9pb2mz1zmb1s)
 - [Загрузить Apple Devices (Устройства Apple) из Microsoft Store](https://apps.microsoft.com/detail/9np83lwlpz9k)
 * Вместо полной установки iTunes можно выполнить выборочную установку `AppleMobileDeviceSupport64.msi`, распаковав установщик iTunes любым архиватором (например: [7-Zip](https://www.7-zip.org))
 * Скрипт работает без данного драйвера, однако он требуется для установки загруженных приложений на устройство
@@ -341,8 +342,8 @@ ipatool является неофициальным инструментом; с
 
 ## Возможные ошибки и их решение:
 ### Расшифровка ошибок:
-**1. command not found: pwsh (macOS):**
-* Не установлен PowerShell.
+**1. command not found: pwsh:**
+* PowerShell (pwsh) не установлен.
 
 **2. Обработка `-File ./IPA_Downloader.ps1` завершилась сбоем: Access to the path is denied (macOS):**
 * Включите Терминалу доступ по пути: `Системные настройки - Конфиденциальность и безопасность - Доступ к диску`.
