@@ -15,6 +15,7 @@ ipatool is an unofficial tool; therefore, using the script is only at your own r
 * Windows 7-11 (x64)
 * macOS starting from 10.15 Catalina (both Apple Silicon and Intel are supported)
 * Linux (x64 and ARM64: Arch Linux, Ubuntu, Debian, Fedora, etc.)
+* PowerShell installed (included with Windows; must be installed separately on macOS and Linux)
 * Stable internet connection
 * An Apple account with previously downloaded apps
 ### Script Features:
@@ -56,10 +57,10 @@ ipatool is an unofficial tool; therefore, using the script is only at your own r
 
 ## Using on Windows:
 ### Windows requirements:
-* To install downloaded apps via the script, the `AppleMobileDeviceSupport64` driver is required (included in iTunes):  
+* To install downloaded apps via the script, the `AppleMobileDeviceSupport64` driver is required (included in iTunes and Apple Devices):
 - [Download iTunes from the Apple website](https://www.apple.com/itunes/download/win64)
+- [Download Apple Devices from the Microsoft Store](https://apps.microsoft.com/detail/9np83lwlpz9k)
 * Instead of a full iTunes installation, you can selectively install `AppleMobileDeviceSupport64.msi` by extracting the iTunes installer with any archiver (for example: [7-Zip](https://www.7-zip.org))
-
 * The script works without this driver, but it is required to install downloaded apps on the device
 
 ### Requirements for Windows 7 and 8.1:
@@ -302,9 +303,9 @@ ipatool is an unofficial tool; therefore, using the script is only at your own r
 * The script will clear the selected data type
 #### 10. Apple Account operations:
 * Enter the required action:
-1. Add account  
-2. Switch account  
-3. Log out of Apple Account  
+1. Add account
+2. Switch account
+3. Log out of Apple Account
 * Press Enter
 #### 11. Tip Jar:
 * The script will navigate to the CloudTips page
@@ -341,53 +342,57 @@ ipatool is an unofficial tool; therefore, using the script is only at your own r
 
 ## Possible errors and solutions:
 ### Troubleshooting errors:
-**1. Processing -File ./IPA_Downloader.ps1 failed: Access to the path is denied (macOS):**  
-Allow Terminal access in `System Settings - Privacy & Security - Full Disk Access`.
+**1. command not found: pwsh (macOS):**
+* PowerShell isn't installed.
 
-**2. Login error: Did you forget your password?:**  
-The password was entered incorrectly.  
-Try signing in to `icloud.com` website using Apple account.
+**2. Processing -File ./IPA_Downloader.ps1 failed: Access to the path is denied (macOS):**
+* Allow Terminal access in `System Settings - Privacy & Security - Full Disk Access`.
 
-**3. Login error: failed to initialize SAP signer: curl: Timeout was reached:**  
-Failed to connect to SAP, check your internet connection.
+**3. Two-factor authentication (2FA) code not received or Login error: Did you forget your password?:**
+* The password was entered incorrectly.
+* Try signing in to `icloud.com` website using Apple account.
 
-**4. Error: account is disabled:**  
-Apple account is temporarily blocked by Apple (usually due to multiple attempts to enter incorrect password or 2FA code).  
-Account needs to be unblocked via the device or on the `icloud.com` website.
+**4. Login error: failed to initialize SAP signer: curl: Timeout was reached:**
+* Failed to connect to SAP, check your internet connection.
 
-**5. Download error: invalid response: empty songList:**  
-Re-log in to the script using Apple account.
+**5. Error: account is disabled:**
+* Apple account is temporarily blocked by Apple (usually due to multiple attempts to enter incorrect password or 2FA code).
+* Account needs to be unblocked via the device or on the `icloud.com` website.
 
-**6. Download error: HTTP request failed: Couldn't resolve host name:**  
-Failed to connect to Apple servers, check your internet connection.
+**6. Download error: invalid response: empty songList:**
+* Re-log in to the script using Apple account.
 
-**7. Download error: HTTP request failed: Timeout was reached:**  
-Failed to connect to Apple servers, check your internet connection.
+**7. Download error: HTTP request failed: Couldn't resolve host name:**
+* Failed to connect to Apple servers, check your internet connection.
 
-**8. Download failed after retries: Failure when receiving data from the peer:**  
-Failed to connect to Apple servers, check your internet connection.
-Or re-log in to the script using Apple account.
+**8. Download error: HTTP request failed: Timeout was reached:**
+* Failed to connect to Apple servers, check your internet connection.
 
-**9. Error: license is required:**  
-The app was not previously purchased on this Apple account.
+**9. Download failed after retries: Failure when receiving data from the peer:**
+* Failed to connect to Apple servers, check your internet connection.
+* Or re-log in to the script using Apple account.
 
-**10. Purchase error: app not found:**  
-App purchase failed because the app has been removed from the App Store.
+**10. Error: license is required:**
+* The app was not previously purchased on this Apple account.
 
-**11. Purchase error: item is temporarily unavailable:**  
-The app was not previously purchased on this Apple account.  
-The purchase failed because the app has been removed from the App Store.
+**11. Purchase error: app not found:**
+* App purchase failed because the app has been removed from the App Store.
 
-**12. Error: This Apple Account is temporarily unable to be used in the iTunes Store because it could not be found. Try again later:**  
-Make any free purchase in the App Store.
+**12. Purchase error: item is temporarily unavailable:**
+* The app was not previously purchased on this Apple account.
+* The purchase failed because the app has been removed from the App Store.
 
-**13. No device found:**  
-Device not found.  
-Make sure the AppleMobileDeviceSupport64 driver is installed.
+**13. Error: This Apple Account is temporarily unable to be used in the iTunes Store because it could not be found. Try again later:**
+* Make any free purchase in the App Store.
 
-**14. Could not connect to lockdownd:**  
-Issues with connecting to an Apple device.  
-Uninstall iTunes and AppleMobileDeviceSupport64, then delete the folders listed below and reinstall iTunes or AppleMobileDeviceSupport64.  
+**14. Error: No connected devices found.`nConnect a device and trust this computer:**
+* Connect the device and tap `Trust` when the `Trust This Computer?` prompt appears.
+* Make sure the AppleMobileDeviceSupport64 driver is installed.
+* Reinstall/install iTunes/Apple Devices or AppleMobileDeviceSupport64.
+
+**15. Could not connect to lockdownd:**
+* Issues with connecting to an Apple device.
+* Uninstall iTunes/Apple Devices and AppleMobileDeviceSupport64, then delete the folders listed below and reinstall iTunes/Apple Devices or AppleMobileDeviceSupport64.
 ```
 C:\ProgramData\Apple\
 C:\ProgramData\Apple\Apple Computer\
@@ -395,16 +400,17 @@ C:\Users\%username%\AppData\Local\Apple Computer\
 C:\Users\%username%\AppData\Local\Apple Inc\
 C:\Users\%username%\AppData\Roaming\Apple Computer\
 ```
-Connect the device and tap `Trust` when the `Trust This Computer?` prompt appears.
+* Connect the device and tap `Trust` when the `Trust This Computer?` prompt appears.
 
-**15. WARNING: could not locate Payload/App.app/SC_Info/App.sinf in archive:**  
-App signature not found in the installed .ipa file.
+**16. WARNING: could not locate Payload/App.app/SC_Info/App.sinf in archive:**
+* App signature not found in the installed .ipa file.
 
-**16. ERROR: Install failed. Got error "APIInternalError" with code 0x00000000: Error Domain=IXErrorDomain Code=46:**  
-Remove the app from the device, restart the device, and try installing the app again.
+**17. ERROR: Install failed. Got error "APIInternalError" with code 0x00000000: Error Domain=IXErrorDomain Code=46:**
+* Remove the app from the device, restart the device, and try installing the app again.
 
-**17. The app immediately closes when launched after installation:**  
-Log in to the App Store using the account from which it was downloaded, and install any free app. After that, launch the problematic app again.
+**18. The app immediately closes when launched after installation:**
+* Log in to the App Store using the account from which the app was downloaded, and install any free app.
+* After that, launch the problematic app again.
 
 ### If you encounter an issue:
 #### Please provide the following information:
@@ -415,20 +421,20 @@ Log in to the App Store using the account from which it was downloaded, and inst
 ## Useful information:
 ### Finding an App ID:
 #### Option 1:
-Find the app link in the App Store and copy the value after `id` in the URL.  
+* Find the app link in the App Store and copy the value after `id` in the URL.
 <details>
  <summary>Screenshot (click to view)</summary>
 <img width="389" height="36" alt="AppStore_Link" src="https://github.com/user-attachments/assets/e73fd860-ed11-4293-8600-aef61fe3dc7f" />
 </details>
 
 #### Option 2:
-If the app is installed on your device, press and hold the app icon:  
+* If the app is installed on your device, press and hold the app icon:
 * The Share App option will appear
 * Copy the link and paste it into a browser
 * Copy the value after `id` in the URL
 
 #### Option 3:
-You can view the full list of purchased apps via the website [reportaproblem.apple.com](https://reportaproblem.apple.com)  
+* You can view the full list of purchased apps via the website [reportaproblem.apple.com](https://reportaproblem.apple.com)
 * Next, enter the app name in the search box on the [appmagic.rocks](https://appmagic.rocks/top-charts/apps) website and go to the app's page
 * On the app page, select Select App with the App Store icon and copy the value at the end of the URL
 
@@ -437,7 +443,7 @@ You can view the full list of purchased apps via the website [reportaproblem.app
 - [AppBank Website](https://pwa.appbank.pw)
 
 ## Tip Jar:
-IPA_Downloader is completely free, however, if you want to support the project voluntarily, you can do so via the link below or using the QR code:  
+* IPA_Downloader is completely free, however, if you want to support the project voluntarily, you can do so via the link below or using the QR code:
 - [Support via CloudTips](https://pay.cloudtips.ru/p/93c0b094)
 
 <img width="320" height="320" alt="qrCode" src="https://github.com/user-attachments/assets/1013fdce-2f18-4b5e-bd73-9237f691f51a" />
