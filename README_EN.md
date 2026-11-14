@@ -10,7 +10,7 @@ A script for downloading apps previously purchased in the App Store, including d
 
 ## Information about the script:
 ### Important:
-ipatool is an unofficial tool; therefore, using the script is only at your own risk.
+* ipatool is an unofficial tool; therefore, using the script is only at your own risk
 ### General requirements for use:
 * Windows 7-11 (x64)
 * macOS starting from 10.15 Catalina (both Apple Silicon and Intel are supported)
@@ -23,17 +23,17 @@ ipatool is an unofficial tool; therefore, using the script is only at your own r
 * Search for apps by name or ID and purchase (without downloading)
 * Search for apps by name or ID and download latest version
 * Search for apps by name or ID and download (with version selection)
-* Select an app list and purchase (without downloading):
+* Select a prepared app list and purchase (without downloading):
 1. Popular apps list
 2. List of popular apps not purchased by the script
 3. Custom apps list
-* Select an app list and download latest version:
+* Select a prepared app list and download latest version:
 1. Popular apps list
 2. List of apps from the Apple account purchase history
 3. List of apps installed on the device
 4. List of offloaded apps installed on the device
 5. Custom apps list
-* Select an app list and download (with version selection):
+* Select a prepared app list and download (with version selection):
 1. Popular apps list
 2. List of apps from the Apple account purchase history
 3. List of apps installed on the device
@@ -65,7 +65,6 @@ ipatool is an unofficial tool; therefore, using the script is only at your own r
 * The script works without this driver, but it is required to install downloaded apps on the device
 
 ### Requirements for Windows 7 and 8.1:
-#### All steps must be performed strictly in the following order:
 #### 1. Update system certificates via UpdRootsCert:
 * Download UpdRootsCert.exe file via the link:
 - [Download UpdRootsCert.exe](https://disk.yandex.ru/d/SdHMgwJ55MTQRg)
@@ -116,7 +115,6 @@ ipatool is an unofficial tool; therefore, using the script is only at your own r
 
 ## Using on macOS:
 ### macOS requirements:
-#### All steps must be performed strictly in the following order:
 #### 1. Download PowerShell:
 `powershell-xxx-osx-arm64.pkg` for Apple Silicon or `powershell-xxx-osx-x64.pkg` for Intel:
 - [Download the latest version of PowerShell](https://github.com/PowerShell/PowerShell/releases)
@@ -211,7 +209,7 @@ ipatool is an unofficial tool; therefore, using the script is only at your own r
 * The script will purchase the selected apps
 
 * If app IDs are entered, the script will purchase the specified apps
-#### 2. Search for apps by name or ID and download latest version:
+#### 2. Search for apps by name or ID and download the latest version:
 * Enter the app name or app IDs to search
 * Press Enter
 * If an app name is entered, a list of found apps will be displayed
@@ -242,8 +240,8 @@ ipatool is an unofficial tool; therefore, using the script is only at your own r
 * Enter the index numbers (#) of the app versions to download
 * Press Enter
 * The script will download the selected app versions
-#### 4. Select an app list and purchase (without downloading):
-* Select the app list to display:
+#### 4. Select a prepared app list and purchase (without downloading):
+* Select a prepared app list to display:
 1. Popular apps list (Files/AppsList.txt)
 2. List of popular apps not purchased by the script
 3. Custom apps list (Files/AppsListCustom.txt)
@@ -252,8 +250,8 @@ ipatool is an unofficial tool; therefore, using the script is only at your own r
 * Enter the index numbers (#) of the apps to purchase
 * Press Enter
 * The script will purchase the selected apps
-#### 5. Select an app list and download latest version:
-* Select the app list to display:
+#### 5. Select a prepared app list and download the latest version:
+* Select a prepared app list to display:
 1. Popular apps list (Files/AppsList.txt)
 2. List of apps from the Apple account purchase history (Files/AppsListAccount_.txt)
 3. List of apps installed on the device
@@ -264,8 +262,8 @@ ipatool is an unofficial tool; therefore, using the script is only at your own r
 * Enter the index numbers (#) of the apps to download
 * Press Enter
 * The script will download the selected apps
-#### 6. Select an app list and download (with version selection):
-* Select the app list to display:
+#### 6. Select a prepared app list and download (with version selection):
+* Select a prepared app list to display:
 1. Popular apps list (Files/AppsList.txt)
 2. List of apps from the Apple account purchase history (Files/AppsListAccount_.txt)
 3. List of apps installed on the device
@@ -308,14 +306,14 @@ ipatool is an unofficial tool; therefore, using the script is only at your own r
 2. Switch account
 3. Log out of Apple Account
 * Press Enter
-#### 11. Tip Jar:
+#### 11. Enable/disable developer mode:
+* The script will enable or disable developer mode to collect additional information
+#### 12. Tip Jar:
 * The script will navigate to the CloudTips page
-#### 12. Change Language (Сменить язык):
+#### 13. Change Language (Сменить язык):
 * The script will change its interface language
 #### air
 * Enabling/disabling connection to the device via Wi-Fi
-#### debug
-* Enable/disable debug mode
 
 ### IPA_Installer (installing apps only):
 #### 1. Check the minimum iOS version for apps in the Apps folder:
@@ -330,70 +328,79 @@ ipatool is an unofficial tool; therefore, using the script is only at your own r
 * Enter the index numbers (#) of the apps to install on the devices
 * Press Enter
 * The script will install the selected apps on the devices
-#### 3. Tip Jar:
+#### 3. Enable/disable developer mode:
+* The script will enable or disable developer mode to collect additional information
+#### 4. Tip Jar:
 * The script will navigate to the CloudTips page
-#### 4. Change Language (Сменить язык):
+#### 5. Change Language (Сменить язык):
 * The script will change its interface language
-#### 5. Switch to IPA_Downloader (downloading and installing apps):
+#### 6. Switch to IPA_Downloader (downloading and installing apps):
 * The script will switch the mode to IPA_Downloader
 #### air
 * Enabling/disabling connection to the device via Wi-Fi
-#### debug
-* Enable/disable debug mode
 
 ## Possible errors and solutions:
 ### Troubleshooting errors:
 **1. command not found: pwsh:**
-* PowerShell (pwsh) is not installed.
+* PowerShell (pwsh) is not installed
 
 **2. Processing -File ./IPA_Downloader.ps1 failed: Access to the path is denied (macOS):**
-* Allow Terminal access in `System Settings - Privacy & Security - Full Disk Access`.
+* Allow Terminal access in `System Settings - Privacy & Security - Full Disk Access`
 
-**3. Two-factor authentication (2FA) code not received or Login error: Did you forget your password?:**
-* The password was entered incorrectly.
-* Try signing in to `icloud.com` website using Apple account.
+**3. zsh: operation not permitted (macOS):**
+* Open the Terminal, enter the command: `chmod +x (space)`
+* Drag the file `Start_IPA_Downloader_macOS.command` into the Terminal
+* Press Enter and run the script again
 
-**4. Login error: failed to initialize SAP signer: curl: Timeout was reached:**
-* Failed to connect to SAP, check your internet connection.
+**4. Two-factor authentication (2FA) code not received or Login error: Did you forget your password?:**
+* The password was entered incorrectly
+* Try signing in to `icloud.com` website using Apple account
 
-**5. Error: account is disabled:**
-* Apple account is temporarily blocked by Apple (usually due to multiple attempts to enter incorrect password or 2FA code).
-* Account needs to be unblocked via the device or on the `icloud.com` website.
+**5. Login error: failed to initialize SAP signer: curl: Timeout was reached:**
+* Failed to connect to SAP, check your internet connection
 
-**6. Download error: invalid response: empty songList:**
-* Re-log in to the script using Apple account.
+**6. Error: account is disabled:**
+* Apple account is temporarily blocked by Apple (usually due to multiple attempts to enter incorrect password or 2FA code)
+* Account needs to be unblocked via the device or on the `icloud.com` website
 
-**7. Download error: HTTP request failed: Couldn't resolve host name:**
-* Failed to connect to Apple servers, check your internet connection.
+**7. Not logged in**
+* Tools based on ipatool-go were previously used
+* In the script, you need to log out of your Apple account and log in again
 
-**8. Download error: HTTP request failed: Timeout was reached:**
-* Failed to connect to Apple servers, check your internet connection.
+**8. Download error: invalid response: empty songList:**
+* Re-log in to the script using Apple account
 
-**9. Download failed after retries: Failure when receiving data from the peer:**
-* Failed to connect to Apple servers, check your internet connection.
-* Or re-log in to the script using Apple account.
+**9. Download error: HTTP request failed: Couldn't resolve host name:**
+* Failed to connect to Apple servers, check your internet connection
 
-**10. Error: license is required:**
-* The app was not previously purchased on this Apple account.
+**10. Download error: HTTP request failed: Timeout was reached:**
+* Failed to connect to Apple servers, check your internet connection
 
-**11. Purchase error: app not found:**
-* App purchase failed because the app has been removed from the App Store.
+**11. Download failed after retries: Failure when receiving data from the peer:**
+* Failed to connect to Apple servers, check your internet connection
+* Or re-log in to the script using Apple account
 
-**12. Purchase error: item is temporarily unavailable:**
-* The app was not previously purchased on this Apple account.
-* The purchase failed because the app has been removed from the App Store.
+**12. Error: license is required:**
+* The app was not previously purchased on this Apple account
 
-**13. Error: This Apple Account is temporarily unable to be used in the iTunes Store because it could not be found. Try again later:**
-* Make any free purchase in the App Store.
+**13. Purchase error: app not found:**
+* App purchase failed because the app has been removed from the App Store
 
-**14. Error: No connected devices found.`nConnect a device and trust this computer:**
-* Connect the device and tap `Trust` when the `Trust This Computer?` prompt appears.
-* Make sure the AppleMobileDeviceSupport64 driver is installed.
-* Reinstall/install iTunes/Apple Devices or AppleMobileDeviceSupport64.
+**14. Purchase error: item is temporarily unavailable:**
+* The app was not previously purchased on this Apple account
+* The purchase failed because the app has been removed from the App Store
 
-**15. Could not connect to lockdownd:**
-* Issues with connecting to an Apple device.
-* Uninstall iTunes/Apple Devices and AppleMobileDeviceSupport64, then delete the folders listed below and reinstall iTunes/Apple Devices or AppleMobileDeviceSupport64.
+**15. Error: This Apple Account is temporarily unable to be used in the iTunes Store because it could not be found. Try again later:**
+* Make any free purchase in the App Store
+
+**16. Error: No connected devices found.`nConnect a device and trust this computer:**
+* Connect the device and tap `Trust` when the `Trust This Computer?` prompt appears
+* Make sure the AppleMobileDeviceSupport64 driver is installed
+* Reinstall/install iTunes/Apple Devices or AppleMobileDeviceSupport64
+
+**17. Could not connect to lockdownd:**
+* Issues with connecting to an Apple device
+* Uninstall iTunes/Apple Devices and AppleMobileDeviceSupport64, then delete the folders listed below and reinstall iTunes/Apple Devices or AppleMobileDeviceSupport64
 ```
 C:\ProgramData\Apple\
 C:\ProgramData\Apple\Apple Computer\
@@ -401,28 +408,28 @@ C:\Users\%username%\AppData\Local\Apple Computer\
 C:\Users\%username%\AppData\Local\Apple Inc\
 C:\Users\%username%\AppData\Roaming\Apple Computer\
 ```
-* Connect the device and tap `Trust` when the `Trust This Computer?` prompt appears.
+* Connect the device and tap `Trust` when the `Trust This Computer?` prompt appears
 
-**16. WARNING: could not locate Payload/App.app/SC_Info/App.sinf in archive:**
-* App signature not found in the installed .ipa file.
+**18. WARNING: could not locate Payload/App.app/SC_Info/App.sinf in archive:**
+* App signature not found in the installed .ipa file
 
-**17. ERROR: Install failed. Got error "APIInternalError" with code 0x00000000: Error Domain=IXErrorDomain Code=46:**
-* Remove the app from the device, restart the device, and try installing the app again.
+**19. ERROR: Install failed. Got error "APIInternalError" with code 0x00000000: Error Domain=IXErrorDomain Code=46:**
+* Remove the app from the device, restart the device, and try installing the app again
 
-**18. The app immediately closes when launched after installation:**
-* Log in to the App Store using the account from which the app was downloaded, and install any free app.
-* After that, launch the problematic app again.
+**20. The app immediately closes when launched after installation:**
+* Log in to the App Store using the account from which the app was downloaded, and install any free app
+* After that, launch the problematic app again
 
 ### If you encounter an issue:
 #### Please provide the following information:
 * The operating system and version of IPA_Downloader being used
-* Enter the debug command in the script's main menu, reproduce the action that leads to the error, and send the result
+* Enable developer mode, reproduce the action that leads to the error, and send the result
 * A screenshot of the error
 
 ## Useful information:
 ### Finding an App ID:
 #### Option 1:
-* Find the app link in the App Store and copy the value after `id` in the URL.
+* Find the app link in the App Store and copy the value after `id` in the URL
 <details>
  <summary>Screenshot (click to view)</summary>
 <img width="389" height="36" alt="AppStore_Link" src="https://github.com/user-attachments/assets/e73fd860-ed11-4293-8600-aef61fe3dc7f" />

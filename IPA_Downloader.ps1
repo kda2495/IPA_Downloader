@@ -2,7 +2,7 @@
 Set-Location -LiteralPath $PSScriptRoot
 
 # Версия скрипта:
-$ScriptVersion = "4.4.1"
+$ScriptVersion = "4.4.2"
 
 # Переменная состояния keychain-passphrase:
 $script:KeychainEnabled = $false
@@ -51,42 +51,32 @@ function Set-Setting {
 	)
 	
 	# Сохранение используемых настроек:
-	if ($script:SettingsKeys -notcontains $Key) {
-		return
-	}
+	if ($script:SettingsKeys -notcontains $Key) { return }
 	
 	$Settings = Get-Settings
 	$Settings[$Key] = $Value
 	
-	$Lines = foreach ($K in $Settings.Keys) {
-		"$K=$($Settings[$K])"
-	}
+	$Lines = foreach ($K in $Settings.Keys) { "$K=$($Settings[$K])" }
 	
 	Set-Content -LiteralPath $SettingsFilePath -Value $Lines -Force
 }
 
 # Функция удаления некорректных данных из Files/Settings.txt:
 function Remove-UnusedSettings {
-	if (!(Test-Path -LiteralPath $SettingsFilePath)) {
-		return
-	}
+	if (!(Test-Path -LiteralPath $SettingsFilePath)) { return }
 	
 	$CurrentLines = @(Get-Content -LiteralPath $SettingsFilePath -ErrorAction SilentlyContinue)
-	if ($CurrentLines.Count -eq 0) {
-		return
-	}
+	if ($CurrentLines.Count -eq 0) { return }
 	
 	$Settings = Get-Settings
 	
-	# Удаление файла, если в нем не осталось используемых настроек:
+	# Удаление файла при отсутствии используемых настроек:
 	if ($Settings.Count -eq 0) {
 		Remove-Item -LiteralPath $SettingsFilePath -Force -ErrorAction SilentlyContinue
 		return
 	}
 	
-	$Lines = @(foreach ($K in $Settings.Keys) {
-		"$K=$($Settings[$K])"
-	})
+	$Lines = @(foreach ($K in $Settings.Keys) { "$K=$($Settings[$K])" })
 	
 	# Перезапись файла при наличии некорректных данных:
 	if (($Lines -join "`n") -ne ($CurrentLines -join "`n")) {
@@ -112,17 +102,11 @@ if (-not $IsWin) {
 
 # Функция вычисления папки с ipatool под текущую операционную систему и архитектуру:
 function Get-ArchSubFolder {
-	if ($IsWin) {
-		return "windows_amd64"
-	} elseif ($IsMac) {
-		if ($script:Arch -eq "arm64") {
-			return "macOS_arm64"
-		} else {
-			return "macOS_amd64"
-		}
-	} else {
-		return "linux_amd64"
-	}
+	if ($IsWin) { return "windows_amd64" }
+	elseif ($IsMac) {
+		if ($script:Arch -eq "arm64") { return "macOS_arm64" }
+		else { return "macOS_amd64" }
+	} else { return "linux_amd64" }
 }
 
 # Определение папки с ipatool под текущую систему и архитектуру:
@@ -147,7 +131,11 @@ $WarningTempPath = Join-Path -Path $MainAppFolderPath -ChildPath "Warning_tmp.tx
 
 # Настройка консоли на Windows:
 if ($IsWin) {
-	Add-Type -TypeDefinition @"
+	# Установка шрифта консоли вне Windows Terminal:
+	if (-not $env:WT_SESSION) {
+		# Компиляция типа при первом запуске в текущей сессии:
+		if (-not ('ConsoleFont' -as [type])) {
+			Add-Type -TypeDefinition @"
 using System;
 using System.Runtime.InteropServices;
 public class ConsoleFont {
@@ -167,7 +155,7 @@ public class ConsoleFont {
 	[DllImport("kernel32.dll", SetLastError = true)]
 	public static extern IntPtr GetStdHandle(int nStdHandle);
 	public static void SetFont(string fontName, short fontSize = 12) {
-		IntPtr hConsole = GetStdHandle(-11); // STD_OUTPUT_HANDLE
+		IntPtr hConsole = GetStdHandle(-11);
 		CONSOLE_FONT_INFO_EX fontInfo = new CONSOLE_FONT_INFO_EX();
 		fontInfo.cbSize = (uint)Marshal.SizeOf(fontInfo);
 		fontInfo.FaceName = fontName;
@@ -176,8 +164,10 @@ public class ConsoleFont {
 	}
 }
 "@
-
-	[ConsoleFont]::SetFont("Consolas", 16)
+		}
+		
+		[ConsoleFont]::SetFont("Consolas", 16)
+	}
 	
 	# Настройка размера буфера экрана:
 	try {
@@ -193,13 +183,12 @@ public class ConsoleFont {
 			$RawUI.BufferSize = New-Object System.Management.Automation.Host.Size($BufferWidth, $BufferHeight)
 		}
 		
-		# Расширение окна до 90 символов, если позволяет экран:
+		# Расширение окна до 90 символов:
 		$WindowWidth = [Math]::Min([Math]::Max($WindowSize.Width, 90), $RawUI.MaxPhysicalWindowSize.Width)
 		if ($WindowWidth -gt $WindowSize.Width) {
 			$RawUI.WindowSize = New-Object System.Management.Automation.Host.Size($WindowWidth, $WindowSize.Height)
 		}
-	} catch {
-	}
+	} catch { }
 }
 
 # Включение UTF-8 по умолчанию:
@@ -213,6 +202,13 @@ Add-Type -AssemblyName System.IO.Compression.FileSystem
 # Определение переменной для кэширования списка популярных приложений (Files/AppsList.txt):
 $script:RepoParsedList = $null
 
+# Определение переменной для кэширования названий популярных приложений по ID:
+$script:RepoNames = @{}
+
+# Определение переменных для кэширования пользовательского списка приложений:
+$script:CustomListCache = @()
+$script:CustomListStamp = $null
+
 # Определение переменной для кэширования метаданных ipa файлов:
 $script:IPAMetadataCache = @{}
 
@@ -221,6 +217,9 @@ $script:StartupRequests = $null
 
 # Определение переменной для прокси-сервера:
 $script:SystemProxyUrl = $null
+
+# Определение переменной для кэширования списков файлов в папке с ipatool:
+$script:BinaryFiles = @{}
 
 # Локализация:
 $LangStrings = @{
@@ -269,22 +268,23 @@ $LangStrings = @{
 		"ClearMenuTitle" = "Выберите данные для очистки"
 		"CustomAppsListMenu" = "3. Пользовательский список приложений (Files/AppsListCustom.txt)"
 		"CustomAppsListMenu5" = "5. Пользовательский список приложений (Files/AppsListCustom.txt)"
-		"DebugEnabled" = "Режим отладки включен."
-		"DebugDisabled" = "Режим отладки отключен."
+		"DebugEnabled" = "Режим разработчика включен."
+		"DebugDisabled" = "Режим разработчика отключен."
 		"DeviceAppsListLoad" = "Получение списка приложений, установленных на устройстве..."
 		"DeviceAppsListMenu" = "3. Список приложений, установленных на устройстве"
 		"DownloaderMenu1" = "1. Поиск приложений по названию или ID и покупка (без загрузки)"
 		"DownloaderMenu2" = "2. Поиск приложений по названию или ID и загрузка последней версии"
 		"DownloaderMenu3" = "3. Поиск приложений по названию или ID и загрузка (с выбором версии)"
-		"DownloaderMenu4" = "4. Выбор списка приложений и покупка (без загрузки)"
-		"DownloaderMenu5" = "5. Выбор списка приложений и загрузка последней версии"
-		"DownloaderMenu6" = "6. Выбор списка приложений и загрузка (с выбором версии)"
+		"DownloaderMenu4" = "4. Выбор готового списка приложений и покупка (без загрузки)"
+		"DownloaderMenu5" = "5. Выбор готового списка приложений и загрузка последней версии"
+		"DownloaderMenu6" = "6. Выбор готового списка приложений и загрузка (с выбором версии)"
 		"DownloaderMenu7" = "7. Проверка минимальной версии iOS для приложений в папке Apps"
 		"DownloaderMenu8" = "8. Установка приложений из папки Apps"
 		"DownloaderMenu9" = "9. Очистка данных"
 		"DownloaderMenu10" = "10. Операции с аккаунтом Apple"
-		"DownloaderMenu11" = "11. Банка для чаевых"
-		"DownloaderMenu12" = "12. Сменить язык (Change Language)"
+		"DownloaderMenu11" = "11. Включить/отключить режим разработчика"
+		"DownloaderMenu12" = "12. Банка для чаевых"
+		"DownloaderMenu13" = "13. Сменить язык (Change Language)"
 		"ErrorAppsListAccountLoad" = "Ошибка: Не удалось получить список приложений из истории покупок аккаунта Apple."
 		"ErrorAppsListAccountUpdate" = "Ошибка: Не удалось обновить список приложений из истории покупок аккаунта Apple.`nПоказан ранее сохраненный список."
 		"ErrorAppsListCustomEmpty" = "Ошибка: Пользовательский список приложений пуст.`nДобавьте приложения в Files/AppsListCustom.txt"
@@ -323,9 +323,10 @@ $LangStrings = @{
 		"InstallDevice" = "Устройство:"
 		"InstallerMenu1" = "1. Проверка минимальной версии iOS для приложений в папке Apps"
 		"InstallerMenu2" = "2. Установка приложений из папки Apps"
-		"InstallerMenu3" = "3. Банка для чаевых"
-		"InstallerMenu4" = "4. Сменить язык (Change Language)"
-		"InstallerMenu5" = "5. Перейти в режим IPA_Downloader (загрузка и установка приложений)"
+		"InstallerMenu3" = "3. Включить/отключить режим разработчика"
+		"InstallerMenu4" = "4. Банка для чаевых"
+		"InstallerMenu5" = "5. Сменить язык (Change Language)"
+		"InstallerMenu6" = "6. Перейти в режим IPA_Downloader (загрузка и установка приложений)"
 		"KbSyncGeneration" = "Формирование kbsync. Это может занять некоторое время..."
 		"LanguageChanged" = "Язык успешно изменен на русский."
 		"LanguageMenu1" = "1. Русский"
@@ -337,7 +338,9 @@ $LangStrings = @{
 		"LoggedOut" = "Выполнен выход из аккаунта Apple."
 		"LoginMenu1" = "1. Войти в аккаунт Apple"
 		"LoginMenu2" = "2. Перейти в режим IPA_Installer (только установка приложений)"
-		"LoginMenu3" = "3. Сменить язык (Change Language)"
+		"LoginMenu3" = "3. Включить/отключить режим разработчика"
+		"LoginMenu4" = "4. Банка для чаевых"
+		"LoginMenu5" = "5. Сменить язык (Change Language)"
 		"LogoutAllAccounts" = "Выйти из всех аккаунтов Apple и сбросить настройки скрипта"
 		"Menu1Yes" = "1. Да"
 		"Menu2No" = "2. Нет"
@@ -399,22 +402,23 @@ $LangStrings = @{
 		"ClearMenuTitle" = "Select data to clear"
 		"CustomAppsListMenu" = "3. Custom apps list (Files/AppsListCustom.txt)"
 		"CustomAppsListMenu5" = "5. Custom apps list (Files/AppsListCustom.txt)"
-		"DebugEnabled" = "Debug mode enabled."
-		"DebugDisabled" = "Debug mode disabled."
+		"DebugEnabled" = "Developer mode enabled."
+		"DebugDisabled" = "Developer mode disabled."
 		"DeviceAppsListLoad" = "Getting the list of apps installed on the device..."
 		"DeviceAppsListMenu" = "3. List of apps installed on the device"
 		"DownloaderMenu1" = "1. Search for apps by name or ID and purchase (without downloading)"
-		"DownloaderMenu2" = "2. Search for apps by name or ID and download latest version"
+		"DownloaderMenu2" = "2. Search for apps by name or ID and download the latest version"
 		"DownloaderMenu3" = "3. Search for apps by name or ID and download (with version selection)"
-		"DownloaderMenu4" = "4. Select an app list and purchase (without downloading)"
-		"DownloaderMenu5" = "5. Select an app list and download latest version"
-		"DownloaderMenu6" = "6. Select an app list and download (with version selection)"
+		"DownloaderMenu4" = "4. Select a prepared app list and purchase (without downloading)"
+		"DownloaderMenu5" = "5. Select a prepared app list and download the latest version"
+		"DownloaderMenu6" = "6. Select a prepared app list and download (with version selection)"
 		"DownloaderMenu7" = "7. Check the minimum iOS version for apps in the Apps folder"
 		"DownloaderMenu8" = "8. Install apps from Apps folder"
 		"DownloaderMenu9" = "9. Clear data"
 		"DownloaderMenu10" = "10. Apple account operations"
-		"DownloaderMenu11" = "11. Tip Jar"
-		"DownloaderMenu12" = "12. Change Language (Сменить язык)"
+		"DownloaderMenu11" = "11. Enable/disable developer mode"
+		"DownloaderMenu12" = "12. Tip Jar"
+		"DownloaderMenu13" = "13. Change Language (Сменить язык)"
 		"ErrorAppsListAccountLoad" = "Error: Failed to retrieve list of apps from the Apple account purchase history."
 		"ErrorAppsListAccountUpdate" = "Error: Failed to update the list of apps from the Apple account purchase history.`nShowing the previously saved list."
 		"ErrorAppsListCustomEmpty" = "Error: Custom apps list is empty.`nAdd apps to the Files/AppsListCustom.txt file."
@@ -453,9 +457,10 @@ $LangStrings = @{
 		"InstallDevice" = "Device:"
 		"InstallerMenu1" = "1. Check the minimum iOS version for apps in the Apps folder"
 		"InstallerMenu2" = "2. Install apps from Apps folder"
-		"InstallerMenu3" = "3. Tip Jar"
-		"InstallerMenu4" = "4. Change Language (Сменить язык)"
-		"InstallerMenu5" = "5. Switch to IPA_Downloader mode (download and install apps)"
+		"InstallerMenu3" = "3. Enable/disable developer mode"
+		"InstallerMenu4" = "4. Tip Jar"
+		"InstallerMenu5" = "5. Change Language (Сменить язык)"
+		"InstallerMenu6" = "6. Switch to IPA_Downloader mode (download and install apps)"
 		"KbSyncGeneration" = "Generation of kbsync. This may take some time..."
 		"LanguageChanged" = "Language successfully changed to English."
 		"LanguageMenu1" = "1. Русский"
@@ -467,7 +472,9 @@ $LangStrings = @{
 		"LoggedOut" = "Successfully logged out of Apple account."
 		"LoginMenu1" = "1. Log in to Apple account"
 		"LoginMenu2" = "2. Switch to IPA_Installer mode (install apps only)"
-		"LoginMenu3" = "3. Change Language (Сменить язык)"
+		"LoginMenu3" = "3. Enable/disable developer mode"
+		"LoginMenu4" = "4. Tip Jar"
+		"LoginMenu5" = "5. Change Language (Сменить язык)"
 		"LogoutAllAccounts" = "Log out of all Apple accounts and reset script settings"
 		"Menu1Yes" = "1. Yes"
 		"Menu2No" = "2. No"
@@ -571,15 +578,10 @@ function Out-Table {
 	}
 	
 	# Формирование элементов рамок:
-	$TopParts = @(); $SepParts = @(); $BottomParts = @()
-	foreach ($ColWidth in $ColWidths) {
-		$BorderLine = "─" * ($ColWidth + 2)
-		$TopParts += $BorderLine; $SepParts += $BorderLine; $BottomParts += $BorderLine
-	}
-	
-	$LineTop = "┌" + ($TopParts -join "┬") + "┐"
-	$LineSep = "├" + ($SepParts -join "┼") + "┤"
-	$LineBottom = "└" + ($BottomParts -join "┴") + "┘"
+	$BorderParts = foreach ($ColWidth in $ColWidths) { "─" * ($ColWidth + 2) }
+	$LineTop = "┌" + ($BorderParts -join "┬") + "┐"
+	$LineSep = "├" + ($BorderParts -join "┼") + "┤"
+	$LineBottom = "└" + ($BorderParts -join "┴") + "┘"
 	
 	# Сборка готовой строки:
 	function Build-Row($CellsInfo) {
@@ -671,15 +673,13 @@ function Read-MenuChoice {
 	)
 	
 	while ($true) {
-		$Choice = Read-Host $MenuText
+		$Choice = "$(Read-Host $MenuText)".Trim()
 		
-		if ($AllowCancel -and $Choice -eq '0') {
-			return '0'
-		}
+		if ($AllowCancel -and $Choice -eq '0') { return '0' }
 		
 		# Проверка числа:
 		$ChoiceNumber = 0
-		if (($Choice -match '^\d+$') -and ([int]::TryParse($Choice, [ref]$ChoiceNumber)) -and ($ChoiceNumber -ge 1) -and ($ChoiceNumber -le $OptionsCount)) {
+		if (($Choice -match '^[1-9][0-9]*$') -and ([int]::TryParse($Choice, [ref]$ChoiceNumber)) -and ($ChoiceNumber -le $OptionsCount)) {
 			return $Choice
 		}
 		
@@ -749,9 +749,7 @@ function Connect-AppleAccount {
 
 # Функция получения списка сохраненных аккаунтов Apple:
 function Get-SavedAppleAccounts {
-	if (!(Test-Path -LiteralPath $ipatoolHomePath)) {
-		return @()
-	}
+	if (!(Test-Path -LiteralPath $ipatoolHomePath)) { return @() }
 	
 	return @(Get-ChildItem -LiteralPath $ipatoolHomePath -Directory -ErrorAction SilentlyContinue | Sort-Object Name | ForEach-Object { $_.Name })
 }
@@ -794,7 +792,7 @@ function Clear-ActiveAccountFiles {
 		Remove-Item -LiteralPath (Join-Path -Path $ipatoolHomePath -ChildPath $FileName) -Force -ErrorAction SilentlyContinue
 	}
 	
-	# Удаление папки .ipatool, если сохраненных аккаунтов нет:
+	# Удаление папки .ipatool при отсутствии сохраненных аккаунтов:
 	if (@(Get-SavedAppleAccounts).Count -eq 0) {
 		Remove-Item -LiteralPath $ipatoolHomePath -Recurse -Force -ErrorAction SilentlyContinue
 	}
@@ -849,23 +847,16 @@ function Restore-SavedAppleAccountAtStartup {
 		# Выбор сохраненного аккаунта:
 		Select-AppleAccount
 		
-		# Продолжение работы, если авторизация выбранного аккаунта успешна:
-		if ((Test-Path -LiteralPath "$LoginFilePath") -and $script:AuthSuccess) {
-			return $true
-		}
+		# Выход при отсутствии файла login:
+		if (!(Test-Path -LiteralPath "$LoginFilePath")) { return }
 		
-		# Удаление файлов авторизации, если проверка авторизации не пройдена:
-		if (Test-Path -LiteralPath "$LoginFilePath") {
-			Show-Error "ErrorAuthCheck"
-			Clear-ActiveAccountFiles
-			continue
-		}
+		# Продолжение работы при успешной авторизации выбранного аккаунта:
+		if ($script:AuthSuccess) { return }
 		
-		# Сохранение файлов авторизации для следующего запуска:
-		return $false
+		# Удаление файлов авторизации при неудачной проверке авторизации:
+		Show-Error "ErrorAuthCheck"
+		Clear-ActiveAccountFiles
 	}
-	
-	return $false
 }
 
 # Функция обработки проблем с авторизацией:
@@ -876,7 +867,7 @@ function Resolve-AppleAuthProblem {
 		# Удаление файлов авторизации нерабочего аккаунта:
 		Clear-ActiveAccountFiles
 		
-		# Возврат к входу в аккаунт Apple, если других аккаунтов нет:
+		# Возврат к входу в аккаунт Apple при отсутствии других аккаунтов:
 		if (@(Get-SavedAppleAccounts).Count -eq 0) { return }
 		
 		# Выбор другого аккаунта и проверка авторизации:
@@ -897,7 +888,7 @@ function Add-AppleAccount {
 		Connect-AppleAccount
 	}
 	finally {
-		# Возврат предыдущего аккаунта, если вход не завершен:
+		# Возврат предыдущего аккаунта при незавершенном входе:
 		if (!(Test-Path -LiteralPath "$LoginFilePath")) {
 			Clear-ActiveAccountFiles
 			Restore-SavedAccountFiles -Account $PreviousAccount
@@ -1043,19 +1034,23 @@ function Get-InfoPlistValues {
 	return $Values
 }
 
+# Функция получения метки изменения файла:
+function Get-FileStamp {
+	param ([string]$FilePath)
+	
+	try {
+		$FileInfo = New-Object System.IO.FileInfo($FilePath)
+		return "$($FileInfo.FullName)|$($FileInfo.Length)|$($FileInfo.LastWriteTimeUtc.Ticks)"
+	} catch { return $null }
+}
+
 # Функция извлечения метаданных из ipa:
 function Get-IPA-Metadata {
 	param ([string]$ipaPath)
 	if (!(Test-Path -LiteralPath $ipaPath)) { return $null }
 	
 	# Ключ кэша метаданных:
-	$CacheKey = $null
-	try {
-		$IpaFileInfo = New-Object System.IO.FileInfo($ipaPath)
-		$CacheKey = "$($IpaFileInfo.FullName)|$($IpaFileInfo.Length)|$($IpaFileInfo.LastWriteTimeUtc.Ticks)"
-	} catch {
-		$CacheKey = $null
-	}
+	$CacheKey = Get-FileStamp -FilePath $ipaPath
 	
 	# Возврат метаданных из кэша:
 	if ($null -ne $CacheKey -and $script:IPAMetadataCache.ContainsKey($CacheKey)) {
@@ -1133,11 +1128,8 @@ function Get-IPA-Metadata {
 				}
 			}
 		}
-	} catch {
-		return $null
-	} finally {
-		if ($null -ne $Zip) { $Zip.Dispose() }
-	}
+	} catch { return $null }
+	finally { if ($null -ne $Zip) { $Zip.Dispose() } }
 	
 	$Metadata.AppName = $Metadata.AppName -replace '[\\/:*?"<>|]', ''
 	$Metadata.Version = $Metadata.Version -replace '[\\/:*?"<>|]', ''
@@ -1152,12 +1144,18 @@ function Get-IPA-Metadata {
 
 # Функция инициализации и кэширования списка популярных приложений (Files/AppsList.txt):
 function Initialize-Repo-List {
-	if ($null -ne $script:RepoParsedList) {
-		return
-	}
+	if ($null -ne $script:RepoParsedList) { return }
 	
 	# Чтение локального файла:
 	$script:RepoParsedList = @(Read-AppsListFile -FilePath $AppsListPath)
+	
+	# Формирование словаря названий по ID с приоритетом первой записи:
+	$script:RepoNames = @{}
+	foreach ($RepoApp in $script:RepoParsedList) {
+		if (-not $script:RepoNames.ContainsKey($RepoApp.ID)) {
+			$script:RepoNames[$RepoApp.ID] = $RepoApp.Name
+		}
+	}
 }
 
 # Функция переименования файлов старых версий скрипта в папке Files:
@@ -1174,9 +1172,7 @@ function Rename-Legacy-Files {
 		if (Test-Path -LiteralPath $OldPath -PathType Leaf) {
 			try {
 				Move-Item -LiteralPath $OldPath -Destination $LegacyFile.NewPath -Force -ErrorAction Stop
-			}
-			catch {
-			}
+			} catch { }
 		}
 	}
 }
@@ -1186,9 +1182,7 @@ function Initialize-Custom-List-File {
 	if (!(Test-Path -LiteralPath $AppsListCustomPath)) {
 		try {
 			$null = New-Item -Path $AppsListCustomPath -ItemType "File" -Force -ErrorAction Stop
-		}
-		catch {
-		}
+		} catch { }
 	}
 }
 
@@ -1199,15 +1193,11 @@ function Read-AppsListFile {
 	$Result = New-Object System.Collections.Generic.List[object]
 	
 	try {
-		if (!(Test-Path -LiteralPath $FilePath)) {
-			return $Result
-		}
+		if (!(Test-Path -LiteralPath $FilePath)) { return $Result }
 		
 		$Raw = Get-Content -LiteralPath $FilePath -Raw -Encoding UTF8 -ErrorAction Stop
 		
-		if ([string]::IsNullOrWhiteSpace($Raw)) {
-			return $Result
-		}
+		if ([string]::IsNullOrWhiteSpace($Raw)) { return $Result }
 		
 		foreach ($Line in ($Raw -split "`r?`n")) {
 			# Разбор строки в формате: Название: ID Вид Дата покупки:
@@ -1227,9 +1217,7 @@ function Read-AppsListFile {
 				})
 			}
 		}
-	}
-	catch {
-	}
+	} catch { }
 	
 	return $Result
 }
@@ -1256,6 +1244,12 @@ function Remove-Duplicate-IDs {
 function Get-Custom-List {
 	Initialize-Custom-List-File
 	
+	# Возврат списка из кэша, если файл не изменился:
+	$FileStamp = Get-FileStamp -FilePath $AppsListCustomPath
+	if ($null -ne $FileStamp -and $FileStamp -eq $script:CustomListStamp) {
+		return $script:CustomListCache
+	}
+	
 	# Игнорирование вида приложения и даты покупки в пользовательском списке приложений:
 	$List = @(Read-AppsListFile -FilePath $AppsListCustomPath | ForEach-Object {
 		[PSCustomObject]@{
@@ -1265,7 +1259,10 @@ function Get-Custom-List {
 	})
 	
 	# Удаление дублей приложений по ID внутри пользовательского списка приложений (Files/AppsListCustom.txt):
-	return @(Remove-Duplicate-IDs -Items $List)
+	$script:CustomListCache = @(Remove-Duplicate-IDs -Items $List)
+	$script:CustomListStamp = $FileStamp
+	
+	return $script:CustomListCache
 }
 
 # Функция получения пути к списку приложений из истории покупок аккаунта Apple (Files/AppsListAccount_.txt):
@@ -1296,16 +1293,19 @@ function ConvertTo-Account-AppName {
 	$CleanName = $CleanName.Trim()
 	
 	# Название полностью из удаленных символов:
-	if ([string]::IsNullOrWhiteSpace($CleanName)) {
-		return "Unknown"
-	}
+	if ([string]::IsNullOrWhiteSpace($CleanName)) { return "Unknown" }
 	
 	return $CleanName
 }
 
-# Функция преобразования формата даты покупки:
-function Convert-PurchaseDate {
+# Функция преобразования формата даты:
+function Convert-DateText {
 	param ([string]$DateText)
+	
+	# Формат даты ISO 8601:
+	if ($DateText -match '^(\d{4})-(\d{2})-(\d{2})') {
+		return ("{0}.{1}.{2}" -f $Matches[3], $Matches[2], $Matches[1])
+	}
 	
 	$MonthNumbers = @{ Jan = 1; Feb = 2; Mar = 3; Apr = 4; May = 5; Jun = 6; Jul = 7; Aug = 8; Sep = 9; Oct = 10; Nov = 11; Dec = 12 }
 	
@@ -1355,9 +1355,7 @@ function Get-Purchased-Apps {
 	
 	try {
 		$Apps = @($AppsMatch.Groups[1].Value | ConvertFrom-Json -ErrorAction Stop | ForEach-Object { $_ })
-	} catch {
-		return [PSCustomObject]@{ Success = $false; Output = ""; Apps = @() }
-	}
+	} catch { return [PSCustomObject]@{ Success = $false; Output = ""; Apps = @() } }
 	
 	# Отбор покупок с видом iOS App и Mac App:
 	$Apps = @(
@@ -1374,7 +1372,7 @@ function Get-Purchased-Apps {
 			Name = ConvertTo-Account-AppName -Name ([string]$App.name)
 			ID = [string]$App.id
 			Kind = ([string]$App.kind).Trim()
-			PurchaseDate = Convert-PurchaseDate -DateText ([string]$App.purchaseDate)
+			PurchaseDate = Convert-DateText -DateText ([string]$App.purchaseDate)
 		})
 	}
 	
@@ -1385,9 +1383,7 @@ function Get-Purchased-Apps {
 function Sort-Apps-By-Date {
 	param ([array]$Apps)
 	
-	if ($Apps.Count -eq 0) {
-		return @()
-	}
+	if ($Apps.Count -eq 0) { return @() }
 	
 	$Keyed = New-Object System.Collections.Generic.List[object]
 	for ($i = 0; $i -lt $Apps.Count; $i++) {
@@ -1408,9 +1404,7 @@ function Save-Account-List {
 		[array]$Apps
 	)
 	
-	if ($Apps.Count -eq 0) {
-		return
-	}
+	if ($Apps.Count -eq 0) { return }
 	
 	$Lines = New-Object System.Collections.Generic.List[string]
 	foreach ($App in $Apps) {
@@ -1424,8 +1418,7 @@ function Save-Account-List {
 	try {
 		[System.IO.File]::WriteAllLines($TempPath, $Lines.ToArray(), (New-Object System.Text.UTF8Encoding($false)))
 		Move-Item -LiteralPath $TempPath -Destination $FilePath -Force -ErrorAction Stop
-	}
-	catch {
+	} catch {
 		if (Test-Path -LiteralPath $TempPath) {
 			Remove-Item -LiteralPath $TempPath -Force -ErrorAction SilentlyContinue
 		}
@@ -1437,16 +1430,10 @@ function Get-Account-Apps {
 	$CachePath = Get-Account-List-Path
 	$CachedApps = @(Read-AppsListFile -FilePath $CachePath)
 	
-	$CachedAppsChanged = $false
-	
 	# Удаление из списка приложений из истории покупок аккаунта Apple иных видов покупок:
 	$FilteredCachedApps = @($CachedApps | Where-Object { [string]::IsNullOrWhiteSpace([string]$_.Kind) -or ([string]$_.Kind) -in $script:AccountAppKinds })
 	if ($FilteredCachedApps.Count -ne $CachedApps.Count) {
 		$CachedApps = $FilteredCachedApps
-		$CachedAppsChanged = $true
-	}
-	
-	if ($CachedAppsChanged) {
 		Save-Account-List -FilePath $CachePath -Apps $CachedApps
 	}
 	
@@ -1531,12 +1518,9 @@ function Get-StartupResponse {
 	
 	try {
 		# Ожидание завершения запроса:
-		if ($Task.Wait(11000)) {
-			return ,$Task.Result
-		}
-	}
-	catch {
-		# Вывод причины ошибки в режиме отладки:
+		if ($Task.Wait(11000)) { return ,$Task.Result }
+	} catch {
+		# Вывод причины ошибки в режиме разработчика:
 		if ($script:IsDebugEnabled) {
 			Write-Host $_.Exception.GetBaseException().Message -ForegroundColor DarkGray
 		}
@@ -1568,9 +1552,7 @@ function Start-StartupRequests {
 		$script:StartupRequests.AppsList = $Client.GetByteArrayAsync("https://raw.githubusercontent.com/kda2495/IPA_Downloader/refs/heads/main/Files/AppsList.txt")
 		$script:StartupRequests.Warning = $Client.GetByteArrayAsync("https://raw.githubusercontent.com/kda2495/IPA_Downloader/refs/heads/main/Files/Warning.txt")
 		$script:StartupRequests.Release = $Client.GetByteArrayAsync("https://api.github.com/repos/kda2495/IPA_Downloader/releases/latest")
-	}
-	catch {
-	}
+	} catch { }
 }
 
 # Функция предварительной загрузки списка популярных приложений (Files/AppsList.txt) и предупреждения (Files/Warning.txt):
@@ -1606,8 +1588,7 @@ function Initialize-RemoteFiles {
 				# Замена файла после успешной загрузки:
 				Move-Item -LiteralPath $RemoteFile.Temp -Destination $RemoteFile.Final -Force -ErrorAction Stop
 			}
-		}
-		catch {
+		} catch {
 			# Получение имени файла и вывод ошибки загрузки в консоль:
 			$FileName = Split-Path -Leaf $RemoteFile.Final
 			Separator
@@ -1647,13 +1628,11 @@ function Save-Purchased-App {
 		[string]$AppNameOnly
 	)
 	
-	if ([string]::IsNullOrWhiteSpace($AppNameOnly) -or $AppNameOnly -eq "Unknown") {
-		return
-	}
+	if ([string]::IsNullOrWhiteSpace($AppNameOnly) -or $AppNameOnly -eq "Unknown") { return }
 	
 	$HistoryFile = "$PurchasedAppsListFilePath"
 	
-	# Создание файла, если его нет:
+	# Создание файла при его отсутствии:
 	if (!(Test-Path -LiteralPath $HistoryFile)) {
 		$null = New-Item -Path $HistoryFile -ItemType "File" -Value '{}'
 	}
@@ -1743,12 +1722,14 @@ function Get-Repo-AppName {
 	param ([string]$AppID)
 	Initialize-Repo-List
 	# Поиск в пользовательском списке приложений (Files/AppsListCustom.txt):
-	$App = @(Get-Custom-List) | Where-Object { $_.ID -eq $AppID } | Select-Object -First 1
-	if ($App) { return $App.Name }
+	foreach ($CustomApp in @(Get-Custom-List)) {
+		if ($CustomApp.ID -eq $AppID) { return $CustomApp.Name }
+	}
 	
 	# Поиск в списке популярных приложений (Files/AppsList.txt):
-	$App = $script:RepoParsedList | Where-Object { $_.ID -eq $AppID } | Select-Object -First 1
-	if ($App) { return $App.Name } else { return $null }
+	if ($script:RepoNames.ContainsKey($AppID)) { return $script:RepoNames[$AppID] }
+	
+	return $null
 }
 
 # Функция перемещения и автоматического переименования:
@@ -1833,23 +1814,21 @@ function Parse-NumberSelection {
 			continue
 		}
 		
-		if ($Part -match '^\d+-\d+$') {
+		if ($Part -match '^[1-9][0-9]*-[1-9][0-9]*$') {
 			$Range = $Part -split '-'
 			$Start = 0; $End = 0
 			if (![int]::TryParse($Range[0], [ref]$Start) -or ![int]::TryParse($Range[1], [ref]$End)) { return $null }
-			$RangeStart = [Math]::Max([Math]::Min($Start, $End), 1)
+			$RangeStart = [Math]::Min($Start, $End)
 			$RangeEnd = [Math]::Min([Math]::Max($Start, $End), $MaxCount)
 			if ($RangeStart -le $RangeEnd) { $SelectedIndices += $RangeStart..$RangeEnd }
-		} elseif ($Part -match '^\d+$') {
+		} elseif ($Part -match '^[1-9][0-9]*$') {
 			$Val = 0
 			if (![int]::TryParse($Part, [ref]$Val)) { return $null }
 			$SelectedIndices += $Val
-		} else {
-			return $null
-		}
+		} else { return $null }
 	}
 	
-	$SelectedIndices = $SelectedIndices | Select-Object -Unique | Where-Object { $_ -ge 1 -and $_ -le $MaxCount }
+	$SelectedIndices = $SelectedIndices | Select-Object -Unique | Where-Object { $_ -le $MaxCount }
 	
 	if ($SelectedIndices.Count -eq 0) { return $null }
 	return $SelectedIndices
@@ -1965,16 +1944,12 @@ function Get-AppReference {
 	
 	# Приоритет использования ID:
 	if (![string]::IsNullOrWhiteSpace($AppID)) {
-		if (Test-NumericInput -InputValue $AppID) {
-			return @("-i", $AppID)
-		}
+		if (Test-NumericInput -InputValue $AppID) { return @("-i", $AppID) }
 		
 		return @()
 	}
 	
-	if ($BundleID -match '^[A-Za-z0-9._-]+$') {
-		return @("-b", $BundleID)
-	}
+	if ($BundleID -match '^[A-Za-z0-9._-]+$') { return @("-b", $BundleID) }
 	
 	return @()
 }
@@ -2089,7 +2064,7 @@ function IPA-Download-With-Version {
 		# Запрос порядковых номеров (№) версий для загрузки:
 		$FinalIndices = Read-NumberSelection -PromptKey 'AskVersionsDownloadNum' -MaxCount $DetailedMapping.Count -CancelKey 'CancelStepVerID' -HintKey 'BatchHintVersions'
 		
-		# Возврат цикла к основной таблице, если пользователь ввел 0:
+		# Возврат цикла к основной таблице при вводе 0:
 		if ($null -eq $FinalIndices) {
 			continue
 		}
@@ -2128,12 +2103,9 @@ function Invoke-AppAction {
 	)
 	Separator
 	
-	# Счетчик выбранных приложений:
-	$CounterText = if ($Total -gt 0) { "$Current/$Total " } else { "" }
-	
 	# ID приложения:
 	$AppIdentifier = if (![string]::IsNullOrWhiteSpace($AppID)) { "ID: $AppID" } else { "$(Get-Lang 'HeaderBundleID') $BundleID" }
-	Write-Host "$CounterText$(Get-Lang 'SelectedApp') $DisplayName ($AppIdentifier)"
+	Write-Host "$Current/$Total $(Get-Lang 'SelectedApp') $DisplayName ($AppIdentifier)"
 	switch ($Action) {
 		"Purchase" {
 			Separator
@@ -2187,7 +2159,7 @@ function Invoke-AccountsBatch {
 	$SavedAccounts = @(Get-SavedAppleAccounts)
 	$AccountsToProcess = @($OriginalAccount)
 	
-	# Запрос выполнения действия на всех аккаунтах, если вход произведен больше чем в один аккаунт:
+	# Запрос выполнения действия на всех аккаунтах:
 	if ($SavedAccounts.Count -gt 0) {
 		Separator
 		# Заголовок запроса:
@@ -2205,7 +2177,7 @@ function Invoke-AccountsBatch {
 			if ($Account -ne $script:CurrentAppleAccount) {
 				Switch-AppleAccount -Account $Account
 				
-				# Сохранение названия аккаунта, если получить его данные не удалось:
+				# Сохранение названия аккаунта при неудачной попытке получения его данных:
 				if ($script:CurrentAppleAccount -eq "UnknownAccount") {
 					$script:CurrentAppleAccount = $Account
 				}
@@ -2214,7 +2186,7 @@ function Invoke-AccountsBatch {
 			# Вывод данных текущего аккаунта:
 			Show-AuthData
 			
-			# Пропуск аккаунта, если проверка авторизации не пройдена:
+			# Пропуск аккаунта при неудачной проверке авторизации:
 			if (-not $script:AuthSuccess) {
 				Show-Error "ErrorAuthCheck"
 				continue
@@ -2241,9 +2213,7 @@ function Search-Apps {
 		Separator
 		$AppName = Read-Host "$(Get-Lang 'AskAppSearch') $(Get-Lang 'CancelStep')`n"
 		
-		if ($AppName -eq '0') {
-			return $null
-		}
+		if ($AppName -eq '0') { return $null }
 		
 		# Ввод ID через запятую:
 		$IDParts = @($AppName.Split(',') | ForEach-Object { $_.Trim() } | Where-Object { $_ -ne '' })
@@ -2257,7 +2227,8 @@ function Search-Apps {
 		if (@($IDParts | Where-Object { $_ -notmatch '^\d{6,}$' }).Count -eq 0) {
 			$IDApps = @()
 			
-			foreach ($ID in $IDParts) {
+			# Исключение повторно введенных ID:
+			foreach ($ID in @($IDParts | Select-Object -Unique)) {
 				$AppNames = Resolve-AppDisplayName -AppID $ID
 				$IDApps += [PSCustomObject]@{
 					ID = $ID
@@ -2272,36 +2243,25 @@ function Search-Apps {
 		# Инициализация списка популярных приложений (Files/AppsList.txt):
 		Initialize-Repo-List
 		
+		# Шаблон поиска по названию:
+		$NamePattern = [regex]::Escape($AppName)
+		
 		# Поиск в пользовательском списке приложений (Files/AppsListCustom.txt):
-		$CustomList = @(Get-Custom-List)
-		$FoundApps = @(
-			$CustomList |
-			Where-Object { $_.Name -match [regex]::Escape($AppName) } |
-			ForEach-Object {
-				[PSCustomObject]@{
-					Name = $_.Name
-					ID = $_.ID
-				}
+		$FoundApps = New-Object System.Collections.Generic.List[object]
+		$CustomIDs = @{}
+		foreach ($CustomApp in @(Get-Custom-List)) {
+			$CustomIDs[[string]$CustomApp.ID] = $true
+			
+			if ($CustomApp.Name -match $NamePattern) {
+				$FoundApps.Add($CustomApp)
 			}
-		)
+		}
 		
 		# Поиск в списке популярных приложений (Files/AppsList.txt):
-		$CustomIDs = @($CustomList | ForEach-Object { $_.ID })
-		
-		if ($null -ne $script:RepoParsedList) {
-			$FoundApps += @(
-				$script:RepoParsedList |
-				Where-Object {
-					$CustomIDs -notcontains $_.ID -and
-					$_.Name -match [regex]::Escape($AppName)
-				} |
-				ForEach-Object {
-					[PSCustomObject]@{
-						Name = $_.Name
-						ID = $_.ID
-					}
-				}
-			)
+		foreach ($RepoApp in $script:RepoParsedList) {
+			if (-not $CustomIDs.ContainsKey([string]$RepoApp.ID) -and $RepoApp.Name -match $NamePattern) {
+				$FoundApps.Add($RepoApp)
+			}
 		}
 		
 		# Поиск в App Store:
@@ -2317,21 +2277,19 @@ function Search-Apps {
 				
 				if ($SearchResult.apps) {
 					foreach ($Item in @($SearchResult.apps)) {
-						$FoundApps += [PSCustomObject]@{
+						$FoundApps.Add([PSCustomObject]@{
 							Name = ConvertTo-Account-AppName -Name ([string]$Item.Name)
 							ID = $Item.ID
-						}
+						})
 					}
 				}
-			}
-			catch {
-			}
+			} catch { }
 		}
 		
 		# Удаление дублей приложений по ID:
-		$FoundApps = @(Remove-Duplicate-IDs -Items $FoundApps)
+		$FoundApps = @(Remove-Duplicate-IDs -Items $FoundApps.ToArray())
 		
-		# Возврат к вводу названия/ID, если ничего не найдено:
+		# Возврат к вводу названия/ID при неудачном поиске:
 		if ($FoundApps.Count -eq 0) {
 			Show-Error "ErrorNoAppsFound"
 			continue
@@ -2360,9 +2318,7 @@ function Search-Apps {
 		$Indices = Read-NumberSelection -PromptKey $PromptKey -MaxCount $FoundApps.Count -HintKey $HintKey
 		
 		# Ввод 0: возврат в главное меню:
-		if ($null -eq $Indices) {
-			return $null
-		}
+		if ($null -eq $Indices) { return $null }
 		
 		$SelectedApps = @()
 		
@@ -2386,7 +2342,6 @@ function Get-Apps-From-List {
 		[string]$ListMode
 	)
 	
-	$TargetFile = "$PurchasedAppsListFilePath"
 	$MenuTitle = Get-Lang 'ListMenuTitle'
 	
 	if ($ListMode -eq "Purchase") {
@@ -2395,6 +2350,8 @@ function Get-Apps-From-List {
 			(Get-Lang 'NotPurchasedAppsListMenu')
 			(Get-Lang 'CustomAppsListMenu')
 		)
+		$PromptKey = 'AskAppNumPurchase'
+		$HintKey = 'BatchHintPurchase'
 	} else {
 		$MenuItems = @(
 			(Get-Lang 'PopularAppsListMenu')
@@ -2403,6 +2360,8 @@ function Get-Apps-From-List {
 			(Get-Lang 'PlaceholderAppsListMenu')
 			(Get-Lang 'CustomAppsListMenu5')
 		)
+		$PromptKey = 'AskAppNumDownload'
+		$HintKey = 'BatchHintDownload'
 	}
 	
 	$MenuText = (@("$MenuTitle $(Get-Lang 'CancelStep')") + $MenuItems) -join "`n"
@@ -2436,11 +2395,11 @@ function Get-Apps-From-List {
 				continue
 			}
 			
-			# Добавление приложения в список приложений, приобретенных скриптом (Files/PurchasedAppsList.json):
-			$SavedIDs = @()
-			if (Test-Path -LiteralPath $TargetFile) {
+			# Чтение ID приложений, приобретенных скриптом на текущем аккаунте:
+			$SavedIDs = @{}
+			if (Test-Path -LiteralPath $PurchasedAppsListFilePath) {
 				try {
-					$HistoryRaw = Get-Content -LiteralPath $TargetFile -Raw -Encoding UTF8 -ErrorAction Stop
+					$HistoryRaw = Get-Content -LiteralPath $PurchasedAppsListFilePath -Raw -Encoding UTF8 -ErrorAction Stop
 					if (![string]::IsNullOrWhiteSpace($HistoryRaw) -and $HistoryRaw.Trim() -ne '{}') {
 						$HistoryRoot = $HistoryRaw | ConvertFrom-Json -ErrorAction Stop
 						$HistoryRecords = @()
@@ -2449,16 +2408,19 @@ function Get-Apps-From-List {
 						} elseif ($HistoryRoot -and $HistoryRoot.psobject.properties.Name -contains $script:CurrentAppleAccount) {
 							$HistoryRecords = @($HistoryRoot."$script:CurrentAppleAccount")
 						}
-						$SavedIDs = @($HistoryRecords | ForEach-Object { [string]$_.AppID } | Where-Object { ![string]::IsNullOrWhiteSpace($_) })
+						foreach ($HistoryRecord in $HistoryRecords) {
+							$SavedID = [string]$HistoryRecord.AppID
+							if (![string]::IsNullOrWhiteSpace($SavedID)) {
+								$SavedIDs[$SavedID] = $true
+							}
+						}
 					}
-				} catch {
-					$SavedIDs = @()
-				}
+				} catch { $SavedIDs = @{} }
 			}
 			
 			$NotPurchasedApps = New-Object System.Collections.Generic.List[object]
 			foreach ($App in $script:RepoParsedList) {
-				if ($App.ID -and $SavedIDs -notcontains [string]$App.ID) {
+				if ($App.ID -and -not $SavedIDs.ContainsKey([string]$App.ID)) {
 					$NotPurchasedApps.Add($App)
 				}
 			}
@@ -2528,14 +2490,12 @@ function Get-Apps-From-List {
 		if ($ShowPurchaseDate) {
 			Out-Table -Data $TableData -Headers (Get-Lang "HeaderNum"), (Get-Lang "HeaderAppName"), (Get-Lang "HeaderAppID"), (Get-Lang "HeaderKind"), (Get-Lang "HeaderPurchaseDate") -Properties "Num", "DisplayName", "ID", "Kind", "PurchaseDate"
 		} elseif ($ShowDeviceApps) {
-			Out-Table -Data $TableData -Headers (Get-Lang "HeaderNum"), (Get-Lang "HeaderAppName"), (Get-Lang "HeaderAppID"), (Get-Lang "HeaderBundleID"), (Get-Lang "HeaderVersion") -Properties "Num", "DisplayName", "ID", "BundleID", "Version"
+			Out-Table -Data $TableData -Headers (Get-Lang "HeaderNum"), (Get-Lang "HeaderAppName"), (Get-Lang "HeaderAppID"), (Get-Lang "HeaderVersion"), (Get-Lang "HeaderBundleID") -Properties "Num", "DisplayName", "ID", "Version", "BundleID"
 		} else {
 			Out-Table -Data $TableData -Headers (Get-Lang "HeaderNum"), (Get-Lang "HeaderAppName"), (Get-Lang "HeaderAppID") -Properties "Num", "DisplayName", "ID"
 		}
 		Separator
 		
-		$PromptKey = if ($ListMode -eq "Purchase") { 'AskAppNumPurchase' } else { 'AskAppNumDownload' }
-		$HintKey = if ($ListMode -eq "Purchase") { 'BatchHintPurchase' } else { 'BatchHintDownload' }
 		$SelectedIndices = Read-NumberSelection -PromptKey $PromptKey -MaxCount $TableData.Count -HintKey $HintKey
 		if ($null -eq $SelectedIndices) { return $null }
 		
@@ -2626,6 +2586,34 @@ function Update-PathFolder {
 	}
 }
 
+# Функция получения списка файлов в папке с ipatool:
+function Get-BinaryFiles {
+	param ([string]$FolderPath)
+	
+	# Чтение папки один раз за запуск:
+	if (-not $script:BinaryFiles.ContainsKey($FolderPath)) {
+		$script:BinaryFiles[$FolderPath] = @(Get-ChildItem -LiteralPath $FolderPath -File -ErrorAction SilentlyContinue)
+	}
+	
+	return $script:BinaryFiles[$FolderPath]
+}
+
+# Функция поиска файла в папке с ipatool по маске имени:
+function Find-BinaryFile {
+	param (
+		[string]$FolderPath,
+		[string]$Mask
+	)
+	
+	foreach ($BinaryFile in @(Get-BinaryFiles -FolderPath $FolderPath)) {
+		if ($BinaryFile.Name -like $Mask) {
+			return $BinaryFile
+		}
+	}
+	
+	return $null
+}
+
 # Функция установки путей к ipatool/ideviceinstaller/idevice_id/ideviceinfo и применения PATH/прав запуска:
 function Set-ipatoolBinaryPaths {
 	param ([string]$FolderPath)
@@ -2633,10 +2621,10 @@ function Set-ipatoolBinaryPaths {
 	# Маска имен файлов:
 	$FileMask = if ($IsWin) { "*.exe" } else { "*" }
 	
-	$ipatoolFile = Get-ChildItem -LiteralPath $FolderPath -Filter "ipatool$FileMask" -File -ErrorAction SilentlyContinue | Select-Object -First 1
-	$ideviceinstallerFile = Get-ChildItem -LiteralPath $FolderPath -Filter "ideviceinstaller$FileMask" -File -ErrorAction SilentlyContinue | Select-Object -First 1
-	$ideviceidFile = Get-ChildItem -LiteralPath $FolderPath -Filter "idevice_id$FileMask" -File -ErrorAction SilentlyContinue | Select-Object -First 1
-	$ideviceinfoFile = Get-ChildItem -LiteralPath $FolderPath -Filter "ideviceinfo$FileMask" -File -ErrorAction SilentlyContinue | Select-Object -First 1
+	$ipatoolFile = Find-BinaryFile -FolderPath $FolderPath -Mask "ipatool$FileMask"
+	$ideviceinstallerFile = Find-BinaryFile -FolderPath $FolderPath -Mask "ideviceinstaller$FileMask"
+	$ideviceidFile = Find-BinaryFile -FolderPath $FolderPath -Mask "idevice_id$FileMask"
+	$ideviceinfoFile = Find-BinaryFile -FolderPath $FolderPath -Mask "ideviceinfo$FileMask"
 	
 	if ($ipatoolFile) { $script:ipatoolFilePath = $ipatoolFile.FullName }
 	if ($ideviceinstallerFile) { $script:ideviceinstallerFilePath = $ideviceinstallerFile.FullName }
@@ -2688,8 +2676,7 @@ function Get-MissingBinaryFiles {
 	)
 	
 	foreach ($Pattern in $RequiredPatterns) {
-		$Found = Get-ChildItem -LiteralPath $FolderPath -Filter $Pattern -File -ErrorAction SilentlyContinue
-		if (-not $Found) {
+		if (-not (Find-BinaryFile -FolderPath $FolderPath -Mask $Pattern)) {
 			$MissingFiles += $Pattern
 		}
 	}
@@ -2711,9 +2698,7 @@ function ConvertTo-iOSVersion {
 
 # Функция получения аргументов idevice_id, ideviceinfo и ideviceinstaller для работы с устройствами по Wi-Fi:
 function Get-AirArgs {
-	if ($script:AirEnabled) {
-		return @("-n")
-	}
+	if ($script:AirEnabled) { return @("-n") }
 	
 	return @()
 }
@@ -2767,6 +2752,13 @@ function Get-ConnectedDevices {
 	}
 	
 	return $Devices
+}
+
+# Функция вывода таблицы подключенных устройств:
+function Show-DevicesTable {
+	param ([array]$Devices)
+	
+	Out-Table -Data $Devices -Headers (Get-Lang "HeaderNum"), (Get-Lang "HeaderDeviceName"), (Get-Lang "HeaderDeviceiOS"), (Get-Lang "HeaderUDID"), (Get-Lang "HeaderKind") -Properties "Num", "Name", "iOSVersion", "DisplayUDID", "Connection"
 }
 
 # Функция чтения целого числа из массива байт:
@@ -2835,9 +2827,7 @@ function Get-ItunesItemId {
 	# XML plist:
 	if ([System.Text.Encoding]::ASCII.GetString($Bytes, 0, 8) -ne "bplist00") {
 		$Text = [System.Text.Encoding]::UTF8.GetString($Bytes)
-		if ($Text -match '<key>itemId</key>\s*<integer>(\d+)</integer>') {
-			return $Matches[1]
-		}
+		if ($Text -match '<key>itemId</key>\s*<integer>(\d+)</integer>') { return $Matches[1] }
 		
 		return $null
 	}
@@ -2892,9 +2882,7 @@ function Get-ItunesItemId {
 				return $null
 			}
 		}
-	} catch {
-		return $null
-	}
+	} catch { return $null }
 	
 	return $null
 }
@@ -3035,8 +3023,7 @@ function Get-BplistStringValues {
 				$Values[$KeyName] = $Text
 			}
 		}
-	} catch {
-	}
+	} catch { }
 	
 	return $Values
 }
@@ -3066,11 +3053,8 @@ function Invoke-ideviceinstallerCapture {
 		
 		if ($Process.ExitCode -ne 0) { return $null }
 		return $Output
-	} catch {
-		return $null
-	} finally {
-		if ($null -ne $Process) { $Process.Dispose() }
-	}
+	} catch { return $null }
+	finally { if ($null -ne $Process) { $Process.Dispose() } }
 }
 
 # Функция чтения списка приложений, установленных на устройстве:
@@ -3083,17 +3067,13 @@ function Read-DeviceApps {
 	# Запрос Bundle ID, версии, названия, признака сгруженного приложения и iTunesMetadata:
 	$InstallerArgs = $NetworkArgs + @("--udid", $Device.UDID, "list", "--user", "--placeholders", "--xml", "--attribute", "CFBundleIdentifier", "--attribute", "CFBundleShortVersionString", "--attribute", "CFBundleVersion", "--attribute", "CFBundleDisplayName", "--attribute", "IsPlaceholder", "--attribute", "iTunesMetadata")
 	$XmlOutput = Invoke-ideviceinstallerCapture -Arguments $InstallerArgs
-	if ([string]::IsNullOrWhiteSpace($XmlOutput)) {
-		return $ErrorResult
-	}
+	if ([string]::IsNullOrWhiteSpace($XmlOutput)) { return $ErrorResult }
 	
 	try {
 		$Xml = New-Object System.Xml.XmlDocument
 		$Xml.XmlResolver = $null
 		$Xml.LoadXml($XmlOutput)
-	} catch {
-		return $ErrorResult
-	}
+	} catch { return $ErrorResult }
 	
 	$Apps = New-Object System.Collections.Generic.List[object]
 	foreach ($AppNode in $Xml.SelectNodes("/plist/array/dict")) {
@@ -3134,9 +3114,7 @@ function Read-DeviceApps {
 				try {
 					$MetadataBytes = [System.Convert]::FromBase64String(($MetadataNode.InnerText -replace '\s', ''))
 					$ItemID = Get-ItunesItemId -Bytes $MetadataBytes
-				} catch {
-					$ItemID = $null
-				}
+				} catch { $ItemID = $null }
 			} elseif ($MetadataNode.LocalName -eq "dict") {
 				$ItemNode = $MetadataNode.SelectSingleNode("./key[normalize-space(.)='itemId']/following-sibling::*[1]")
 				if ($null -ne $ItemNode) { $ItemID = $ItemNode.InnerText.Trim() }
@@ -3177,7 +3155,7 @@ function Get-DeviceApps {
 	
 	# Выбор устройства:
 	Separator
-	Out-Table -Data $Devices -Headers (Get-Lang "HeaderNum"), (Get-Lang "HeaderDeviceName"), (Get-Lang "HeaderDeviceiOS"), (Get-Lang "HeaderUDID"), (Get-Lang "HeaderKind") -Properties "Num", "Name", "iOSVersion", "DisplayUDID", "Connection"
+	Show-DevicesTable -Devices $Devices
 	Separator
 	
 	while ($true) {
@@ -3228,7 +3206,7 @@ function Install-Apps {
 		
 		# Выбор устройств для установки:
 		Separator
-		Out-Table -Data $Devices -Headers (Get-Lang "HeaderNum"), (Get-Lang "HeaderDeviceName"), (Get-Lang "HeaderDeviceiOS"), (Get-Lang "HeaderUDID"), (Get-Lang "HeaderKind") -Properties "Num", "Name", "iOSVersion", "DisplayUDID", "Connection"
+		Show-DevicesTable -Devices $Devices
 		Separator
 		
 		$SelectedDeviceIndices = Read-NumberSelection -PromptKey 'AskDeviceNum' -MaxCount $Devices.Count -HintKey 'BatchHintInstallDevices'
@@ -3324,9 +3302,7 @@ function Open-Url {
 			Start-Process -FilePath "xdg-open" -ArgumentList $Url -ErrorAction Stop
 		}
 		return $true
-	} catch {
-		return $false
-	}
+	} catch { return $false }
 }
 
 # Функция проверки обновлений:
@@ -3338,9 +3314,7 @@ function Check-Update {
 		if ($null -ne $ReleaseBytes) {
 			try {
 				$LatestRelease = [System.Text.Encoding]::UTF8.GetString($ReleaseBytes) | ConvertFrom-Json
-			} catch {
-				$LatestRelease = $null
-			}
+			} catch { $LatestRelease = $null }
 		}
 		
 		if (-not ($LatestRelease -and $LatestRelease.tag_name)) {
@@ -3356,7 +3330,7 @@ function Check-Update {
 		# Проверка переменных:
 		if (![string]::IsNullOrEmpty($LatestVersion) -and ![string]::IsNullOrEmpty($CurrentVersion)) {
 			
-			# Вывод информации об обновлении, если числовая версия больше:
+			# Вывод информации об обновлении:
 			if ([version]$LatestVersion -gt [version]$CurrentVersion) {
 				$UpdateFound = $true
 			}
@@ -3385,9 +3359,7 @@ $(Get-Lang 'Menu2No')`n
 				exit
 			}
 		}
-	} catch {
-		Show-Error "ErrorUpdateCheck"
-	}
+	} catch { Show-Error "ErrorUpdateCheck" }
 }
 
 # Функция вывода баннера с текущим режимом работы и версией скрипта:
@@ -3401,7 +3373,7 @@ function Show-ModeBanner {
 			Split-Path -Leaf $script:ipatoolFilePath
 		} else {
 			$Filter = if ($IsWin) { "ipatool*.exe" } else { "ipatool*" }
-			$FoundFile = Get-ChildItem -LiteralPath $script:BinaryFolderPath -Filter $Filter -File -ErrorAction SilentlyContinue | Select-Object -First 1
+			$FoundFile = Find-BinaryFile -FolderPath $script:BinaryFolderPath -Mask $Filter
 			if ($FoundFile) { $FoundFile.Name } else { "ipatool" }
 		}
 		
@@ -3410,7 +3382,7 @@ function Show-ModeBanner {
 	
 	Show-SystemInfo
 	
-	# Вывод сообщений о включенных режимах отладки и подключения к устройству по Wi-Fi:
+	# Вывод сообщений о включенных режимах разработчика и подключения к устройству по Wi-Fi:
 	if ($script:IsDebugEnabled -or $script:AirEnabled) {
 		Separator
 		
@@ -3448,7 +3420,7 @@ function Switch-Language {
 	Write-Host (Get-Lang "LanguageChanged")
 }
 
-# Функция включения/отключения режима отладки:
+# Функция включения/отключения режима разработчика:
 function Switch-DebugMode {
 	$script:IsDebugEnabled = -not $script:IsDebugEnabled
 	Set-Setting -Key "DebugEnabled" -Value $script:IsDebugEnabled
@@ -3554,51 +3526,38 @@ $(Get-Lang 'InstallerMenu1')
 $(Get-Lang 'InstallerMenu2')
 $(Get-Lang 'InstallerMenu3')
 $(Get-Lang 'InstallerMenu4')
-$(Get-Lang 'InstallerMenu5')`n
+$(Get-Lang 'InstallerMenu5')
+$(Get-Lang 'InstallerMenu6')`n
 "@
 		$SwitchValue = Read-Host $Installer_Menu
 		switch ($SwitchValue) {
 			
 			# 1. Проверка минимальной версии iOS для приложений в папке Apps:
-			"1" {
-				$null = Get-iOS-MinVersion
-			}
+			"1" { $null = Get-iOS-MinVersion }
 			
 			# 2. Установка приложений из папки Apps:
-			"2" {
-				Install-Apps
-			}
+			"2" { Install-Apps }
 			
-			# 3. Банка для чаевых:
-			"3" {
-				Open-TipJar
-			}
+			# 3. Включить/отключить режим разработчика:
+			"3" { Switch-DebugMode }
 			
-			# 4. Сменить язык (Change Language):
-			"4" {
-				Switch-Language
-			}
+			# 4. Банка для чаевых:
+			"4" { Open-TipJar }
 			
-			# 5. Перейти в режим IPA_Downloader (загрузка и установка приложений):
-			"5" {
+			# 5. Сменить язык (Change Language):
+			"5" { Switch-Language }
+			
+			# 6. Перейти в режим IPA_Downloader (загрузка и установка приложений):
+			"6" {
 				$script:WorkMode = "Downloader"
 				return
 			}
 			
-			# Режим отладки:
-			"debug" {
-				Switch-DebugMode
-			}
-			
 			# Подключение к устройству по Wi-Fi:
-			"air" {
-				Switch-AirMode
-			}
+			"air" { Switch-AirMode }
 			
 			# Неверный ввод:
-			default {
-				Show-Error "ErrorInvalidInput"
-			}
+			default { Show-Error "ErrorInvalidInput" }
 		}
 	}
 }
@@ -3615,9 +3574,7 @@ function Test-ProxyReachable {
 		
 		# Ожидание подключения:
 		$Connect = $Client.BeginConnect($ProxyUri.Host, $Port, $null, $null)
-		if (-not $Connect.AsyncWaitHandle.WaitOne(1000)) {
-			return $false
-		}
+		if (-not $Connect.AsyncWaitHandle.WaitOne(1000)) { return $false }
 		
 		# Завершение подключения:
 		$Client.EndConnect($Connect)
@@ -3633,9 +3590,7 @@ function Test-ProxyReachable {
 function Get-SystemProxyUrl {
 	# Прокси-сервер в переменных окружения:
 	foreach ($Name in @("HTTPS_PROXY", "https_proxy", "ALL_PROXY", "all_proxy")) {
-		if (![string]::IsNullOrWhiteSpace([Environment]::GetEnvironmentVariable($Name))) {
-			return $null
-		}
+		if (![string]::IsNullOrWhiteSpace([Environment]::GetEnvironmentVariable($Name))) { return $null }
 	}
 	
 	# Адрес Apple, для которого определяется необходимость использования прокси-сервера:
@@ -3651,9 +3606,7 @@ function Get-SystemProxyUrl {
 			$Scheme = if ($ProxyUri.Scheme -like "socks*") { "socks5h" } else { $ProxyUri.Scheme }
 			$ProxyUrl = "${Scheme}://$($ProxyUri.Authority)"
 		}
-	} catch {
-		$ProxyUrl = $null
-	}
+	} catch { $ProxyUrl = $null }
 	
 	# SOCKS-прокси:
 	if (-not $ProxyUrl -and $IsWin) {
@@ -3669,15 +3622,11 @@ function Get-SystemProxyUrl {
 					$ProxyUrl = "socks5h://$SocksServer"
 				}
 			}
-		} catch {
-			$ProxyUrl = $null
-		}
+		} catch { $ProxyUrl = $null }
 	}
 	
 	# Использование прокси-сервера при его доступности:
-	if ($ProxyUrl -and (Test-ProxyReachable $ProxyUrl)) {
-		return $ProxyUrl
-	}
+	if ($ProxyUrl -and (Test-ProxyReachable $ProxyUrl)) { return $ProxyUrl }
 	
 	return $null
 }
@@ -3686,12 +3635,12 @@ function Get-SystemProxyUrl {
 function Invoke-ipatool {
 	$ipatoolArgs = @($args)
 	
-	# Добавление параметра --keychain-passphrase, если $script:KeychainEnabled = $true:
+	# Добавление параметра --keychain-passphrase при $script:KeychainEnabled = $true:
 	if ($script:KeychainEnabled) {
 		$ipatoolArgs += "--keychain-passphrase", $script:Kp
 	}
 	
-	# Добавление флага --debug при включении режима отладки:
+	# Добавление флага --debug при включении режима разработчика:
 	if ($script:IsDebugEnabled) {
 		$ipatoolArgs += "--debug"
 	}
@@ -3732,8 +3681,8 @@ function Invoke-ipatool {
 	}
 }
 
-# Функция режима IPA_Downloader:
-function Invoke-DownloaderMode {
+# Функция инициализации keychain-passphrase:
+function Initialize-KeychainPassphrase {
 	# Инициализация keychain-passphrase на Windows при $script:KeychainEnabled = $true:
 	if ($IsWin -and $script:KeychainEnabled) {
 		$KeychainFilePath = Join-Path -Path $ipatoolHomePath -ChildPath "keychain-passphrase"
@@ -3755,7 +3704,10 @@ function Invoke-DownloaderMode {
 	if (!$script:KeychainEnabled) {
 		Remove-Item -LiteralPath (Join-Path -Path $ipatoolHomePath -ChildPath "keychain-passphrase") -Force -ErrorAction SilentlyContinue
 	}
-	
+}
+
+# Функция проверки авторизации при запуске:
+function Confirm-AppleAuthAtStartup {
 	# Проверка осуществленного входа с аккаунтом Apple:
 	if (Test-Path -LiteralPath "$LoginFilePath") {
 		Get-Current-AppleAccount
@@ -3768,66 +3720,152 @@ function Invoke-DownloaderMode {
 	
 	# Выбор сохраненных аккаунтов при отсутствии файла login в папке .ipatool:
 	if (!(Test-Path -LiteralPath "$LoginFilePath") -and @(Get-SavedAppleAccounts).Count -gt 0) {
-		Restore-SavedAppleAccountAtStartup | Out-Null
+		Restore-SavedAppleAccountAtStartup
 	}
-	
-	# Вход в аккаунт Apple:
-	if (!(Test-Path -LiteralPath "$LoginFilePath")) {
-		while (!(Test-Path -LiteralPath "$LoginFilePath")) {
-			# Удаление файлов авторизации:
-			Clear-ActiveAccountFiles
-			
-			# Вывод меню:
-			Separator
-			$LoginMenu = @"
+}
+
+# Функция меню входа в аккаунт Apple:
+function Invoke-LoginMenu {
+	while (!(Test-Path -LiteralPath "$LoginFilePath")) {
+		# Удаление файлов авторизации:
+		Clear-ActiveAccountFiles
+		
+		# Вывод меню:
+		Separator
+		$LoginMenu = @"
 $(Get-Lang 'MenuTitle')
 $(Get-Lang 'LoginMenu1')
 $(Get-Lang 'LoginMenu2')
-$(Get-Lang 'LoginMenu3')`n
+$(Get-Lang 'LoginMenu3')
+$(Get-Lang 'LoginMenu4')
+$(Get-Lang 'LoginMenu5')`n
 "@
-			$LoginChoice = Read-Host $LoginMenu
-			switch ($LoginChoice) {
-				# 1. Войти в аккаунт Apple:
-				"1" {
-					Connect-AppleAccount
-				}
-				
-				# 2. Перейти в режим IPA_Installer (только установка приложений):
-				"2" {
-					$script:WorkMode = "Installer"
-					Set-Setting -Key "Mode" -Value "Installer"
-					return
-				}
-				
-				# 3. Сменить язык (Change Language):
-				"3" {
-					Switch-Language
-				}
-				
-				# Режим отладки:
-				"debug" {
-					Switch-DebugMode
-				}
-				
-				# Подключение к устройству по Wi-Fi:
-				"air" {
-					Switch-AirMode
-				}
-				
-				# Неверный ввод:
-				default {
-					Show-Error "ErrorInvalidInput"
-				}
+		$LoginChoice = Read-Host $LoginMenu
+		switch ($LoginChoice) {
+			# 1. Войти в аккаунт Apple:
+			"1" { Connect-AppleAccount }
+			
+			# 2. Перейти в режим IPA_Installer (только установка приложений):
+			"2" {
+				$script:WorkMode = "Installer"
+				Set-Setting -Key "Mode" -Value "Installer"
+				return
 			}
+			
+			# 3. Включить/отключить режим разработчика:
+			"3" { Switch-DebugMode }
+			
+			# 4. Банка для чаевых:
+			"4" { Open-TipJar }
+			
+			# 5. Сменить язык (Change Language):
+			"5" { Switch-Language }
+			
+			# Подключение к устройству по Wi-Fi:
+			"air" { Switch-AirMode }
+			
+			# Неверный ввод:
+			default { Show-Error "ErrorInvalidInput" }
 		}
 	}
+}
+
+# Функция очистки списка приложений, приобретенных скриптом:
+function Clear-PurchasedAppsList {
+	if (!(Test-Path -LiteralPath "$PurchasedAppsListFilePath")) {
+		Show-Error "ErrorPurchasedAppsListEmpty"
+		return
+	}
 	
-	# Сохранение настроек режима IPA_Downloader после успешной авторизации с аккаунтом Apple:
-	Set-Setting -Key "Language" -Value $script:CurrentLang
-	Set-Setting -Key "Mode" -Value "Downloader"
-	Set-Setting -Key "KeychainEnabled" -Value $script:KeychainEnabled
+	$RawData = Get-Content -LiteralPath "$PurchasedAppsListFilePath" -Raw -Encoding UTF8
 	
-	# Основной цикл:
+	# Очистка пустого файла:
+	if ([string]::IsNullOrWhiteSpace($RawData) -or $RawData.Trim() -eq '{}') {
+		Remove-Item -LiteralPath "$PurchasedAppsListFilePath" -Force -ErrorAction SilentlyContinue
+		Show-Error "ErrorPurchasedAppsListEmpty"
+		return
+	}
+	
+	$Data = $RawData | ConvertFrom-Json
+	
+	# Очистка файла старого формата или файла без аккаунтов:
+	if ($Data -isnot [System.Management.Automation.PSCustomObject] -or $Data.psobject.properties.Count -eq 0) {
+		Remove-Item -LiteralPath "$PurchasedAppsListFilePath" -Force -ErrorAction SilentlyContinue
+		Separator
+		Write-Host (Get-Lang "PurchasedAppsListCleared")
+		return
+	}
+	
+	# Формирование динамического меню аккаунтов:
+	$Accounts = @($Data.psobject.properties.Name)
+	$AccountMenuText = "$(Get-Lang 'ClearAccountMenuTitle') $(Get-Lang 'CancelStep')`n"
+	$Counter = 1
+	foreach ($Account in $Accounts) {
+		$AccountMenuText += "$Counter. $Account`n"
+		$Counter++
+	}
+	$AccountMenuText += "$Counter. $(Get-Lang 'ClearAllAccounts')`n"
+	
+	Separator
+	$AccountChoice = Read-MenuChoice -MenuText $AccountMenuText -OptionsCount $Counter -AllowCancel
+	if ($AccountChoice -eq '0') { return }
+	
+	if ([int]$AccountChoice -eq $Counter) {
+		# Очистка данных всех аккаунтов:
+		Remove-Item -LiteralPath "$PurchasedAppsListFilePath" -Force -ErrorAction SilentlyContinue
+		Separator
+		Write-Host (Get-Lang "PurchasedAppsListCleared")
+	} else {
+		# Удаление данных выбранного аккаунта:
+		$SelectedAccount = $Accounts[[int]$AccountChoice - 1]
+		
+		# Удаление файла при отсутствии аккаунтов:
+		if ($Accounts.Count -le 1) {
+			Remove-Item -LiteralPath "$PurchasedAppsListFilePath" -Force -ErrorAction SilentlyContinue
+		} else {
+			$Data.psobject.properties.Remove($SelectedAccount)
+			$Data | ConvertTo-Json -Depth 5 | Set-Content -LiteralPath "$PurchasedAppsListFilePath" -Encoding UTF8
+		}
+		Separator
+		Write-Host ((Get-Lang "AccountCleared") -f $SelectedAccount)
+	}
+}
+
+# Функция очистки приложений в папке Apps:
+function Clear-AppsFolder {
+	$ipaFilesToRemove = Get-ChildItem -LiteralPath $AppsFolderPath -Filter "*.ipa" -File -ErrorAction SilentlyContinue
+	if ($ipaFilesToRemove) {
+		$ipaFilesToRemove | Remove-Item -Force -ErrorAction SilentlyContinue
+		Separator
+		Write-Host (Get-Lang "AppsCleared")
+	} else {
+		Show-Error "ErrorNoApps"
+	}
+}
+
+# Функция меню очистки данных скрипта:
+function Invoke-ClearMenu {
+	Separator
+	$ClearMenu = @"
+$(Get-Lang 'ClearMenuTitle') $(Get-Lang 'CancelStep')
+$(Get-Lang 'ClearMenu1')
+$(Get-Lang 'ClearMenu2')`n
+"@
+	$ClearChoice = Read-MenuChoice -MenuText $ClearMenu -OptionsCount 2 -AllowCancel
+	
+	switch ($ClearChoice) {
+		"1" {
+			Clear-PurchasedAppsList
+		}
+		
+		"2" {
+			Clear-AppsFolder
+		}
+	}
+}
+
+# Функция меню IPA_Downloader:
+function Invoke-DownloaderMenu {
 	while (Test-Path -LiteralPath "$LoginFilePath") {
 		# Вывод данных текущего аккаунта Apple:
 		Separator
@@ -3850,176 +3888,96 @@ $(Get-Lang 'DownloaderMenu8')
 $(Get-Lang 'DownloaderMenu9')
 $(Get-Lang 'DownloaderMenu10')
 $(Get-Lang 'DownloaderMenu11')
-$(Get-Lang 'DownloaderMenu12')`n
+$(Get-Lang 'DownloaderMenu12')
+$(Get-Lang 'DownloaderMenu13')`n
 "@
 	
 		$SwitchValue = Read-Host $MainMenu
 		switch ($SwitchValue) {
 			
 			# 1. Поиск приложений по названию или ID и покупка (без загрузки):
-			"1" {
-				Invoke-AccountsBatch -Apps (Search-Apps -PromptKey 'AskAppNumPurchase') -Action "Purchase"
-			}
+			"1" { Invoke-AccountsBatch -Apps (Search-Apps -PromptKey 'AskAppNumPurchase') -Action "Purchase" }
 			
 			# 2. Поиск приложений по названию или ID и загрузка последней версии:
-			"2" {
-				Invoke-AccountsBatch -Apps (Search-Apps -PromptKey 'AskAppNumDownload') -Action "Download"
-			}
+			"2" { Invoke-AccountsBatch -Apps (Search-Apps -PromptKey 'AskAppNumDownload') -Action "Download" }
 			
 			# 3. Поиск приложений по названию или ID и загрузка (с выбором версии):
-			"3" {
-				Invoke-AppsBatch -Apps (Search-Apps -PromptKey 'AskAppNumDownload') -Action "DownloadVersion"
-			}
+			"3" { Invoke-AppsBatch -Apps (Search-Apps -PromptKey 'AskAppNumDownload') -Action "DownloadVersion" }
 			
-			# 4. Выбор списка приложений и покупка (без загрузки):
+			# 4. Выбор готового списка приложений и покупка (без загрузки):
 			"4" {
 				Separator
 				Invoke-AccountsBatch -Apps (Get-Apps-From-List -ListMode "Purchase") -Action "Purchase"
 			}
 			
-			# 5. Выбор списка приложений и загрузка последней версии:
+			# 5. Выбор готового списка приложений и загрузка последней версии:
 			"5" {
 				Separator
 				Invoke-AccountsBatch -Apps (Get-Apps-From-List -ListMode "Download") -Action "Download"
 			}
 			
-			# 6. Выбор списка приложений и загрузка (с выбором версии):
+			# 6. Выбор готового списка приложений и загрузка (с выбором версии):
 			"6" {
 				Separator
 				Invoke-AppsBatch -Apps (Get-Apps-From-List -ListMode "Download") -Action "DownloadVersion"
 			}
 			
 			# 7. Проверка минимальной версии iOS для приложений в папке Apps:
-			"7" {
-				$null = Get-iOS-MinVersion
-			}
+			"7" { $null = Get-iOS-MinVersion }
 			
 			# 8. Установка приложений из папки Apps:
-			"8" {
-				Install-Apps
-			}
+			"8" { Install-Apps }
 			
-			# 9. Очистка данных скрипта:
-			"9" {
-				Separator
-				$ClearMenu = @"
-$(Get-Lang 'ClearMenuTitle') $(Get-Lang 'CancelStep')
-$(Get-Lang 'ClearMenu1')
-$(Get-Lang 'ClearMenu2')`n
-"@
-				$ClearChoice = Read-MenuChoice -MenuText $ClearMenu -OptionsCount 2 -AllowCancel
-				
-				if ($ClearChoice -eq '0') { continue }
-				
-				switch ($ClearChoice) {
-					"1" {
-						if (!(Test-Path -LiteralPath "$PurchasedAppsListFilePath")) {
-							Show-Error "ErrorPurchasedAppsListEmpty"
-						} else {
-							$RawData = Get-Content -LiteralPath "$PurchasedAppsListFilePath" -Raw -Encoding UTF8
-							
-							# Очистка, если файл пуст или содержит пустые скобки {}:
-							if ([string]::IsNullOrWhiteSpace($RawData) -or $RawData.Trim() -eq '{}') {
-								Remove-Item -LiteralPath "$PurchasedAppsListFilePath" -Force -ErrorAction SilentlyContinue
-								Show-Error "ErrorPurchasedAppsListEmpty"
-								continue
-							}
-							
-							$Data = $RawData | ConvertFrom-Json
-							
-							# Очистка, если файл старого формата или без свойств:
-							if ($Data -isnot [System.Management.Automation.PSCustomObject] -or $Data.psobject.properties.Count -eq 0) {
-								Remove-Item -LiteralPath "$PurchasedAppsListFilePath" -Force -ErrorAction SilentlyContinue
-								Separator
-								Write-Host (Get-Lang "PurchasedAppsListCleared")
-								continue
-							}
-							
-							# Формирование динамического меню аккаунтов:
-							$Accounts = @($Data.psobject.properties.Name)
-							$AccountMenuText = "$(Get-Lang 'ClearAccountMenuTitle') $(Get-Lang 'CancelStep')`n"
-							$Counter = 1
-							foreach ($Account in $Accounts) {
-								$AccountMenuText += "$Counter. $Account`n"
-								$Counter++
-							}
-							$AccountMenuText += "$Counter. $(Get-Lang 'ClearAllAccounts')`n"
-							
-							Separator
-							$AccountChoice = Read-MenuChoice -MenuText $AccountMenuText -OptionsCount $Counter -AllowCancel
-							if ($AccountChoice -eq '0') { continue }
-							
-							if ([int]$AccountChoice -eq $Counter) {
-								# Очистка, если выбрано "Все аккаунты":
-								Remove-Item -LiteralPath "$PurchasedAppsListFilePath" -Force -ErrorAction SilentlyContinue
-								Separator
-								Write-Host (Get-Lang "PurchasedAppsListCleared")
-							} else {
-								# Удаление данных выбранного аккаунта:
-								$SelectedAccount = $Accounts[[int]$AccountChoice - 1]
-								
-								# Удаление файла, если в файле отсутствуют аккаунты:
-								if ($Accounts.Count -le 1) {
-									Remove-Item -LiteralPath "$PurchasedAppsListFilePath" -Force -ErrorAction SilentlyContinue
-								} else {
-									$Data.psobject.properties.Remove($SelectedAccount)
-									$Data | ConvertTo-Json -Depth 5 | Set-Content -LiteralPath "$PurchasedAppsListFilePath" -Encoding UTF8
-								}
-								Separator
-								Write-Host ((Get-Lang "AccountCleared") -f $SelectedAccount)
-							}
-						}
-					}
-					
-					"2" {
-						$ipaFilesToRemove = Get-ChildItem -LiteralPath $AppsFolderPath -Filter "*.ipa" -File -ErrorAction SilentlyContinue
-						if ($ipaFilesToRemove) {
-							$ipaFilesToRemove | Remove-Item -Force -ErrorAction SilentlyContinue
-							Separator
-							Write-Host (Get-Lang "AppsCleared")
-						} else {
-							Show-Error "ErrorNoApps"
-						}
-					}
-				}
-			}
+			# 9. Очистка данных:
+			"9" { Invoke-ClearMenu }
 			
 			# 10. Операции с аккаунтом Apple:
 			"10" {
 				Invoke-AccountMenu
 				
 				# Выход из всех аккаунтов:
-				if ($null -eq $script:WorkMode) {
-					return
-				}
+				if ($null -eq $script:WorkMode) { return }
 			}
 			
-			# 11. Банка для чаевых:
-			"11" {
-				Open-TipJar
-			}
+			# 11. Включить/отключить режим разработчика:
+			"11" { Switch-DebugMode }
 			
-			# 12. Сменить язык (Change Language):
-			"12" {
-				Switch-Language
-			}
+			# 12. Банка для чаевых:
+			"12" { Open-TipJar }
 			
-			# Режим отладки:
-			"debug" {
-				Switch-DebugMode
-			}
+			# 13. Сменить язык (Change Language):
+			"13" { Switch-Language }
 			
 			# Подключение к устройству по Wi-Fi:
-			"air" {
-				Switch-AirMode
-			}
+			"air" { Switch-AirMode }
 			
 			# Неверный ввод:
-			default {
-				Show-Error "ErrorInvalidInput"
-			}
+			default { Show-Error "ErrorInvalidInput" }
 		}
 	}
+}
+
+# Функция режима IPA_Downloader:
+function Invoke-DownloaderMode {
+	# Инициализация keychain-passphrase:
+	Initialize-KeychainPassphrase
+	
+	# Проверка авторизации:
+	Confirm-AppleAuthAtStartup
+	
+	# Вход в аккаунт Apple:
+	Invoke-LoginMenu
+	
+	# Выход из режима IPA_Downloader при переходе в режим IPA_Installer:
+	if ($script:WorkMode -eq "Installer") { return }
+	
+	# Сохранение настроек режима IPA_Downloader после успешной авторизации с аккаунтом Apple:
+	Set-Setting -Key "Language" -Value $script:CurrentLang
+	Set-Setting -Key "Mode" -Value "Downloader"
+	Set-Setting -Key "KeychainEnabled" -Value $script:KeychainEnabled
+	
+	# Основной цикл:
+	Invoke-DownloaderMenu
 }
 
 # Главный рабочий цикл:
