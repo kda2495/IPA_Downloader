@@ -354,53 +354,56 @@ A script for downloading apps previously purchased in the App Store, including d
 * Drag the file `Start_IPA_Downloader_macOS.command` into the Terminal
 * Press Enter and run the script again
 
-**4. Two-factor authentication (2FA) code not received or Login error: Did you forget your password?:**
+**4. The "Start_IPA_Downloader_macOS.command" app is damaged and can’t be opened. You should move it to the Trash (macOS):**
+* Two-finger click on the trackpad (or right-click with a mouse) the `Start_IPA_Downloader_macOS.command` file and select `Open` from the context menu
+
+**5. Two-factor authentication (2FA) code not received or Login error: Did you forget your password?:**
 * The password was entered incorrectly
 * Try signing in to [icloud.com](https://icloud.com) website using Apple account
 
-**5. Login error: failed to initialize SAP signer: curl: Timeout was reached:**
+**6. Login error: failed to initialize SAP signer: curl: Timeout was reached:**
 * Failed to connect to SAP, check your internet connection
 
-**6. Error: account is disabled:**
+**7. Error: account is disabled:**
 * Apple account is temporarily locked by Apple (usually due to multiple attempts to enter incorrect password or 2FA code)
 * Account needs to be unlocked via the device or on the [icloud.com](https://icloud.com) website
 
-**7. Not logged in**
+**8. Not logged in**
 * Tools based on ipatool-go were previously used
 * In the script, you need to log out of your Apple account and log in again
 
-**8. Download error: invalid response: empty songList:**
+**9. Download error: invalid response: empty songList:**
 * Re-log in to the script using Apple account
 
-**9. Download error: HTTP request failed: Couldn't resolve host name:**
+**10. Download error: HTTP request failed: Couldn't resolve host name:**
 * Failed to connect to Apple servers, check your internet connection
 
-**10. Download error: HTTP request failed: Timeout was reached:**
+**11. Download error: HTTP request failed: Timeout was reached:**
 * Failed to connect to Apple servers, check your internet connection
 
-**11. Download failed after retries: Failure when receiving data from the peer:**
+**12. Download failed after retries: Failure when receiving data from the peer:**
 * Failed to connect to Apple servers, check your internet connection
 * Or re-log in to the script using Apple account
 
-**12. Error: license is required:**
+**13. Error: license is required:**
 * The app was not previously purchased on this Apple account
 
-**13. Purchase error: app not found:**
+**14. Purchase error: app not found:**
 * App purchase failed because the app has been removed from the App Store
 
-**14. Purchase error: item is temporarily unavailable:**
+**15. Purchase error: item is temporarily unavailable:**
 * The app was not previously purchased on this Apple account
 * The purchase failed because the app has been removed from the App Store
 
-**15. Error: This Apple Account is temporarily unable to be used in the iTunes Store because it could not be found. Try again later:**
+**16. Error: This Apple Account is temporarily unable to be used in the iTunes Store because it could not be found. Try again later:**
 * Make any free purchase in the App Store
 
-**16. Error: No connected devices found.`nConnect a device and trust this computer:**
+**17. Error: No connected devices found.`nConnect a device and trust this computer:**
 * Connect the device and tap `Trust` when the `Trust This Computer?` prompt appears
 * Make sure the AppleMobileDeviceSupport64 driver is installed
 * Reinstall/install iTunes/Apple Devices or AppleMobileDeviceSupport64
 
-**17. Could not connect to lockdownd:**
+**18. Could not connect to lockdownd:**
 * Issues with connecting to an Apple device
 * Uninstall iTunes/Apple Devices and AppleMobileDeviceSupport64, then delete the folders listed below and reinstall iTunes/Apple Devices or AppleMobileDeviceSupport64
 ```
@@ -412,13 +415,13 @@ C:\Users\%username%\AppData\Roaming\Apple Computer\
 ```
 * Connect the device and tap `Trust` when the `Trust This Computer?` prompt appears
 
-**18. WARNING: could not locate Payload/App.app/SC_Info/App.sinf in archive:**
+**19. WARNING: could not locate Payload/App.app/SC_Info/App.sinf in archive:**
 * App signature not found in the installed .ipa file
 
-**19. ERROR: Install failed. Got error "APIInternalError" with code 0x00000000: Error Domain=IXErrorDomain Code=46:**
+**20. ERROR: Install failed. Got error "APIInternalError" with code 0x00000000: Error Domain=IXErrorDomain Code=46:**
 * Remove the app from the device, restart the device, and try installing the app again
 
-**20. The app immediately closes when launched after installation:**
+**21. The app immediately closes when launched after installation:**
 * Log in to the App Store using the account from which the app was downloaded, and install any free app
 * After that, launch the problematic app again
 

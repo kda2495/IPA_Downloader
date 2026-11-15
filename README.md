@@ -345,7 +345,7 @@
 **1. command not found: pwsh:**
 * PowerShell (pwsh) не установлен
 
-**2. Обработка `-File ./IPA_Downloader.ps1` завершилась сбоем: Access to the path is denied (macOS):**
+**2. Обработка -File ./IPA_Downloader.ps1 завершилась сбоем: Access to the path is denied (macOS):**
 * Включите Терминалу доступ по пути: `Системные настройки - Конфиденциальность и безопасность - Доступ к диску`
 
 **3. zsh: operation not permitted (macOS):**
@@ -353,53 +353,56 @@
 * Перетащите файл `Start_IPA_Downloader_macOS.command` на Терминал
 * Нажмите Enter и запустите скрипт заново
 
-**4. Не приходит код двухфакторной аутентификации (2FA) или Login error: Did you forget your password?:**
+**4. Приложение "Start_IPA_Downloader_macOS.command" повреждено, и его не удается открыть. Переместите приложение в Корзину (macOS):**
+* Нажмите двумя пальцами на трекпаде (или правой кнопкой мыши) на файл `Start_IPA_Downloader_macOS.command` и в появившемся меню выберите `Открыть`
+
+**5. Не приходит код двухфакторной аутентификации (2FA) или Login error: Did you forget your password?:**
 * Пароль введен неверно
 * Попробуйте войти с аккаунтом Apple на сайте [icloud.com](https://icloud.com)
 
-**5. Login error: failed to initialize SAP signer: curl: Timeout was reached:**
+**6. Login error: failed to initialize SAP signer: curl: Timeout was reached:**
 * Не удалось подключиться к SAP, проверьте ваше интернет-соединение
 
-**6. Error: account is disabled:**
+**7. Error: account is disabled:**
 * Аккаунт Apple временно заблокирован Apple (обычно из-за многократных попыток ввода неверных данных пароля или кода 2FA)
 * Требуется разблокировка аккаунта через устройство или на сайте [icloud.com](https://icloud.com)
 
-**7. Not logged in**
+**8. Not logged in**
 * Ранее использовались инструменты, основанные на ipatool-go
 * В скрипте необходимо выйти из аккаунта Apple и авторизоваться заново
 
-**8. Download error: invalid response: empty songList:**
+**9. Download error: invalid response: empty songList:**
 * Необходимо заново авторизоваться в скрипте с аккаунтом Apple
 
-**9. Download error: HTTP request failed: Couldn't resolve host name:**
+**10. Download error: HTTP request failed: Couldn't resolve host name:**
 * Не удалось подключиться к серверам Apple, проверьте ваше интернет-соединение
 
-**10. Download error: HTTP request failed: Timeout was reached:**
+**11. Download error: HTTP request failed: Timeout was reached:**
 * Не удалось подключиться к серверам Apple, проверьте ваше интернет-соединение
 
-**11. Download failed after retries: Failure when receiving data from the peer:**
+**12. Download failed after retries: Failure when receiving data from the peer:**
 * Не удалось подключиться к серверам Apple, проверьте ваше интернет-соединение
 * Либо попробуйте заново авторизоваться в скрипте с аккаунтом Apple
 
-**12. Error: license is required:**
+**13. Error: license is required:**
 * Приложение не было приобретено на этом аккаунте Apple ранее
 
-**13. Purchase error: app not found:**
+**14. Purchase error: app not found:**
 * Покупка приложения не удалась, так как приложение удалено из App Store
 
-**14. Purchase error: item is temporarily unavailable:**
+**15. Purchase error: item is temporarily unavailable:**
 * Приложение не было приобретено на этом аккаунте Apple ранее
 * Покупка не удалась, так как приложение удалено из App Store
 
-**15. Error: This Apple Account is temporarily unable to be used in the iTunes Store because it could not be found. Try again later:**
+**16. Error: This Apple Account is temporarily unable to be used in the iTunes Store because it could not be found. Try again later:**
 * Необходимо совершить любую бесплатную покупку в App Store
 
-**16. Ошибка: Подключенные устройства не найдены. Подключите устройство и подтвердите доверие компьютеру:**
+**17. Ошибка: Подключенные устройства не найдены. Подключите устройство и подтвердите доверие компьютеру:**
 * Подключите устройство и нажмите `Доверять` при запросе `Доверять этому компьютеру?`
 * Убедитесь, что драйвер AppleMobileDeviceSupport64 установлен
 * Переустановите/установите iTunes/Apple Devices (Устройства Apple) или AppleMobileDeviceSupport64
 
-**17. Could not connect to lockdownd:**
+**18. Could not connect to lockdownd:**
 * Проблемы с подключением к устройству Apple
 * Удалите iTunes/Apple Devices (Устройства Apple) и AppleMobileDeviceSupport64, затем удалите нижеуказанные папки и переустановите iTunes/Apple Devices (Устройства Apple) или AppleMobileDeviceSupport64
 ```
@@ -411,13 +414,13 @@ C:\Users\%username%\AppData\Roaming\Apple Computer\
 ```
 * Подключите устройство и нажмите `Доверять` при запросе `Доверять этому компьютеру?`
 
-**18. WARNING: could not locate Payload/App.app/SC_Info/App.sinf in archive:**
+**19. WARNING: could not locate Payload/App.app/SC_Info/App.sinf in archive:**
 * В устанавливаемом .ipa файле не найдена подпись приложения
 
-**19. ERROR: Install failed. Got error "APIInternalError" with code 0x00000000: Error Domain=IXErrorDomain Code=46:**
+**20. ERROR: Install failed. Got error "APIInternalError" with code 0x00000000: Error Domain=IXErrorDomain Code=46:**
 * Удалите приложение с устройства, перезагрузите устройство и попробуйте установить приложение еще раз
 
-**20. После установки приложение сразу сворачивается при запуске:**
+**21. После установки приложение сразу сворачивается при запуске:**
 * Войдите в App Store под аккаунтом, с которого приложение было загружено, и установите любое бесплатное приложение
 * После этого запустите проблемное приложение снова
 
