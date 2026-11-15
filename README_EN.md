@@ -11,6 +11,8 @@ A script for downloading apps previously purchased in the App Store, including d
 ## Information about the script:
 ### Important:
 * ipatool is an unofficial tool; therefore, using the script is only at your own risk
+* To avoid having your Apple Account locked, make sure you enter password and/or two-factor authentication (2FA) code correctly
+* If your Apple account is locked, you can unlock it via your device or on the [icloud.com](https://icloud.com) website
 ### General requirements for use:
 * Windows 7-11 (x64)
 * macOS starting from 10.15 Catalina (both Apple Silicon and Intel are supported)
@@ -354,14 +356,14 @@ A script for downloading apps previously purchased in the App Store, including d
 
 **4. Two-factor authentication (2FA) code not received or Login error: Did you forget your password?:**
 * The password was entered incorrectly
-* Try signing in to `icloud.com` website using Apple account
+* Try signing in to [icloud.com](https://icloud.com) website using Apple account
 
 **5. Login error: failed to initialize SAP signer: curl: Timeout was reached:**
 * Failed to connect to SAP, check your internet connection
 
 **6. Error: account is disabled:**
-* Apple account is temporarily blocked by Apple (usually due to multiple attempts to enter incorrect password or 2FA code)
-* Account needs to be unblocked via the device or on the `icloud.com` website
+* Apple account is temporarily locked by Apple (usually due to multiple attempts to enter incorrect password or 2FA code)
+* Account needs to be unlocked via the device or on the [icloud.com](https://icloud.com) website
 
 **7. Not logged in**
 * Tools based on ipatool-go were previously used
