@@ -347,11 +347,15 @@ A script for downloading apps previously purchased in the App Store, including d
 * PowerShell (pwsh) is not installed
 
 **2. Processing -File ./IPA_Downloader.ps1 failed: Access to the path is denied (macOS):**
-* Allow Terminal access in `System Settings - Privacy & Security - Full Disk Access`
+* Grant the `Terminal` app full disk access in `System Settings - Privacy & Security - Full Disk Access`
 
 **3. zsh: operation not permitted (macOS):**
-* Open the Terminal, enter the command: `chmod +x (space)`
-* Drag the file `Start_IPA_Downloader_macOS.command` into the Terminal
+* Open the `Terminal` app
+* Enter the command: `chmod +x (space)`
+* Drag the file `Start_IPA_Downloader_macOS.command` into the Terminal window
+* Press Enter
+* Then enter the command:  `xattr -d com.apple.quarantine (space)`
+* Drag the file `Start_IPA_Downloader_macOS.command` into the Terminal window
 * Press Enter and run the script again
 
 **4. The "Start_IPA_Downloader_macOS.command" app is damaged and can’t be opened. You should move it to the Trash (macOS):**
