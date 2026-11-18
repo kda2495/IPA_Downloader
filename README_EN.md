@@ -294,25 +294,17 @@ A script for downloading apps previously purchased in the App Store, including d
 * Enter the index numbers (#) of the apps to install on the devices
 * Press Enter
 * The script will install the selected apps on the devices
-#### 9. Clear data:
-* Select the data to clear:
-1. List of apps purchased by the script (Files/PurchasedAppsList.json)
-2. Apps in Apps folder
-* Press Enter
-* When choosing to clear the list of apps purchased by the script, select the Apple account to clear
-* Press Enter
-* The script will clear the selected data type
-#### 10. Apple Account operations:
+#### 9. Apple Account operations:
 * Enter the required action:
 1. Add account
 2. Switch account
 3. Log out of Apple Account
 * Press Enter
-#### 11. Enable/disable developer mode:
+#### 10. Enable/disable developer mode:
 * The script will enable or disable developer mode to collect additional information
-#### 12. Tip Jar:
+#### 11. Tip Jar:
 * The script will navigate to the CloudTips page
-#### 13. Change Language (Сменить язык):
+#### 12. Change Language (Сменить язык):
 * The script will change its interface language
 #### air
 * Enabling/disabling connection to the device via Wi-Fi

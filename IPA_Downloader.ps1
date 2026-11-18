@@ -2,7 +2,7 @@
 Set-Location -LiteralPath $PSScriptRoot
 
 # Версия скрипта:
-$ScriptVersion = "4.4.3"
+$ScriptVersion = "4.4.4"
 
 # Переменная состояния keychain-passphrase:
 $script:KeychainEnabled = $false
@@ -121,6 +121,8 @@ $AppsFolderPath = Join-Path -Path $PSScriptRoot -ChildPath "Apps"
 $ipatoolHomePath = Join-Path -Path $HOME -ChildPath ".ipatool"
 $LoginFilePath = Join-Path -Path $ipatoolHomePath -ChildPath "login"
 $AuthFileNames = @("account", "adi-state", "cookies", "login")
+$AccountNameFileName = "name"
+$AccountStorefrontFileName = "storefront"
 $TempFolderPath = [System.IO.Path]::GetTempPath()
 $TempipaFilePath = Join-Path -Path $TempFolderPath -ChildPath "Temp.ipa"
 $AppsListPath = Join-Path -Path $FilesFolderPath -ChildPath "AppsList.txt"
@@ -227,7 +229,6 @@ $LangStrings = @{
 		"AccountAppsListLoad" = "Загрузка списка приложений из истории покупок аккаунта Apple.`nЭто может занять некоторое время..."
 		"AccountAppsListMenu" = "2. Список приложений из истории покупок аккаунта Apple (Files/AppsListAccount_.txt)"
 		"AccountAppsListUpdate" = "Обновление списка приложений из истории покупок аккаунта Apple (с {0} года).`nЭто может занять некоторое время..."
-		"AccountCleared" = "Готово. Данные аккаунта {0} удалены."
 		"AccountCurrent" = "(текущий)"
 		"AccountLoggedOut" = "Выполнен выход из аккаунта Apple: {0}"
 		"AccountLogoutMenuTitle" = "Выберите аккаунт Apple для выхода"
@@ -238,7 +239,6 @@ $LangStrings = @{
 		"AccountSwitchMenuTitle" = "Выберите аккаунт Apple для перехода"
 		"AirEnabled" = "Подключение к устройству по Wi-Fi включено."
 		"AirDisabled" = "Подключение к устройству по Wi-Fi отключено."
-		"AppsCleared" = "Готово. Приложения в папке Apps удалены."
 		"AskAppNumDownload" = "Введите порядковые номера (№) приложений для загрузки"
 		"AskAppNumPurchase" = "Введите порядковые номера (№) приложений для покупки"
 		"AskAppSearch" = "Введите название приложения или ID приложений"
@@ -261,11 +261,6 @@ $LangStrings = @{
 		"CancelStep" = "(0: Возврат в главное меню):"
 		"CancelStepList" = "(0: Возврат к выбору списка):"
 		"CancelStepVerID" = "(0: Возврат к вводу порядковых номеров (№) или ID версий):"
-		"ClearAccountMenuTitle" = "Выберите аккаунт Apple для очистки"
-		"ClearAllAccounts" = "Все аккаунты Apple"
-		"ClearMenu1" = "1. Список приложений, приобретенных скриптом (Files/PurchasedAppsList.json)"
-		"ClearMenu2" = "2. Приложения в папке Apps"
-		"ClearMenuTitle" = "Выберите данные для очистки"
 		"CustomAppsListMenu" = "3. Пользовательский список приложений (Files/AppsListCustom.txt)"
 		"CustomAppsListMenu5" = "5. Пользовательский список приложений (Files/AppsListCustom.txt)"
 		"DebugEnabled" = "Режим разработчика включен."
@@ -280,11 +275,10 @@ $LangStrings = @{
 		"DownloaderMenu6" = "6. Выбор готового списка приложений и загрузка (с выбором версии)"
 		"DownloaderMenu7" = "7. Проверка минимальной версии iOS для приложений в папке Apps"
 		"DownloaderMenu8" = "8. Установка приложений из папки Apps"
-		"DownloaderMenu9" = "9. Очистка данных"
-		"DownloaderMenu10" = "10. Операции с аккаунтом Apple"
-		"DownloaderMenu11" = "11. Включить/отключить режим разработчика"
-		"DownloaderMenu12" = "12. Банка для чаевых"
-		"DownloaderMenu13" = "13. Сменить язык (Change Language)"
+		"DownloaderMenu9" = "9. Операции с аккаунтом Apple"
+		"DownloaderMenu10" = "10. Включить/отключить режим разработчика"
+		"DownloaderMenu11" = "11. Банка для чаевых"
+		"DownloaderMenu12" = "12. Сменить язык (Change Language)"
 		"ErrorAppsListAccountLoad" = "Ошибка: Не удалось получить список приложений из истории покупок аккаунта Apple."
 		"ErrorAppsListAccountUpdate" = "Ошибка: Не удалось обновить список приложений из истории покупок аккаунта Apple.`nПоказан ранее сохраненный список."
 		"ErrorAppsListCustomEmpty" = "Ошибка: Пользовательский список приложений пуст.`nДобавьте приложения в Files/AppsListCustom.txt"
@@ -302,7 +296,6 @@ $LangStrings = @{
 		"ErrorNoOtherAccounts" = "Ошибка: Других аккаунтов Apple не найдено."
 		"ErrorNoVersionsFound" = "Ошибка: Версии приложения не найдены."
 		"ErrorOpenUrl" = "Ошибка: Не удалось открыть страницу."
-		"ErrorPurchasedAppsListEmpty" = "Ошибка: Список приложений, приобретенных скриптом (Files/PurchasedAppsList.json), пуст."
 		"ErrorUpdateCheck" = "Ошибка: Не удалось проверить наличие обновлений."
 		"FileName" = "Имя файла:"
 		"FileSaved" = "Готово. Файл сохранен в папку Apps."
@@ -316,6 +309,7 @@ $LangStrings = @{
 		"HeaderMinPlatformVersion" = "Мин. версия {0}:"
 		"HeaderNum" = "№"
 		"HeaderPurchaseDate" = "Дата покупки:"
+		"HeaderReleaseDate" = "Дата выхода:"
 		"HeaderUDID" = "UDID:"
 		"HeaderVersion" = "Версия:"
 		"HeaderVersionID" = "ID версии:"
@@ -350,7 +344,6 @@ $LangStrings = @{
 		"PlaceholderAppsListMenu" = "4. Список сгруженных приложений, установленных на устройстве"
 		"PopularAppsListMenu" = "1. Список популярных приложений (Files/AppsList.txt)"
 		"ProxyUsed" = "Используется системный прокси-сервер:"
-		"PurchasedAppsListCleared" = "Готово. Список приложений, приобретенных скриптом (Files/PurchasedAppsList.json), очищен."
 		"SelectedApp" = "Выбрано приложение:"
 		"SelectedVersion" = "Выбрана версия:"
 		"SelectedVersionsList" = "Выбраны следующие версии:"
@@ -361,7 +354,6 @@ $LangStrings = @{
 		"AccountAppsListLoad" = "Loading the list of apps from the Apple account's purchase history.`nThis may take some time..."
 		"AccountAppsListMenu" = "2. List of apps from the Apple account purchase history (Files/AppsListAccount_.txt)"
 		"AccountAppsListUpdate" = "Updating the list of apps from the Apple account purchase history (since {0}).`nThis may take some time..."
-		"AccountCleared" = "Done. Account {0} data cleared."
 		"AccountCurrent" = "(current)"
 		"AccountLoggedOut" = "Successfully logged out of Apple account: {0}"
 		"AccountLogoutMenuTitle" = "Select Apple account to log out of"
@@ -372,7 +364,6 @@ $LangStrings = @{
 		"AccountSwitchMenuTitle" = "Select Apple account to switch to"
 		"AirEnabled" = "Connection to the device via Wi-Fi enabled."
 		"AirDisabled" = "Connection to the device via Wi-Fi disabled."
-		"AppsCleared" = "Done. Apps folder has been cleared."
 		"AskAppNumDownload" = "Enter index numbers (#) of apps to download"
 		"AskAppNumPurchase" = "Enter index numbers (#) of apps to purchase"
 		"AskAppSearch" = "Enter app name or app IDs"
@@ -395,11 +386,6 @@ $LangStrings = @{
 		"CancelStep" = "(0: Return to main menu):"
 		"CancelStepList" = "(0: Return to list selection):"
 		"CancelStepVerID" = "(0: Return to entering index numbers (#) or version IDs):"
-		"ClearAccountMenuTitle" = "Select Apple account to clear"
-		"ClearAllAccounts" = "All Apple accounts"
-		"ClearMenu1" = "1. List of apps purchased by the script (Files/PurchasedAppsList.json)"
-		"ClearMenu2" = "2. Apps in Apps folder"
-		"ClearMenuTitle" = "Select data to clear"
 		"CustomAppsListMenu" = "3. Custom apps list (Files/AppsListCustom.txt)"
 		"CustomAppsListMenu5" = "5. Custom apps list (Files/AppsListCustom.txt)"
 		"DebugEnabled" = "Developer mode enabled."
@@ -414,11 +400,10 @@ $LangStrings = @{
 		"DownloaderMenu6" = "6. Select a prepared app list and download (with version selection)"
 		"DownloaderMenu7" = "7. Check the minimum iOS version for apps in the Apps folder"
 		"DownloaderMenu8" = "8. Install apps from Apps folder"
-		"DownloaderMenu9" = "9. Clear data"
-		"DownloaderMenu10" = "10. Apple account operations"
-		"DownloaderMenu11" = "11. Enable/disable developer mode"
-		"DownloaderMenu12" = "12. Tip Jar"
-		"DownloaderMenu13" = "13. Change Language (Сменить язык)"
+		"DownloaderMenu9" = "9. Apple account operations"
+		"DownloaderMenu10" = "10. Enable/disable developer mode"
+		"DownloaderMenu11" = "11. Tip Jar"
+		"DownloaderMenu12" = "12. Change Language (Сменить язык)"
 		"ErrorAppsListAccountLoad" = "Error: Failed to retrieve list of apps from the Apple account purchase history."
 		"ErrorAppsListAccountUpdate" = "Error: Failed to update the list of apps from the Apple account purchase history.`nShowing the previously saved list."
 		"ErrorAppsListCustomEmpty" = "Error: Custom apps list is empty.`nAdd apps to the Files/AppsListCustom.txt file."
@@ -436,7 +421,6 @@ $LangStrings = @{
 		"ErrorNoOtherAccounts" = "Error: No other Apple accounts found."
 		"ErrorNoVersionsFound" = "Error: No app versions found."
 		"ErrorOpenUrl" = "Error: Failed to open the page."
-		"ErrorPurchasedAppsListEmpty" = "Error: List of apps purchased by the script (Files/PurchasedAppsList.json) is empty."
 		"ErrorUpdateCheck" = "Error: Failed to check for updates."
 		"FileName" = "File name:"
 		"FileSaved" = "Done. File saved to Apps folder."
@@ -450,6 +434,7 @@ $LangStrings = @{
 		"HeaderMinPlatformVersion" = "Min. {0} version:"
 		"HeaderNum" = "#"
 		"HeaderPurchaseDate" = "Purchase date:"
+		"HeaderReleaseDate" = "Release date:"
 		"HeaderUDID" = "UDID:"
 		"HeaderVersion" = "Version:"
 		"HeaderVersionID" = "Version ID:"
@@ -484,7 +469,6 @@ $LangStrings = @{
 		"PlaceholderAppsListMenu" = "4. List of offloaded apps installed on the device"
 		"PopularAppsListMenu" = "1. Popular apps list (Files/AppsList.txt)"
 		"ProxyUsed" = "Using the system proxy server:"
-		"PurchasedAppsListCleared" = "Done. List of apps purchased by the script (Files/PurchasedAppsList.json) cleared."
 		"SelectedApp" = "Selected app:"
 		"SelectedVersion" = "Selected version:"
 		"SelectedVersionsList" = "Selected versions:"
@@ -649,13 +633,26 @@ function Show-Error {
 # Определение переменной для хранения текущего аккаунта Apple:
 $script:CurrentAppleAccount = "UnknownAccount"
 
+# Определение переменной для хранения имени владельца текущего аккаунта Apple:
+$script:CurrentAppleAccountName = ""
+
+# Определение переменной для хранения storefront текущего аккаунта Apple:
+$script:CurrentAppleAccountStorefront = ""
+
 # Функция получения текущего аккаунта Apple:
 function Get-Current-AppleAccount {
 	# Запрос данных аккаунта:
 	$AuthInfo = Invoke-ipatool auth info 2>$null | Out-String
 	
+	# Удаление ANSI-кодов из данных аккаунта:
+	$CleanAuthInfo = $script:reANSI.Replace($AuthInfo, '')
+	
 	# Проверка успешной авторизации через ipatool auth info:
-	$script:AuthSuccess = ($script:reANSI.Replace($AuthInfo, '') -match 'success=true')
+	$script:AuthSuccess = ($CleanAuthInfo -match 'success=true')
+	
+	# Получение имени владельца и storefront аккаунта:
+	$script:CurrentAppleAccountName = if ($CleanAuthInfo -match '(?m)email=\S+\s+name=(.*?)(?=\s+\w+=|\s*$)') { $Matches[1].Trim() } else { "" }
+	$script:CurrentAppleAccountStorefront = if ($CleanAuthInfo -match '(?m)email=.*?\bstorefront=(\S*)') { $Matches[1] } else { "" }
 	
 	if ($AuthInfo -match 'email=([^\s]+)') {
 		$script:CurrentAppleAccount = $script:reANSI.Replace($Matches[1].Trim(), '')
@@ -754,6 +751,45 @@ function Get-SavedAppleAccounts {
 	return @(Get-ChildItem -LiteralPath $ipatoolHomePath -Directory -ErrorAction SilentlyContinue | Sort-Object Name | ForEach-Object { $_.Name })
 }
 
+# Функция чтения значения из файла в папке сохраненного аккаунта:
+function Read-SavedAccountValue {
+	param (
+		[string]$Account,
+		[string]$FileName
+	)
+	
+	$FilePath = Join-Path -Path (Join-Path -Path $ipatoolHomePath -ChildPath $Account) -ChildPath $FileName
+	if (!(Test-Path -LiteralPath $FilePath)) { return "" }
+	
+	return "$(Get-Content -LiteralPath $FilePath -Raw -Encoding UTF8)".Trim()
+}
+
+# Функция формирования названия аккаунта Apple с именем владельца и storefront:
+function Get-AppleAccountTitle {
+	param (
+		[string]$Account,
+		[switch]$WithStorefront
+	)
+	
+	if ($Account -eq $script:CurrentAppleAccount) {
+		# Имя владельца и storefront текущего аккаунта:
+		$Name = $script:CurrentAppleAccountName
+		$Storefront = $script:CurrentAppleAccountStorefront
+	} else {
+		# Чтение имени владельца и storefront из папки сохраненного аккаунта:
+		$Name = Read-SavedAccountValue -Account $Account -FileName $AccountNameFileName
+		$Storefront = Read-SavedAccountValue -Account $Account -FileName $AccountStorefrontFileName
+	}
+	
+	# Формирование названия аккаунта с именем владельца:
+	$Title = if ([string]::IsNullOrWhiteSpace($Name)) { $Account } else { "$Account ($Name)" }
+	
+	# Добавление storefront перед названием аккаунта:
+	if ($WithStorefront -and ![string]::IsNullOrWhiteSpace($Storefront)) { return "${Storefront}: $Title" }
+	
+	return $Title
+}
+
 # Функция сохранения файлов авторизации текущего аккаунта в папку с названием аккаунта:
 function Save-ActiveAccountFiles {
 	param ([string]$Account)
@@ -766,6 +802,16 @@ function Save-ActiveAccountFiles {
 		if (Test-Path -LiteralPath $SourcePath) {
 			Move-Item -LiteralPath $SourcePath -Destination $AccountFolderPath -Force
 		}
+	}
+	
+	# Сохранение имени владельца аккаунта в папку:
+	if (![string]::IsNullOrWhiteSpace($script:CurrentAppleAccountName)) {
+		Set-Content -LiteralPath (Join-Path -Path $AccountFolderPath -ChildPath $AccountNameFileName) -Value $script:CurrentAppleAccountName -Encoding UTF8 -Force
+	}
+	
+	# Сохранение storefront аккаунта в папку:
+	if (![string]::IsNullOrWhiteSpace($script:CurrentAppleAccountStorefront)) {
+		Set-Content -LiteralPath (Join-Path -Path $AccountFolderPath -ChildPath $AccountStorefrontFileName) -Value $script:CurrentAppleAccountStorefront -Encoding UTF8 -Force
 	}
 }
 
@@ -830,7 +876,7 @@ function Select-AppleAccount {
 	$AccountMenuText += "`n"
 	$Counter = 1
 	foreach ($Account in $Accounts) {
-		$AccountMenuText += "$Counter. $Account`n"
+		$AccountMenuText += "$Counter. $(Get-AppleAccountTitle -Account $Account -WithStorefront)`n"
 		$Counter++
 	}
 	
@@ -920,7 +966,7 @@ function Invoke-AppleAccountLogout {
 	$Counter = 1
 	foreach ($Account in $Accounts) {
 		$CurrentMark = if ($Counter -eq 1) { " $(Get-Lang 'AccountCurrent')" } else { "" }
-		$AccountMenuText += "$Counter. $Account$CurrentMark`n"
+		$AccountMenuText += "$Counter. $(Get-AppleAccountTitle -Account $Account -WithStorefront)$CurrentMark`n"
 		$Counter++
 	}
 	
@@ -938,10 +984,13 @@ function Invoke-AppleAccountLogout {
 	
 	$SelectedAccount = $Accounts[[int]$AccountChoice - 1]
 	
+	# Получение названия выбранного аккаунта до удаления его папки:
+	$SelectedAccountTitle = Get-AppleAccountTitle -Account $SelectedAccount
+	
 	if ($AccountChoice -eq '1') {
 		# Выход из текущего аккаунта:
 		Separator
-		Write-Host ((Get-Lang "AccountLoggedOut") -f $SelectedAccount)
+		Write-Host ((Get-Lang "AccountLoggedOut") -f $SelectedAccountTitle)
 		Invoke-ipatool auth revoke
 		Clear-ActiveAccountFiles
 		
@@ -951,7 +1000,7 @@ function Invoke-AppleAccountLogout {
 		# Удаление сохраненного аккаунта:
 		Remove-Item -LiteralPath (Join-Path -Path $ipatoolHomePath -ChildPath $SelectedAccount) -Recurse -Force -ErrorAction SilentlyContinue
 		Separator
-		Write-Host ((Get-Lang "AccountLoggedOut") -f $SelectedAccount)
+		Write-Host ((Get-Lang "AccountLoggedOut") -f $SelectedAccountTitle)
 	}
 }
 
@@ -1154,25 +1203,6 @@ function Initialize-Repo-List {
 	foreach ($RepoApp in $script:RepoParsedList) {
 		if (-not $script:RepoNames.ContainsKey($RepoApp.ID)) {
 			$script:RepoNames[$RepoApp.ID] = $RepoApp.Name
-		}
-	}
-}
-
-# Функция переименования файлов старых версий скрипта в папке Files:
-function Rename-Legacy-Files {
-	$LegacyFiles = @(
-		[PSCustomObject]@{ OldName = "Apps_ID_List.txt"; NewPath = $AppsListPath }
-		[PSCustomObject]@{ OldName = "Purchased_IDs.json"; NewPath = $PurchasedAppsListFilePath }
-	)
-	
-	foreach ($LegacyFile in $LegacyFiles) {
-		$OldPath = Join-Path -Path $FilesFolderPath -ChildPath $LegacyFile.OldName
-		
-		# Переименование старого файла с заменой нового файла:
-		if (Test-Path -LiteralPath $OldPath -PathType Leaf) {
-			try {
-				Move-Item -LiteralPath $OldPath -Destination $LegacyFile.NewPath -Force -ErrorAction Stop
-			} catch { }
 		}
 	}
 }
@@ -1431,14 +1461,11 @@ function Get-Account-Apps {
 	$CachedApps = @(Read-AppsListFile -FilePath $CachePath)
 	
 	# Удаление из списка приложений из истории покупок аккаунта Apple иных видов покупок:
-	$FilteredCachedApps = @($CachedApps | Where-Object { [string]::IsNullOrWhiteSpace([string]$_.Kind) -or ([string]$_.Kind) -in $script:AccountAppKinds })
+	$FilteredCachedApps = @($CachedApps | Where-Object { ([string]$_.Kind) -in $script:AccountAppKinds })
 	if ($FilteredCachedApps.Count -ne $CachedApps.Count) {
 		$CachedApps = $FilteredCachedApps
 		Save-Account-List -FilePath $CachePath -Apps $CachedApps
 	}
-	
-	# Определение устаревшего формата сохраненного списка:
-	$LegacyCache = @($CachedApps | Where-Object { [string]::IsNullOrWhiteSpace([string]$_.Kind) }).Count -gt 0
 	
 	# Определение года и ID последней покупки в сохраненном списке приложений:
 	$LastKey = 0
@@ -1453,7 +1480,7 @@ function Get-Account-Apps {
 	$LastYear = [int][Math]::Floor($LastKey / 10000)
 	
 	# Повторная загрузка списка приложений, начиная с года последней покупки:
-	if (!$LegacyCache -and $LastYear -gt 0 -and $LastYear -le (Get-Date).Year) {
+	if ($LastYear -gt 0 -and $LastYear -le (Get-Date).Year) {
 		Separator
 		Write-Host ((Get-Lang "AccountAppsListUpdate") -f $LastYear)
 		
@@ -1485,7 +1512,7 @@ function Get-Account-Apps {
 		}
 	}
 	
-	# Загрузка полного списка приложений из истории покупок аккаунта Apple при первой загрузке, устаревшем формате списка, ошибке повторной загрузки:
+	# Загрузка полного списка приложений из истории покупок аккаунта Apple при первой загрузке и ошибке повторной загрузки:
 	Separator
 	Write-Host (Get-Lang "AccountAppsListLoad")
 	$FullResult = Get-Purchased-Apps -ListArgs @("--all")
@@ -1641,9 +1668,6 @@ function Save-Purchased-App {
 	if ([string]::IsNullOrWhiteSpace($JsonRaw)) { $JsonRaw = '{}' }
 	
 	$Data = $JsonRaw | ConvertFrom-Json
-	if ($null -eq $Data -or ($Data -is [System.Collections.IEnumerable] -and $Data -isnot [System.Management.Automation.PSCustomObject])) {
-		$Data = New-Object PSCustomObject
-	}
 	
 	# Получение списка приложений для текущего аккаунта:
 	$AccountApps = @()
@@ -2040,6 +2064,10 @@ function IPA-Download-With-Version {
 			$DisplayVersion = if ($MetaText -match 'displayVersion=([^\s,]+)') { $Matches[1] } else { "NA" }
 			$DisplayVersion = $script:reANSI.Replace($DisplayVersion, '')
 			
+			# Дата выхода версии из значения releaseDate:
+			$ReleaseDate = if ($MetaText -match 'releaseDate=([^\s,]+)') { $Matches[1] } else { "NA" }
+			$ReleaseDate = Convert-DateText -DateText ($script:reANSI.Replace($ReleaseDate, ''))
+			
 			# Минимальная версия iOS из значения minimumOSVersion:
 			$MinOSVersion = if ($MetaText -match 'minimumOSVersion=([^\s,]+)') { $Matches[1] } else { "NA" }
 			$MinOSVersion = $script:reANSI.Replace($MinOSVersion, '')
@@ -2048,6 +2076,7 @@ function IPA-Download-With-Version {
 				Index = $DetailCounter
 				ID = $VersionID
 				Version = $DisplayVersion
+				ReleaseDate = $ReleaseDate
 				MinOS = $MinOSVersion
 			}
 			$DetailCounter++
@@ -2058,7 +2087,7 @@ function IPA-Download-With-Version {
 		Separator
 		
 		# Отрисовка таблицы:
-		Out-Table -Data $DetailedMapping -Headers (Get-Lang "HeaderNum"), (Get-Lang "HeaderVersion"), (Get-Lang "HeaderMinIOS"), (Get-Lang "HeaderVersionID") -Properties "Index", "Version", "MinOS", "ID"
+		Out-Table -Data $DetailedMapping -Headers (Get-Lang "HeaderNum"), (Get-Lang "HeaderVersion"), (Get-Lang "HeaderReleaseDate"), (Get-Lang "HeaderMinIOS"), (Get-Lang "HeaderVersionID") -Properties "Index", "Version", "ReleaseDate", "MinOS", "ID"
 		Separator
 		
 		# Запрос порядковых номеров (№) версий для загрузки:
@@ -2163,8 +2192,9 @@ function Invoke-AccountsBatch {
 	if ($SavedAccounts.Count -gt 0) {
 		Separator
 		# Заголовок запроса:
-		$AccountsMenu = "$(Get-Lang "BatchAllAccountsTitle$Action")`n$(Get-Lang 'Menu1Yes')`n$(Get-Lang 'Menu2No')`n"
-		$AccountsChoice = Read-MenuChoice -MenuText $AccountsMenu -OptionsCount 2
+		$AccountsMenu = "$(Get-Lang "BatchAllAccountsTitle$Action") $(Get-Lang 'CancelStep')`n$(Get-Lang 'Menu1Yes')`n$(Get-Lang 'Menu2No')`n"
+		$AccountsChoice = Read-MenuChoice -MenuText $AccountsMenu -OptionsCount 2 -AllowCancel
+		if ($AccountsChoice -eq '0') { return }
 		
 		if ($AccountsChoice -eq '1') {
 			$AccountsToProcess += $SavedAccounts
@@ -2403,9 +2433,7 @@ function Get-Apps-From-List {
 					if (![string]::IsNullOrWhiteSpace($HistoryRaw) -and $HistoryRaw.Trim() -ne '{}') {
 						$HistoryRoot = $HistoryRaw | ConvertFrom-Json -ErrorAction Stop
 						$HistoryRecords = @()
-						if ($HistoryRoot -is [System.Collections.IEnumerable] -and $HistoryRoot -isnot [System.Management.Automation.PSCustomObject]) {
-							$HistoryRecords = @($HistoryRoot)
-						} elseif ($HistoryRoot -and $HistoryRoot.psobject.properties.Name -contains $script:CurrentAppleAccount) {
+						if ($HistoryRoot -and $HistoryRoot.psobject.properties.Name -contains $script:CurrentAppleAccount) {
 							$HistoryRecords = @($HistoryRoot."$script:CurrentAppleAccount")
 						}
 						foreach ($HistoryRecord in $HistoryRecords) {
@@ -3496,9 +3524,6 @@ foreach ($Dir in @("$AppsFolderPath", "$FilesFolderPath", "$MainAppFolderPath"))
 	}
 }
 
-# Переименование файлов старых версий скрипта:
-Rename-Legacy-Files
-
 # Создание пустого файла с пользовательским списком приложений (Files/AppsListCustom.txt):
 Initialize-Custom-List-File
 
@@ -3506,9 +3531,8 @@ Initialize-Custom-List-File
 [Net.ServicePointManager]::SecurityProtocol = [Net.ServicePointManager]::SecurityProtocol -bor [Net.SecurityProtocolType]::Tls12
 
 # Удаление временных файлов при запуске:
-Get-ChildItem -LiteralPath $PSScriptRoot -Filter "*.ipa.tmp" -File -ErrorAction SilentlyContinue | Remove-Item -Force -ErrorAction SilentlyContinue
-Get-ChildItem -LiteralPath $PSScriptRoot -Filter "*.ipa" -File -ErrorAction SilentlyContinue | Remove-Item -Force -ErrorAction SilentlyContinue
-Get-ChildItem -LiteralPath $PSScriptRoot -Filter "*.pkg.tmp" -File -ErrorAction SilentlyContinue | Remove-Item -Force -ErrorAction SilentlyContinue
+Get-ChildItem -LiteralPath $PSScriptRoot -Filter "*.ipa.*" -File -ErrorAction SilentlyContinue | Remove-Item -Force -ErrorAction SilentlyContinue
+Get-ChildItem -LiteralPath $PSScriptRoot -Filter "*.pkg.tmp.*" -File -ErrorAction SilentlyContinue | Remove-Item -Force -ErrorAction SilentlyContinue
 if (Test-Path -LiteralPath $AppsListTempPath) { Remove-Item -LiteralPath $AppsListTempPath -Force -ErrorAction SilentlyContinue }
 if (Test-Path -LiteralPath $WarningTempPath) { Remove-Item -LiteralPath $WarningTempPath -Force -ErrorAction SilentlyContinue }
 
@@ -3770,100 +3794,6 @@ $(Get-Lang 'LoginMenu5')`n
 	}
 }
 
-# Функция очистки списка приложений, приобретенных скриптом:
-function Clear-PurchasedAppsList {
-	if (!(Test-Path -LiteralPath "$PurchasedAppsListFilePath")) {
-		Show-Error "ErrorPurchasedAppsListEmpty"
-		return
-	}
-	
-	$RawData = Get-Content -LiteralPath "$PurchasedAppsListFilePath" -Raw -Encoding UTF8
-	
-	# Очистка пустого файла:
-	if ([string]::IsNullOrWhiteSpace($RawData) -or $RawData.Trim() -eq '{}') {
-		Remove-Item -LiteralPath "$PurchasedAppsListFilePath" -Force -ErrorAction SilentlyContinue
-		Show-Error "ErrorPurchasedAppsListEmpty"
-		return
-	}
-	
-	$Data = $RawData | ConvertFrom-Json
-	
-	# Очистка файла старого формата или файла без аккаунтов:
-	if ($Data -isnot [System.Management.Automation.PSCustomObject] -or $Data.psobject.properties.Count -eq 0) {
-		Remove-Item -LiteralPath "$PurchasedAppsListFilePath" -Force -ErrorAction SilentlyContinue
-		Separator
-		Write-Host (Get-Lang "PurchasedAppsListCleared")
-		return
-	}
-	
-	# Формирование динамического меню аккаунтов:
-	$Accounts = @($Data.psobject.properties.Name)
-	$AccountMenuText = "$(Get-Lang 'ClearAccountMenuTitle') $(Get-Lang 'CancelStep')`n"
-	$Counter = 1
-	foreach ($Account in $Accounts) {
-		$AccountMenuText += "$Counter. $Account`n"
-		$Counter++
-	}
-	$AccountMenuText += "$Counter. $(Get-Lang 'ClearAllAccounts')`n"
-	
-	Separator
-	$AccountChoice = Read-MenuChoice -MenuText $AccountMenuText -OptionsCount $Counter -AllowCancel
-	if ($AccountChoice -eq '0') { return }
-	
-	if ([int]$AccountChoice -eq $Counter) {
-		# Очистка данных всех аккаунтов:
-		Remove-Item -LiteralPath "$PurchasedAppsListFilePath" -Force -ErrorAction SilentlyContinue
-		Separator
-		Write-Host (Get-Lang "PurchasedAppsListCleared")
-	} else {
-		# Удаление данных выбранного аккаунта:
-		$SelectedAccount = $Accounts[[int]$AccountChoice - 1]
-		
-		# Удаление файла при отсутствии аккаунтов:
-		if ($Accounts.Count -le 1) {
-			Remove-Item -LiteralPath "$PurchasedAppsListFilePath" -Force -ErrorAction SilentlyContinue
-		} else {
-			$Data.psobject.properties.Remove($SelectedAccount)
-			$Data | ConvertTo-Json -Depth 5 | Set-Content -LiteralPath "$PurchasedAppsListFilePath" -Encoding UTF8
-		}
-		Separator
-		Write-Host ((Get-Lang "AccountCleared") -f $SelectedAccount)
-	}
-}
-
-# Функция очистки приложений в папке Apps:
-function Clear-AppsFolder {
-	$ipaFilesToRemove = Get-ChildItem -LiteralPath $AppsFolderPath -Filter "*.ipa" -File -ErrorAction SilentlyContinue
-	if ($ipaFilesToRemove) {
-		$ipaFilesToRemove | Remove-Item -Force -ErrorAction SilentlyContinue
-		Separator
-		Write-Host (Get-Lang "AppsCleared")
-	} else {
-		Show-Error "ErrorNoApps"
-	}
-}
-
-# Функция меню очистки данных скрипта:
-function Invoke-ClearMenu {
-	Separator
-	$ClearMenu = @"
-$(Get-Lang 'ClearMenuTitle') $(Get-Lang 'CancelStep')
-$(Get-Lang 'ClearMenu1')
-$(Get-Lang 'ClearMenu2')`n
-"@
-	$ClearChoice = Read-MenuChoice -MenuText $ClearMenu -OptionsCount 2 -AllowCancel
-	
-	switch ($ClearChoice) {
-		"1" {
-			Clear-PurchasedAppsList
-		}
-		
-		"2" {
-			Clear-AppsFolder
-		}
-	}
-}
-
 # Функция меню IPA_Downloader:
 function Invoke-DownloaderMenu {
 	while (Test-Path -LiteralPath "$LoginFilePath") {
@@ -3888,8 +3818,7 @@ $(Get-Lang 'DownloaderMenu8')
 $(Get-Lang 'DownloaderMenu9')
 $(Get-Lang 'DownloaderMenu10')
 $(Get-Lang 'DownloaderMenu11')
-$(Get-Lang 'DownloaderMenu12')
-$(Get-Lang 'DownloaderMenu13')`n
+$(Get-Lang 'DownloaderMenu12')`n
 "@
 	
 		$SwitchValue = Read-Host $MainMenu
@@ -3928,25 +3857,22 @@ $(Get-Lang 'DownloaderMenu13')`n
 			# 8. Установка приложений из папки Apps:
 			"8" { Install-Apps }
 			
-			# 9. Очистка данных:
-			"9" { Invoke-ClearMenu }
-			
-			# 10. Операции с аккаунтом Apple:
-			"10" {
+			# 9. Операции с аккаунтом Apple:
+			"9" {
 				Invoke-AccountMenu
 				
 				# Выход из всех аккаунтов:
 				if ($null -eq $script:WorkMode) { return }
 			}
 			
-			# 11. Включить/отключить режим разработчика:
-			"11" { Switch-DebugMode }
+			# 10. Включить/отключить режим разработчика:
+			"10" { Switch-DebugMode }
 			
-			# 12. Банка для чаевых:
-			"12" { Open-TipJar }
+			# 11. Банка для чаевых:
+			"11" { Open-TipJar }
 			
-			# 13. Сменить язык (Change Language):
-			"13" { Switch-Language }
+			# 12. Сменить язык (Change Language):
+			"12" { Switch-Language }
 			
 			# Подключение к устройству по Wi-Fi:
 			"air" { Switch-AirMode }
