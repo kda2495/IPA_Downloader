@@ -306,8 +306,6 @@ A script for downloading apps previously purchased in the App Store, including d
 * The script will navigate to the CloudTips page
 #### 12. Change Language (Сменить язык):
 * The script will change its interface language
-#### air
-* Enabling/disabling connection to the device via Wi-Fi
 
 ### IPA_Installer (installing apps only):
 #### 1. Check the minimum iOS version for apps in the Apps folder:
@@ -326,12 +324,10 @@ A script for downloading apps previously purchased in the App Store, including d
 * The script will enable or disable developer mode to collect additional information
 #### 4. Tip Jar:
 * The script will navigate to the CloudTips page
-#### 5. Change Language (Сменить язык):
-* The script will change its interface language
-#### 6. Switch to IPA_Downloader (downloading and installing apps):
+#### 5. Switch to IPA_Downloader (downloading and installing apps):
 * The script will switch the mode to IPA_Downloader
-#### air
-* Enabling/disabling connection to the device via Wi-Fi
+#### 6. Change Language (Сменить язык):
+* The script will change its interface language
 
 ## Possible errors and solutions:
 ### Troubleshooting errors:

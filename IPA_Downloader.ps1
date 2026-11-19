@@ -2,13 +2,10 @@
 Set-Location -LiteralPath $PSScriptRoot
 
 # Версия скрипта:
-$ScriptVersion = "4.4.4"
+$ScriptVersion = "4.5.0"
 
 # Переменная состояния keychain-passphrase:
 $script:KeychainEnabled = $false
-
-# Переменная состояния подключения к устройству по Wi-Fi:
-$script:AirEnabled = $false
 
 # Виды покупок, отображаемые в списке приложений из истории покупок аккаунта Apple:
 $script:AccountAppKinds = @("iOS App", "Mac App")
@@ -23,7 +20,7 @@ $FilesFolderPath = Join-Path -Path $PSScriptRoot -ChildPath "Files"
 $SettingsFilePath = Join-Path -Path $FilesFolderPath -ChildPath "Settings.txt"
 
 # Список настроек, которые сохраняются и используются в скрипте:
-$script:SettingsKeys = @('Language', 'Mode', 'DebugEnabled', 'KeychainEnabled', 'AirEnabled')
+$script:SettingsKeys = @('Language', 'Mode', 'DebugEnabled', 'KeychainEnabled')
 
 # Функция чтения настроек из Files/Settings.txt:
 function Get-Settings {
@@ -93,7 +90,6 @@ $script:CurrentLang = if ($SavedSettings['Language'] -match '^(RU|EN)$') { $Save
 $script:WorkMode = if ($SavedSettings['Mode'] -in @('Downloader', 'Installer')) { $SavedSettings['Mode'] } else { $null }
 $script:IsDebugEnabled = if ($SavedSettings['DebugEnabled'] -eq 'True') { $true } else { $false }
 $script:KeychainEnabled = if ($SavedSettings['KeychainEnabled'] -in @('True', 'False')) { $SavedSettings['KeychainEnabled'] -eq 'True' } else { $script:KeychainEnabled }
-$script:AirEnabled = if ($SavedSettings['AirEnabled'] -in @('True', 'False')) { $SavedSettings['AirEnabled'] -eq 'True' } else { $script:AirEnabled }
 
 # Определение архитектуры macOS и Linux:
 if (-not $IsWin) {
@@ -214,6 +210,9 @@ $script:CustomListStamp = $null
 # Определение переменной для кэширования метаданных ipa файлов:
 $script:IPAMetadataCache = @{}
 
+# Определение переменной для хранения выбранных версий приложений при загрузке на нескольких аккаунтах:
+$script:VersionSelections = @{}
+
 # Определение переменной для параллельных запросов к репозиторию при запуске:
 $script:StartupRequests = $null
 
@@ -237,8 +236,6 @@ $LangStrings = @{
 		"AccountMenu3" = "3. Выйти из аккаунта Apple"
 		"AccountMenuTitle" = "Операции с аккаунтом Apple"
 		"AccountSwitchMenuTitle" = "Выберите аккаунт Apple для перехода"
-		"AirEnabled" = "Подключение к устройству по Wi-Fi включено."
-		"AirDisabled" = "Подключение к устройству по Wi-Fi отключено."
 		"AskAppNumDownload" = "Введите порядковые номера (№) приложений для загрузки"
 		"AskAppNumPurchase" = "Введите порядковые номера (№) приложений для покупки"
 		"AskAppSearch" = "Введите название приложения или ID приложений"
@@ -251,6 +248,7 @@ $LangStrings = @{
 		"AuthFail" = "Вход в аккаунт Apple не выполнен."
 		"AuthSuccess" = "Вход в аккаунт Apple выполнен."
 		"BatchAllAccountsTitleDownload" = "Осуществить загрузку на всех аккаунтах, с которыми произведен вход?"
+		"BatchAllAccountsTitleDownloadVersion" = "Осуществить загрузку на всех аккаунтах, с которыми произведен вход?"
 		"BatchAllAccountsTitlePurchase" = "Осуществить покупку на всех аккаунтах, с которыми произведен вход?"
 		"BatchHintDownload" = "Доступна загрузка нескольких приложений, например, при вводе: 1, 2 и/или 3-5."
 		"BatchHintInstallApps" = "Доступна установка нескольких приложений, например, при вводе: 1, 2 и/или 3-5."
@@ -319,8 +317,8 @@ $LangStrings = @{
 		"InstallerMenu2" = "2. Установка приложений из папки Apps"
 		"InstallerMenu3" = "3. Включить/отключить режим разработчика"
 		"InstallerMenu4" = "4. Банка для чаевых"
-		"InstallerMenu5" = "5. Сменить язык (Change Language)"
-		"InstallerMenu6" = "6. Перейти в режим IPA_Downloader (загрузка и установка приложений)"
+		"InstallerMenu5" = "5. Перейти в режим IPA_Downloader (загрузка и установка приложений)"
+		"InstallerMenu6" = "6. Сменить язык (Change Language)"
 		"KbSyncGeneration" = "Формирование kbsync. Это может занять некоторое время..."
 		"LanguageChanged" = "Язык успешно изменен на русский."
 		"LanguageMenu1" = "1. Русский"
@@ -362,8 +360,6 @@ $LangStrings = @{
 		"AccountMenu3" = "3. Log out of Apple account"
 		"AccountMenuTitle" = "Apple account operations"
 		"AccountSwitchMenuTitle" = "Select Apple account to switch to"
-		"AirEnabled" = "Connection to the device via Wi-Fi enabled."
-		"AirDisabled" = "Connection to the device via Wi-Fi disabled."
 		"AskAppNumDownload" = "Enter index numbers (#) of apps to download"
 		"AskAppNumPurchase" = "Enter index numbers (#) of apps to purchase"
 		"AskAppSearch" = "Enter app name or app IDs"
@@ -376,6 +372,7 @@ $LangStrings = @{
 		"AuthFail" = "Not authenticated with Apple account."
 		"AuthSuccess" = "Apple account login successful."
 		"BatchAllAccountsTitleDownload" = "Download on all accounts that are signed in?"
+		"BatchAllAccountsTitleDownloadVersion" = "Download on all accounts that are signed in?"
 		"BatchAllAccountsTitlePurchase" = "Make the purchase on all accounts that are signed in?"
 		"BatchHintDownload" = "Downloading multiple apps is available, for example, by entering: 1, 2 and/or 3-5."
 		"BatchHintInstallApps" = "Installing multiple apps is available, for example, by entering: 1, 2 and/or 3-5."
@@ -444,8 +441,8 @@ $LangStrings = @{
 		"InstallerMenu2" = "2. Install apps from Apps folder"
 		"InstallerMenu3" = "3. Enable/disable developer mode"
 		"InstallerMenu4" = "4. Tip Jar"
-		"InstallerMenu5" = "5. Change Language (Сменить язык)"
-		"InstallerMenu6" = "6. Switch to IPA_Downloader mode (download and install apps)"
+		"InstallerMenu5" = "5. Switch to IPA_Downloader mode (download and install apps)"
+		"InstallerMenu6" = "6. Change Language (Сменить язык)"
 		"KbSyncGeneration" = "Generation of kbsync. This may take some time..."
 		"LanguageChanged" = "Language successfully changed to English."
 		"LanguageMenu1" = "1. Русский"
@@ -1994,11 +1991,10 @@ function IPA-Download {
 	Move-IPA-Files -AppID $AppID -AppName $AppName
 }
 
-# Функция загрузки приложений с выбором версии:
-function IPA-Download-With-Version {
+# Функция выбора версий приложения для загрузки:
+function IPA-Select-Versions {
 	param (
 		[string]$AppID,
-		[string]$AppName,
 		[string]$BundleID
 	)
 	
@@ -2098,24 +2094,54 @@ function IPA-Download-With-Version {
 			continue
 		}
 		
-		# Загрузка выбранных финальных версий:
-		$VersionsTotal = @($FinalIndices).Count
-		$VersionsCurrent = 0
-		foreach ($Index in $FinalIndices) {
-			$VersionsCurrent++
-			$SelectedToDownload = $DetailedMapping[$Index - 1]
-			Separator
-			
-			# Вывод выбранной версии приложения:
-			Write-Host "$VersionsCurrent/$VersionsTotal $(Get-Lang 'SelectedVersion') $($SelectedToDownload.Version)"
-			Separator
-			$FinalID = $SelectedToDownload.ID
-			Invoke-ipatool download @AppRef --external-version-id $FinalID
-			Move-IPA-Files -AppID $AppID -AppName $AppName
+		# Сохранение выбранных версий приложения:
+		$script:VersionSelections["$AppID|$BundleID"] = [PSCustomObject]@{
+			Account = $script:CurrentAppleAccount
+			Versions = @($FinalIndices | ForEach-Object { $DetailedMapping[$_ - 1] })
 		}
 		
-		# Выход из цикла после успешной загрузки:
+		# Выход из цикла после выбора версий:
 		break
+	}
+}
+
+# Функция загрузки выбранных версий приложения:
+function IPA-Download-With-Version {
+	param (
+		[string]$AppID,
+		[string]$AppName,
+		[string]$BundleID
+	)
+	
+	# Пропуск приложения без выбранных версий:
+	$Selection = $script:VersionSelections["$AppID|$BundleID"]
+	if ($null -eq $Selection) { return }
+	
+	$AppRef = @(Get-AppReference -AppID $AppID -BundleID $BundleID)
+	if ($AppRef.Count -eq 0) { return }
+	
+	# Получение лицензии на аккаунте, отличном от аккаунта выбора версий:
+	if ($Selection.Account -ne $script:CurrentAppleAccount) {
+		$RawOutput = Invoke-ipatool list-versions @AppRef --purchase
+		if ($RawOutput -match "Error:") {
+			Write-Host $RawOutput -ForegroundColor DarkRed
+			return
+		}
+	}
+	
+	# Загрузка выбранных финальных версий:
+	$VersionsTotal = @($Selection.Versions).Count
+	$VersionsCurrent = 0
+	foreach ($SelectedToDownload in @($Selection.Versions)) {
+		$VersionsCurrent++
+		Separator
+		
+		# Вывод выбранной версии приложения:
+		Write-Host "$VersionsCurrent/$VersionsTotal $(Get-Lang 'SelectedVersion') $($SelectedToDownload.Version)"
+		Separator
+		$FinalID = $SelectedToDownload.ID
+		Invoke-ipatool download @AppRef --external-version-id $FinalID
+		Move-IPA-Files -AppID $AppID -AppName $AppName
 	}
 }
 
@@ -2126,7 +2152,7 @@ function Invoke-AppAction {
 		[string]$BundleID,
 		[string]$AppName,
 		[string]$DisplayName,
-		[ValidateSet("Purchase", "Download", "DownloadVersion")][string]$Action,
+		[ValidateSet("Purchase", "Download", "SelectVersions", "DownloadVersion")][string]$Action,
 		[int]$Current,
 		[int]$Total
 	)
@@ -2144,6 +2170,9 @@ function Invoke-AppAction {
 		"Download" {
 			IPA-Download -AppID $AppID -AppName $AppName -BundleID $BundleID
 		}
+		"SelectVersions" {
+			IPA-Select-Versions -AppID $AppID -BundleID $BundleID
+		}
 		"DownloadVersion" {
 			IPA-Download-With-Version -AppID $AppID -AppName $AppName -BundleID $BundleID
 		}
@@ -2154,7 +2183,7 @@ function Invoke-AppAction {
 function Invoke-AppsBatch {
 	param (
 		$Apps,
-		[ValidateSet("Purchase", "Download", "DownloadVersion")][string]$Action
+		[ValidateSet("Purchase", "Download", "SelectVersions", "DownloadVersion")][string]$Action
 	)
 	
 	if ($null -eq $Apps) { return }
@@ -2178,10 +2207,19 @@ function Show-AuthData {
 function Invoke-AccountsBatch {
 	param (
 		$Apps,
-		[ValidateSet("Purchase", "Download")][string]$Action
+		[ValidateSet("Purchase", "Download", "DownloadVersion")][string]$Action
 	)
 	
 	if ($null -eq $Apps) { return }
+	
+	# Выбор версий приложений на текущем аккаунте:
+	if ($Action -eq "DownloadVersion") {
+		$script:VersionSelections = @{}
+		Invoke-AppsBatch -Apps $Apps -Action "SelectVersions"
+		
+		# Возврат в главное меню при отсутствии выбранных версий:
+		if ($script:VersionSelections.Count -eq 0) { return }
+	}
 	
 	# Исходный аккаунт и список аккаунтов для выполнения действия:
 	$OriginalAccount = $script:CurrentAppleAccount
@@ -2724,9 +2762,11 @@ function ConvertTo-iOSVersion {
 	return [version]($Parts -join '.')
 }
 
-# Функция получения аргументов idevice_id, ideviceinfo и ideviceinstaller для работы с устройствами по Wi-Fi:
-function Get-AirArgs {
-	if ($script:AirEnabled) { return @("-n") }
+# Функция получения аргументов idevice_id, ideviceinfo и ideviceinstaller для работы с устройством по виду подключения:
+function Get-NetworkArgs {
+	param ([string]$Connection)
+	
+	if ($Connection -eq "Wi-Fi") { return @("-n") }
 	
 	return @()
 }
@@ -2734,48 +2774,50 @@ function Get-AirArgs {
 # Функция получения списка подключенных устройств:
 function Get-ConnectedDevices {
 	$Devices = @()
-	$NetworkArgs = @(Get-AirArgs)
-	
-	# Поиск устройств, подключенных по Wi-Fi (-n) или по USB (-l):
-	$DeviceListFlag = if ($script:AirEnabled) { "-n" } else { "-l" }
-	$UDIDList = @(& "$script:ideviceidFilePath" $DeviceListFlag 2>$null)
-	
-	# Вид подключения устройств:
-	$ConnectionType = if ($script:AirEnabled) { "Wi-Fi" } else { "USB" }
 	
 	# Путь к ideviceinfo:
 	$ideviceinfoFilePath = $script:ideviceinfoFilePath
 	
-	foreach ($UDID in $UDIDList) {
-		$UDID = "$UDID".Trim()
+	# Поиск устройств, подключенных по USB и по Wi-Fi:
+	foreach ($ConnectionType in @("USB", "Wi-Fi")) {
+		$NetworkArgs = @(Get-NetworkArgs -Connection $ConnectionType)
+		$DeviceListFlag = if ($ConnectionType -eq "Wi-Fi") { "-n" } else { "-l" }
+		$UDIDList = @(& "$script:ideviceidFilePath" $DeviceListFlag 2>$null)
 		
-		# Пропуск строк, не похожих на UDID:
-		if ($UDID -notmatch '^[0-9A-Fa-f-]{20,}$') { continue }
-		
-		# Получение имени устройства:
-		$DeviceName = (& "$script:ideviceidFilePath" @NetworkArgs $UDID 2>$null | Out-String).Trim()
-		if ([string]::IsNullOrWhiteSpace($DeviceName)) { $DeviceName = "Unknown" }
-		
-		# Получение версии iOS устройства:
-		$DeviceVersion = "?"
-		if ($ideviceinfoFilePath) {
-			$VersionOutput = (& "$ideviceinfoFilePath" @NetworkArgs -u $UDID -k ProductVersion 2>$null | Out-String).Trim()
-			if ($VersionOutput -match '^\d+(\.\d+)+$') { $DeviceVersion = $VersionOutput }
-		}
-		
-		# Ограничение длины UDID в таблице:
-		$DisplayUDID = $UDID
-		if ($DisplayUDID.Length -gt 15) {
-			$DisplayUDID = $DisplayUDID.Substring(0, 15) + "…"
-		}
-		
-		$Devices += [PSCustomObject]@{
-			Num = $Devices.Count + 1
-			Name = $DeviceName
-			iOSVersion = $DeviceVersion
-			UDID = $UDID
-			DisplayUDID = $DisplayUDID
-			Connection = $ConnectionType
+		foreach ($UDID in $UDIDList) {
+			$UDID = "$UDID".Trim()
+			
+			# Пропуск строк, не похожих на UDID:
+			if ($UDID -notmatch '^[0-9A-Fa-f-]{20,}$') { continue }
+			
+			# Пропуск устройства, уже найденного по USB:
+			if ($Devices.UDID -contains $UDID) { continue }
+			
+			# Получение имени устройства:
+			$DeviceName = (& "$script:ideviceidFilePath" @NetworkArgs $UDID 2>$null | Out-String).Trim()
+			if ([string]::IsNullOrWhiteSpace($DeviceName)) { $DeviceName = "Unknown" }
+			
+			# Получение версии iOS устройства:
+			$DeviceVersion = "?"
+			if ($ideviceinfoFilePath) {
+				$VersionOutput = (& "$ideviceinfoFilePath" @NetworkArgs -u $UDID -k ProductVersion 2>$null | Out-String).Trim()
+				if ($VersionOutput -match '^\d+(\.\d+)+$') { $DeviceVersion = $VersionOutput }
+			}
+			
+			# Ограничение длины UDID в таблице:
+			$DisplayUDID = $UDID
+			if ($DisplayUDID.Length -gt 15) {
+				$DisplayUDID = $DisplayUDID.Substring(0, 15) + "…"
+			}
+			
+			$Devices += [PSCustomObject]@{
+				Num = $Devices.Count + 1
+				Name = $DeviceName
+				iOSVersion = $DeviceVersion
+				UDID = $UDID
+				DisplayUDID = $DisplayUDID
+				Connection = $ConnectionType
+			}
 		}
 	}
 	
@@ -3090,7 +3132,7 @@ function Read-DeviceApps {
 	param ($Device)
 	
 	$ErrorResult = [PSCustomObject]@{ Status = "Error"; Apps = @() }
-	$NetworkArgs = @(Get-AirArgs)
+	$NetworkArgs = @(Get-NetworkArgs -Connection $Device.Connection)
 	
 	# Запрос Bundle ID, версии, названия, признака сгруженного приложения и iTunesMetadata:
 	$InstallerArgs = $NetworkArgs + @("--udid", $Device.UDID, "list", "--user", "--placeholders", "--xml", "--attribute", "CFBundleIdentifier", "--attribute", "CFBundleShortVersionString", "--attribute", "CFBundleVersion", "--attribute", "CFBundleDisplayName", "--attribute", "IsPlaceholder", "--attribute", "iTunesMetadata")
@@ -3221,9 +3263,6 @@ function Get-DeviceApps {
 
 # Функция установки приложений из папки Apps:
 function Install-Apps {
-	# Аргументы для взаимодействия с устройствами, подключенными по Wi-Fi:
-	$NetworkArgs = @(Get-AirArgs)
-	
 	while ($true) {
 		# Поиск подключенных устройств:
 		$Devices = @(Get-ConnectedDevices)
@@ -3275,6 +3314,9 @@ function Install-Apps {
 				foreach ($DeviceIndex in $SelectedDeviceIndices) {
 					$Device = $Devices[$DeviceIndex - 1]
 					$DeviceUDID = $Device.UDID
+					
+					# Аргументы для взаимодействия с устройством по виду подключения:
+					$NetworkArgs = @(Get-NetworkArgs -Connection $Device.Connection)
 					
 					Separator
 					Write-Host "$(Get-Lang 'InstallDevice') $($Device.Name) ($($Device.DisplayUDID))"
@@ -3410,17 +3452,10 @@ function Show-ModeBanner {
 	
 	Show-SystemInfo
 	
-	# Вывод сообщений о включенных режимах разработчика и подключения к устройству по Wi-Fi:
-	if ($script:IsDebugEnabled -or $script:AirEnabled) {
+	# Вывод сообщения о включенном режиме разработчика:
+	if ($script:IsDebugEnabled) {
 		Separator
-		
-		if ($script:IsDebugEnabled) {
-			Write-Host (Get-Lang "DebugEnabled")
-		}
-		
-		if ($script:AirEnabled) {
-			Write-Host (Get-Lang "AirEnabled")
-		}
+		Write-Host (Get-Lang "DebugEnabled")
 	}
 }
 
@@ -3457,18 +3492,6 @@ function Switch-DebugMode {
 		Write-Host (Get-Lang "DebugEnabled")
 	} else {
 		Write-Host (Get-Lang "DebugDisabled")
-	}
-}
-
-# Функция включения/отключения подключения к устройству по Wi-Fi:
-function Switch-AirMode {
-	$script:AirEnabled = -not $script:AirEnabled
-	Set-Setting -Key "AirEnabled" -Value $script:AirEnabled
-	Separator
-	if ($script:AirEnabled) {
-		Write-Host (Get-Lang "AirEnabled")
-	} else {
-		Write-Host (Get-Lang "AirDisabled")
 	}
 }
 
@@ -3568,17 +3591,14 @@ $(Get-Lang 'InstallerMenu6')`n
 			# 4. Банка для чаевых:
 			"4" { Open-TipJar }
 			
-			# 5. Сменить язык (Change Language):
-			"5" { Switch-Language }
-			
-			# 6. Перейти в режим IPA_Downloader (загрузка и установка приложений):
-			"6" {
+			# 5. Перейти в режим IPA_Downloader (загрузка и установка приложений):
+			"5" {
 				$script:WorkMode = "Downloader"
 				return
 			}
 			
-			# Подключение к устройству по Wi-Fi:
-			"air" { Switch-AirMode }
+			# 6. Сменить язык (Change Language):
+			"6" { Switch-Language }
 			
 			# Неверный ввод:
 			default { Show-Error "ErrorInvalidInput" }
@@ -3785,9 +3805,6 @@ $(Get-Lang 'LoginMenu5')`n
 			# 5. Сменить язык (Change Language):
 			"5" { Switch-Language }
 			
-			# Подключение к устройству по Wi-Fi:
-			"air" { Switch-AirMode }
-			
 			# Неверный ввод:
 			default { Show-Error "ErrorInvalidInput" }
 		}
@@ -3831,7 +3848,7 @@ $(Get-Lang 'DownloaderMenu12')`n
 			"2" { Invoke-AccountsBatch -Apps (Search-Apps -PromptKey 'AskAppNumDownload') -Action "Download" }
 			
 			# 3. Поиск приложений по названию или ID и загрузка (с выбором версии):
-			"3" { Invoke-AppsBatch -Apps (Search-Apps -PromptKey 'AskAppNumDownload') -Action "DownloadVersion" }
+			"3" { Invoke-AccountsBatch -Apps (Search-Apps -PromptKey 'AskAppNumDownload') -Action "DownloadVersion" }
 			
 			# 4. Выбор готового списка приложений и покупка (без загрузки):
 			"4" {
@@ -3848,7 +3865,7 @@ $(Get-Lang 'DownloaderMenu12')`n
 			# 6. Выбор готового списка приложений и загрузка (с выбором версии):
 			"6" {
 				Separator
-				Invoke-AppsBatch -Apps (Get-Apps-From-List -ListMode "Download") -Action "DownloadVersion"
+				Invoke-AccountsBatch -Apps (Get-Apps-From-List -ListMode "Download") -Action "DownloadVersion"
 			}
 			
 			# 7. Проверка минимальной версии iOS для приложений в папке Apps:
@@ -3873,9 +3890,6 @@ $(Get-Lang 'DownloaderMenu12')`n
 			
 			# 12. Сменить язык (Change Language):
 			"12" { Switch-Language }
-			
-			# Подключение к устройству по Wi-Fi:
-			"air" { Switch-AirMode }
 			
 			# Неверный ввод:
 			default { Show-Error "ErrorInvalidInput" }
