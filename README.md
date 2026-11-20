@@ -412,7 +412,10 @@ C:\Users\%username%\AppData\Roaming\Apple Computer\
 **20. ERROR: Install failed. Got error "APIInternalError" with code 0x00000000: Error Domain=IXErrorDomain Code=46:**
 * Удалите приложение с устройства, перезагрузите устройство и попробуйте установить приложение еще раз
 
-**21. После установки приложение сразу сворачивается при запуске:**
+**21. ERROR: Install failed. Got error "PackageExtractionFailed" with code 0x00000000: Could not extract archive:**
+* На устройстве не хватает памяти для установки приложения
+
+**22. После установки приложение сразу сворачивается при запуске:**
 * Войдите в App Store под аккаунтом, с которого приложение было загружено, и установите любое бесплатное приложение
 * После этого запустите проблемное приложение снова
 

@@ -413,7 +413,10 @@ C:\Users\%username%\AppData\Roaming\Apple Computer\
 **20. ERROR: Install failed. Got error "APIInternalError" with code 0x00000000: Error Domain=IXErrorDomain Code=46:**
 * Remove the app from the device, restart the device, and try installing the app again
 
-**21. The app immediately closes when launched after installation:**
+**21. ERROR: Install failed. Got error "PackageExtractionFailed" with code 0x00000000: Could not extract archive:**
+* The device does not have enough storage space to install the app
+
+**22. The app immediately closes when launched after installation:**
 * Log in to the App Store using the account from which the app was downloaded, and install any free app
 * After that, launch the problematic app again
 
