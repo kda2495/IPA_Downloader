@@ -2,10 +2,13 @@
 Set-Location -LiteralPath $PSScriptRoot
 
 # Версия скрипта:
-$ScriptVersion = "4.5.0"
+$ScriptVersion = "4.5.1"
 
 # Переменная состояния keychain-passphrase:
 $script:KeychainEnabled = $false
+
+# Переменная состояния запроса покупки или загрузки на всех аккаунтах:
+$script:BatchAllAccountsEnabled = $true
 
 # Виды покупок, отображаемые в списке приложений из истории покупок аккаунта Apple:
 $script:AccountAppKinds = @("iOS App", "Mac App")
@@ -20,7 +23,7 @@ $FilesFolderPath = Join-Path -Path $PSScriptRoot -ChildPath "Files"
 $SettingsFilePath = Join-Path -Path $FilesFolderPath -ChildPath "Settings.txt"
 
 # Список настроек, которые сохраняются и используются в скрипте:
-$script:SettingsKeys = @('Language', 'Mode', 'DebugEnabled', 'KeychainEnabled')
+$script:SettingsKeys = @('Language', 'Mode', 'DebugEnabled', 'KeychainEnabled', 'BatchAllAccountsEnabled')
 
 # Функция чтения настроек из Files/Settings.txt:
 function Get-Settings {
@@ -90,6 +93,7 @@ $script:CurrentLang = if ($SavedSettings['Language'] -match '^(RU|EN)$') { $Save
 $script:WorkMode = if ($SavedSettings['Mode'] -in @('Downloader', 'Installer')) { $SavedSettings['Mode'] } else { $null }
 $script:IsDebugEnabled = if ($SavedSettings['DebugEnabled'] -eq 'True') { $true } else { $false }
 $script:KeychainEnabled = if ($SavedSettings['KeychainEnabled'] -in @('True', 'False')) { $SavedSettings['KeychainEnabled'] -eq 'True' } else { $script:KeychainEnabled }
+$script:BatchAllAccountsEnabled = if ($SavedSettings['BatchAllAccountsEnabled'] -in @('True', 'False')) { $SavedSettings['BatchAllAccountsEnabled'] -eq 'True' } else { $script:BatchAllAccountsEnabled }
 
 # Определение архитектуры macOS и Linux:
 if (-not $IsWin) {
@@ -2227,7 +2231,7 @@ function Invoke-AccountsBatch {
 	$AccountsToProcess = @($OriginalAccount)
 	
 	# Запрос выполнения действия на всех аккаунтах:
-	if ($SavedAccounts.Count -gt 0) {
+	if ($script:BatchAllAccountsEnabled -and $SavedAccounts.Count -gt 0) {
 		Separator
 		# Заголовок запроса:
 		$AccountsMenu = "$(Get-Lang "BatchAllAccountsTitle$Action") $(Get-Lang 'CancelStep')`n$(Get-Lang 'Menu1Yes')`n$(Get-Lang 'Menu2No')`n"
@@ -3518,9 +3522,10 @@ $(Get-Lang 'LanguageMenu2')`n
 	# Установка режима IPA_Downloader по умолчанию:
 	$script:WorkMode = "Downloader"
 	
-	# Сохранение режима работы, состояния keychain-passphrase и вывод баннера:
+	# Сохранение режима работы, состояния keychain-passphrase, запроса покупки/загрузки на всех аккаунтах и вывод баннера:
 	Set-Setting -Key "Mode" -Value $script:WorkMode
 	Set-Setting -Key "KeychainEnabled" -Value $script:KeychainEnabled
+	Set-Setting -Key "BatchAllAccountsEnabled" -Value $script:BatchAllAccountsEnabled
 	Show-ModeBanner
 	
 	# Проверка обновлений:
@@ -3915,6 +3920,7 @@ function Invoke-DownloaderMode {
 	Set-Setting -Key "Language" -Value $script:CurrentLang
 	Set-Setting -Key "Mode" -Value "Downloader"
 	Set-Setting -Key "KeychainEnabled" -Value $script:KeychainEnabled
+	Set-Setting -Key "BatchAllAccountsEnabled" -Value $script:BatchAllAccountsEnabled
 	
 	# Основной цикл:
 	Invoke-DownloaderMenu
