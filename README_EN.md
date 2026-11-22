@@ -11,7 +11,7 @@ A script for downloading apps previously purchased in the App Store, including d
 ## Information about the script:
 ### Important:
 * ipatool is an unofficial tool; therefore, using the script is only at your own risk
-* To avoid having your Apple Account locked, make sure you enter password and/or two-factor authentication (2FA) code correctly
+* To avoid having your Apple Account locked, make sure you enter password and/or six-digit two-factor authentication (2FA) code correctly
 * If your Apple account is locked, you can unlock it via your device or on the [icloud.com](https://icloud.com) website
 ### General requirements for use:
 * Windows 7-11 (x64)
@@ -102,15 +102,15 @@ A script for downloading apps previously purchased in the App Store, including d
 * When an update is available, choose to either visit the repository to download new script version or continue with current version
 * Press Enter
 #### 4. By default, the script starts in IPA_Downloader mode (downloading and installing apps):
-* To log in, enter the command: 1. Log in to Apple account
+* To sign in, enter the command: 1. Sign in to Apple account
 * Press Enter
-* Enter Apple account (Enter email:)
+* Enter email: enter Apple account
 * Press Enter
-* Enter password (Enter password:)
+* Enter password: enter password of Apple account
 * Press Enter
-* Tap `Allow` on your device and remember the two-factor authentication (2FA) code
-* If the two-factor authentication (2FA) code doesn't arrive automatically, turn on Airplane mode on your device, go to `Settings - Apple Account - Sign-In & Security - Get Verification Code` (this is the two-factor authentication (2FA) code)
-* Enter the two-factor authentication code (Enter 2FA code:)
+* Tap `Allow` on your device and note down the six-digit two-factor authentication (2FA) code
+* If the two-factor authentication (2FA) code does not automatically appear on your device, this means the password was entered incorrectly. Exit the script and try signing in again. Do not attempt to enter anything other than the six-digit code.
+* Enter 2FA code: enter the six-digit two-factor authentication (2FA) code without spaces, all on one line. For example: 123456
 * Press Enter
 * Enter the required command
 * Press Enter
@@ -141,15 +141,15 @@ A script for downloading apps previously purchased in the App Store, including d
 * When an update is available, choose to either visit the repository to download new script version or continue with current version
 * Press Enter
 #### 4. By default, the script starts in IPA_Downloader mode (downloading and installing apps):
-* To log in, enter the command: 1. Log in to Apple account
+* To sign in, enter the command: 1. Sign in to Apple account
 * Press Enter
-* Enter Apple account (Enter email:)
+* Enter email: enter Apple account
 * Press Enter
-* Enter password (Enter password:)
+* Enter password: enter password of Apple account
 * Press Enter
-* Tap `Allow` on your device and remember the two-factor authentication (2FA) code
-* If the two-factor authentication (2FA) code doesn't arrive automatically, turn on Airplane mode on your device, go to `Settings - Apple Account - Sign-In & Security - Get Verification Code` (this is the two-factor authentication (2FA) code)
-* Enter the two-factor authentication code (Enter 2FA code:)
+* Tap `Allow` on your device and note down the six-digit two-factor authentication (2FA) code
+* If the two-factor authentication (2FA) code does not automatically appear on your device, this means the password was entered incorrectly. Exit the script and try signing in again. Do not attempt to enter anything other than the six-digit code.
+* Enter 2FA code: enter the six-digit two-factor authentication (2FA) code without spaces, all on one line. For example: 123456
 * Press Enter
 * Enter the required command
 * Press Enter
@@ -187,15 +187,15 @@ A script for downloading apps previously purchased in the App Store, including d
 * When an update is available, choose to either visit the repository to download new script version or continue with current version
 * Press Enter
 #### 5. By default, the script starts in IPA_Downloader mode (downloading and installing apps):
-* To log in, enter the command: 1. Log in to Apple account
+* To sign in, enter the command: 1. Sign in to Apple account
 * Press Enter
-* Enter Apple account (Enter email:)
+* Enter email: enter Apple account
 * Press Enter
-* Enter password (Enter password:)
+* Enter password: enter password of Apple account
 * Press Enter
-* Tap `Allow` on your device and remember the two-factor authentication (2FA) code
-* If the two-factor authentication (2FA) code doesn't arrive automatically, turn on Airplane mode on your device, go to `Settings - Apple Account - Sign-In & Security - Get Verification Code` (this is the two-factor authentication (2FA) code)
-* Enter the two-factor authentication code (Enter 2FA code:)
+* Tap `Allow` on your device and note down the six-digit two-factor authentication (2FA) code
+* If the two-factor authentication (2FA) code does not automatically appear on your device, this means the password was entered incorrectly. Exit the script and try signing in again. Do not attempt to enter anything other than the six-digit code.
+* Enter 2FA code: enter the six-digit two-factor authentication (2FA) code without spaces, all on one line. For example: 123456
 * Press Enter
 * Enter the required command
 * Press Enter
@@ -298,7 +298,7 @@ A script for downloading apps previously purchased in the App Store, including d
 * Enter the required action:
 1. Add account
 2. Switch account
-3. Log out of Apple Account
+3. Sign out of Apple Account
 * Press Enter
 #### 10. Enable/disable developer mode:
 * The script will enable or disable developer mode to collect additional information
@@ -342,7 +342,7 @@ A script for downloading apps previously purchased in the App Store, including d
 * Enter the command: `chmod +x (space)`
 * Drag the file `Start_IPA_Downloader_macOS.command` into the Terminal window
 * Press Enter
-* Then enter the command:  `xattr -d com.apple.quarantine (space)`
+* Then enter the command: `xattr -d com.apple.quarantine (space)`
 * Drag the file `Start_IPA_Downloader_macOS.command` into the Terminal window
 * Press Enter and run the script again
 
@@ -362,10 +362,10 @@ A script for downloading apps previously purchased in the App Store, including d
 
 **8. Not logged in**
 * Tools based on ipatool-go were previously used
-* In the script, you need to log out of your Apple account and log in again
+* In the script, you need to sign out of your Apple account and sign in again
 
 **9. Download error: invalid response: empty songList:**
-* Re-log in to the script using Apple account
+* Re-sign in to the script using Apple account
 
 **10. Download error: HTTP request failed: Couldn't resolve host name:**
 * Failed to connect to Apple servers, check your internet connection
@@ -375,7 +375,7 @@ A script for downloading apps previously purchased in the App Store, including d
 
 **12. Download failed after retries: Failure when receiving data from the peer:**
 * Failed to connect to Apple servers, check your internet connection
-* Or re-log in to the script using Apple account
+* Or re-sign in to the script using Apple account
 
 **13. Error: license is required:**
 * The app was not previously purchased on this Apple account
@@ -417,7 +417,7 @@ C:\Users\%username%\AppData\Roaming\Apple Computer\
 * The device does not have enough storage space to install the app
 
 **22. The app immediately closes when launched after installation:**
-* Log in to the App Store using the account from which the app was downloaded, and install any free app
+* Sign in to the App Store using the account from which the app was downloaded, and install any free app
 * After that, launch the problematic app again
 
 ### If you encounter an issue:
