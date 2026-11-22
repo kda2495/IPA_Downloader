@@ -53,7 +53,7 @@ A script for downloading apps previously purchased in the App Store, including d
 * To download apps, they must be previously acquired in the App Store
 * Apps are downloaded directly from the App Store
 * It is recommended to disable security keys and switch to standard two-factor authentication (2FA)
-* The script supports bulk purchasing/downloading/installing apps. Simply enter the index numbers (#) of the apps/versions from the tables, separated by commas or hyphens. For example, entering 1, 2, 3-5 will purchase/download/install the apps with index numbers (#) 1, 2, 3, 4, and 5
+* The script supports bulk purchasing/downloading/installing apps. Simply enter the index numbers (#) of the apps/versions from the tables, separated by commas or hyphens, for example, entering `1, 2, 3-5` will purchase/download/install the apps with index numbers (#) `1, 2, 3, 4, and 5`
 * It is possible to create a custom list of applications; you just need to add data in the format `App name: its ID`, for example: `Google: 284815942` to the file Files/AppsListCustom.txt
 * The IPA_Installer mode (installing apps only) works without authorization
 
@@ -110,7 +110,7 @@ A script for downloading apps previously purchased in the App Store, including d
 * Press Enter
 * Tap `Allow` on your device and note down the six-digit two-factor authentication (2FA) code
 * If the two-factor authentication (2FA) code does not automatically appear on your device, this means the password was entered incorrectly. Exit the script and try signing in again. Do not attempt to enter anything other than the six-digit code.
-* Enter 2FA code: enter the six-digit two-factor authentication (2FA) code without spaces, all on one line. For example: 123456
+* Enter 2FA code: enter the six-digit two-factor authentication (2FA) code without spaces, all on one line, for example: `123456`
 * Press Enter
 * Enter the required command
 * Press Enter
@@ -149,7 +149,7 @@ A script for downloading apps previously purchased in the App Store, including d
 * Press Enter
 * Tap `Allow` on your device and note down the six-digit two-factor authentication (2FA) code
 * If the two-factor authentication (2FA) code does not automatically appear on your device, this means the password was entered incorrectly. Exit the script and try signing in again. Do not attempt to enter anything other than the six-digit code.
-* Enter 2FA code: enter the six-digit two-factor authentication (2FA) code without spaces, all on one line. For example: 123456
+* Enter 2FA code: enter the six-digit two-factor authentication (2FA) code without spaces, all on one line, for example: `123456`
 * Press Enter
 * Enter the required command
 * Press Enter
@@ -195,7 +195,7 @@ A script for downloading apps previously purchased in the App Store, including d
 * Press Enter
 * Tap `Allow` on your device and note down the six-digit two-factor authentication (2FA) code
 * If the two-factor authentication (2FA) code does not automatically appear on your device, this means the password was entered incorrectly. Exit the script and try signing in again. Do not attempt to enter anything other than the six-digit code.
-* Enter 2FA code: enter the six-digit two-factor authentication (2FA) code without spaces, all on one line. For example: 123456
+* Enter 2FA code: enter the six-digit two-factor authentication (2FA) code without spaces, all on one line, for example: `123456`
 * Press Enter
 * Enter the required command
 * Press Enter
