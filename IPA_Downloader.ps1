@@ -261,10 +261,11 @@ $LangStrings = @{
 		"BatchHintVersionIDs" = "Доступен выбор нескольких ID версий приложения, например, при вводе: 1, 2 и/или 3-5."
 		"BatchHintVersions" = "Доступна загрузка нескольких версий приложения, например, при вводе: 1, 2 и/или 3-5."
 		"CancelStep" = "(0: Возврат в главное меню):"
-		"CancelStepList" = "(0: Возврат к выбору списка):"
-		"CancelStepVerID" = "(0: Возврат к вводу порядковых номеров (№) или ID версий):"
 		"CustomAppsListMenu" = "3. Пользовательский список приложений (Files/AppsListCustom.txt)"
 		"CustomAppsListMenu5" = "5. Пользовательский список приложений (Files/AppsListCustom.txt)"
+		"CustomIOSListMenu" = "6. Список версий приложений для определенной iOS"
+		"CustomIOSMenuItem" = "iOS {0}.x"
+		"CustomIOSMenuTitle" = "Выберите версию iOS"
 		"DebugEnabled" = "Режим разработчика включен."
 		"DebugDisabled" = "Режим разработчика отключен."
 		"DeviceAppsListLoad" = "Получение списка приложений, установленных на устройстве..."
@@ -385,10 +386,11 @@ $LangStrings = @{
 		"BatchHintVersionIDs" = "Selecting multiple app version IDs is available, for example, by entering: 1, 2 and/or 3-5."
 		"BatchHintVersions" = "Downloading multiple app versions is available, for example, by entering: 1, 2 and/or 3-5."
 		"CancelStep" = "(0: Return to main menu):"
-		"CancelStepList" = "(0: Return to list selection):"
-		"CancelStepVerID" = "(0: Return to entering index numbers (#) or version IDs):"
 		"CustomAppsListMenu" = "3. Custom apps list (Files/AppsListCustom.txt)"
 		"CustomAppsListMenu5" = "5. Custom apps list (Files/AppsListCustom.txt)"
+		"CustomIOSListMenu" = "6. List of app versions for a specific iOS"
+		"CustomIOSMenuItem" = "iOS {0}.x"
+		"CustomIOSMenuTitle" = "Choose iOS version"
 		"DebugEnabled" = "Developer mode enabled."
 		"DebugDisabled" = "Developer mode disabled."
 		"DeviceAppsListLoad" = "Getting the list of apps installed on the device..."
@@ -1296,6 +1298,88 @@ function Get-Custom-List {
 	return $script:CustomListCache
 }
 
+# Функция чтения сохраненных ID версий по версиям iOS из пользовательского списка приложений:
+function Read-CustomIOSVersionMap {
+	$ValuesByID = @{}
+	
+	if (!(Test-Path -LiteralPath $AppsListCustomPath -PathType Leaf)) {
+		return [PSCustomObject]@{ VersionsByID = @{}; IOSVersions = @() }
+	}
+	
+	try {
+		foreach ($Line in @(Get-Content -LiteralPath $AppsListCustomPath -Encoding UTF8 -ErrorAction Stop)) {
+			if ([string]::IsNullOrWhiteSpace($Line) -or $Line.TrimStart().StartsWith('#')) { continue }
+			
+			# Разбор строки в формате: Название: ID | 15-16=ID версии:
+			$Row = [regex]::Match($Line, '^\s*(.+?):\s*(\d{6,})\s*(?:\|\s*(.*))?\s*$')
+			if (!$Row.Success) { continue }
+			
+			$AppID = $Row.Groups[2].Value
+			foreach ($Field in @($Row.Groups[3].Value -split '\s*\|\s*')) {
+				# Разбор поля с ID версии или NO_SUPPORT для версии iOS или диапазона версий iOS:
+				$Match = [regex]::Match($Field, '^\s*(\d{1,2})(?:\s*-\s*(\d{1,2}))?\s*=\s*(\d+|NO_SUPPORT)\s*$', [System.Text.RegularExpressions.RegexOptions]::IgnoreCase)
+				
+				# Пропуск полей другого формата, например UNKNOWN и RETRY:
+				if (!$Match.Success) { continue }
+				
+				$First = [int]$Match.Groups[1].Value
+				$Last = if ($Match.Groups[2].Success) { [int]$Match.Groups[2].Value } else { $First }
+				if ($First -lt 1 -or $Last -lt $First -or $Last -gt 99) { continue }
+				
+				# Накопление значений для каждой версии iOS:
+				if (!$ValuesByID.ContainsKey($AppID)) { $ValuesByID[$AppID] = @{} }
+				foreach ($IOS in $First..$Last) {
+					if (!$ValuesByID[$AppID].ContainsKey($IOS)) {
+						$ValuesByID[$AppID][$IOS] = New-Object 'System.Collections.Generic.HashSet[string]'
+					}
+					$null = $ValuesByID[$AppID][$IOS].Add($Match.Groups[3].Value.ToUpperInvariant())
+				}
+			}
+		}
+	} catch {
+		Show-Error 'ErrorAppsListLoad'
+		return [PSCustomObject]@{ VersionsByID = @{}; IOSVersions = @() }
+	}
+	
+	# Отбор версий iOS с единственным числовым ID версии:
+	$VersionsByID = @{}
+	$IOSSet = New-Object 'System.Collections.Generic.HashSet[int]'
+	foreach ($AppID in $ValuesByID.Keys) {
+		foreach ($IOS in $ValuesByID[$AppID].Keys) {
+			$Values = @($ValuesByID[$AppID][$IOS])
+			if ($Values.Count -ne 1 -or $Values[0] -notmatch '^\d+$') { continue }
+			
+			if (!$VersionsByID.ContainsKey($AppID)) { $VersionsByID[$AppID] = @{} }
+			$VersionsByID[$AppID][$IOS] = $Values[0]
+			$null = $IOSSet.Add($IOS)
+		}
+	}
+	
+	return [PSCustomObject]@{
+		VersionsByID = $VersionsByID
+		IOSVersions = @($IOSSet | Sort-Object)
+	}
+}
+
+# Функция выбора версии iOS из сохраненных в пользовательском списке приложений:
+function Read-CustomIOSVersion {
+	param ([int[]]$IOSVersions)
+	
+	# Формирование пунктов меню по версиям iOS:
+	$SortedIOS = @($IOSVersions | Sort-Object -Unique)
+	$MenuItems = @(
+		for ($i = 0; $i -lt $SortedIOS.Count; $i++) {
+			"$($i + 1). $((Get-Lang 'CustomIOSMenuItem') -f $SortedIOS[$i])"
+		}
+	)
+	$MenuText = (@("$(Get-Lang 'CustomIOSMenuTitle') $(Get-Lang 'CancelStep')") + $MenuItems) -join "`n"
+	
+	$Choice = Read-MenuChoice -MenuText "$MenuText`n" -OptionsCount $MenuItems.Count -AllowCancel
+	if ($Choice -eq '0') { return $null }
+	
+	return $SortedIOS[[int]$Choice - 1]
+}
+
 # Функция получения пути к списку приложений из истории покупок аккаунта Apple (Files/AppsListAccount_.txt):
 function Get-Account-List-Path {
 	$SafeAccountName = $script:CurrentAppleAccount -replace '[\\/:*?"<>|]', '_'
@@ -1864,7 +1948,6 @@ function Read-NumberSelection {
 	param (
 		[string]$PromptKey,
 		[int]$MaxCount,
-		[string]$CancelKey = 'CancelStep',
 		[string]$HintKey
 	)
 	
@@ -1875,7 +1958,7 @@ function Read-NumberSelection {
 			Separator
 		}
 		
-		$Selection = Read-Host "$(Get-Lang $PromptKey) (1-$MaxCount) $(Get-Lang $CancelKey)`n"
+		$Selection = Read-Host "$(Get-Lang $PromptKey) (1-$MaxCount) $(Get-Lang 'CancelStep')`n"
 		
 		if ($Selection -eq '0') { return $null }
 		
@@ -1984,14 +2067,20 @@ function IPA-Download {
 	param (
 		[string]$AppID,
 		[string]$AppName,
-		[string]$BundleID
+		[string]$BundleID,
+		[string]$ExternalVersionID
 	)
 	
 	$AppRef = @(Get-AppReference -AppID $AppID -BundleID $BundleID)
 	if ($AppRef.Count -eq 0) { return }
 	
 	Separator
-	Invoke-ipatool download @AppRef --purchase
+	if (![string]::IsNullOrWhiteSpace($ExternalVersionID)) {
+		# Загрузка сборки по ID версии из пользовательского списка:
+		Invoke-ipatool download @AppRef --external-version-id $ExternalVersionID
+	} else {
+		Invoke-ipatool download @AppRef --purchase
+	}
 	Move-IPA-Files -AppID $AppID -AppName $AppName
 }
 
@@ -2041,71 +2130,69 @@ function IPA-Select-Versions {
 	}
 	$VersionMapping = $VersionList.ToArray()
 	
-	# Внешний цикл:
-	while ($true) {
-		Separator
-		Out-Table -Data @($VersionMapping) -Headers (Get-Lang "HeaderNum"), (Get-Lang "HeaderVersionID") -Properties "Num", "ID"
-		Separator
+	Separator
+	Out-Table -Data @($VersionMapping) -Headers (Get-Lang "HeaderNum"), (Get-Lang "HeaderVersionID") -Properties "Num", "ID"
+	Separator
+	
+	# Запрос порядковых номеров (№) или ID версий для вычисления и вывода версий:
+	$PreSelectedIDs = Read-VersionIDSelection -VersionMapping $VersionMapping
+	
+	# Ввод 0: возврат в главное меню:
+	if ($null -eq $PreSelectedIDs) {
+		$script:BatchCancelled = $true
+		return
+	}
+	
+	$DetailedMapping = @()
+	$DetailCounter = 1
+	
+	# Запрос метаданных для выбранных ID:
+	foreach ($VersionID in $PreSelectedIDs) {
+		$Meta = Invoke-ipatool get-version-metadata @AppRef --external-version-id $VersionID
+		$MetaText = ($Meta | Out-String)
 		
-		# Запрос порядковых номеров (№) или ID версий для вычисления и вывода версий:
-		$PreSelectedIDs = Read-VersionIDSelection -VersionMapping $VersionMapping
+		$DisplayVersion = if ($MetaText -match 'displayVersion=([^\s,]+)') { $Matches[1] } else { "NA" }
+		$DisplayVersion = $script:reANSI.Replace($DisplayVersion, '')
 		
-		# Ввод 0: возврат в главное меню:
-		if ($null -eq $PreSelectedIDs) { return }
+		# Дата выхода версии из значения releaseDate:
+		$ReleaseDate = if ($MetaText -match 'releaseDate=([^\s,]+)') { $Matches[1] } else { "NA" }
+		$ReleaseDate = Convert-DateText -DateText ($script:reANSI.Replace($ReleaseDate, ''))
 		
-		$DetailedMapping = @()
-		$DetailCounter = 1
+		# Минимальная версия iOS из значения minimumOSVersion:
+		$MinOSVersion = if ($MetaText -match 'minimumOSVersion=([^\s,]+)') { $Matches[1] } else { "NA" }
+		$MinOSVersion = $script:reANSI.Replace($MinOSVersion, '')
 		
-		# Запрос метаданных для выбранных ID:
-		foreach ($VersionID in $PreSelectedIDs) {
-			$Meta = Invoke-ipatool get-version-metadata @AppRef --external-version-id $VersionID
-			$MetaText = ($Meta | Out-String)
-			
-			$DisplayVersion = if ($MetaText -match 'displayVersion=([^\s,]+)') { $Matches[1] } else { "NA" }
-			$DisplayVersion = $script:reANSI.Replace($DisplayVersion, '')
-			
-			# Дата выхода версии из значения releaseDate:
-			$ReleaseDate = if ($MetaText -match 'releaseDate=([^\s,]+)') { $Matches[1] } else { "NA" }
-			$ReleaseDate = Convert-DateText -DateText ($script:reANSI.Replace($ReleaseDate, ''))
-			
-			# Минимальная версия iOS из значения minimumOSVersion:
-			$MinOSVersion = if ($MetaText -match 'minimumOSVersion=([^\s,]+)') { $Matches[1] } else { "NA" }
-			$MinOSVersion = $script:reANSI.Replace($MinOSVersion, '')
-			
-			$DetailedMapping += [PSCustomObject]@{
-				Index = $DetailCounter
-				ID = $VersionID
-				Version = $DisplayVersion
-				ReleaseDate = $ReleaseDate
-				MinOS = $MinOSVersion
-			}
-			$DetailCounter++
+		$DetailedMapping += [PSCustomObject]@{
+			Index = $DetailCounter
+			ID = $VersionID
+			Version = $DisplayVersion
+			ReleaseDate = $ReleaseDate
+			MinOS = $MinOSVersion
 		}
-		
-		Separator
-		Write-Host (Get-Lang "SelectedVersionsList")
-		Separator
-		
-		# Отрисовка таблицы:
-		Out-Table -Data $DetailedMapping -Headers (Get-Lang "HeaderNum"), (Get-Lang "HeaderVersion"), (Get-Lang "HeaderReleaseDate"), (Get-Lang "HeaderMinIOS"), (Get-Lang "HeaderVersionID") -Properties "Index", "Version", "ReleaseDate", "MinOS", "ID"
-		Separator
-		
-		# Запрос порядковых номеров (№) версий для загрузки:
-		$FinalIndices = Read-NumberSelection -PromptKey 'AskVersionsDownloadNum' -MaxCount $DetailedMapping.Count -CancelKey 'CancelStepVerID' -HintKey 'BatchHintVersions'
-		
-		# Возврат цикла к основной таблице при вводе 0:
-		if ($null -eq $FinalIndices) {
-			continue
-		}
-		
-		# Сохранение выбранных версий приложения:
-		$script:VersionSelections["$AppID|$BundleID"] = [PSCustomObject]@{
-			Account = $script:CurrentAppleAccount
-			Versions = @($FinalIndices | ForEach-Object { $DetailedMapping[$_ - 1] })
-		}
-		
-		# Выход из цикла после выбора версий:
-		break
+		$DetailCounter++
+	}
+	
+	Separator
+	Write-Host (Get-Lang "SelectedVersionsList")
+	Separator
+	
+	# Отрисовка таблицы:
+	Out-Table -Data $DetailedMapping -Headers (Get-Lang "HeaderNum"), (Get-Lang "HeaderVersion"), (Get-Lang "HeaderReleaseDate"), (Get-Lang "HeaderMinIOS"), (Get-Lang "HeaderVersionID") -Properties "Index", "Version", "ReleaseDate", "MinOS", "ID"
+	Separator
+	
+	# Запрос порядковых номеров (№) версий для загрузки:
+	$FinalIndices = Read-NumberSelection -PromptKey 'AskVersionsDownloadNum' -MaxCount $DetailedMapping.Count -HintKey 'BatchHintVersions'
+	
+	# Ввод 0: возврат в главное меню:
+	if ($null -eq $FinalIndices) {
+		$script:BatchCancelled = $true
+		return
+	}
+	
+	# Сохранение выбранных версий приложения:
+	$script:VersionSelections["$AppID|$BundleID"] = [PSCustomObject]@{
+		Account = $script:CurrentAppleAccount
+		Versions = @($FinalIndices | ForEach-Object { $DetailedMapping[$_ - 1] })
 	}
 }
 
@@ -2156,6 +2243,7 @@ function Invoke-AppAction {
 		[string]$BundleID,
 		[string]$AppName,
 		[string]$DisplayName,
+		[string]$ExternalVersionID,
 		[ValidateSet("Purchase", "Download", "SelectVersions", "DownloadVersion")][string]$Action,
 		[int]$Current,
 		[int]$Total
@@ -2172,7 +2260,7 @@ function Invoke-AppAction {
 			Save-Purchased-App -AppID $AppID -AppNameOnly $AppName
 		}
 		"Download" {
-			IPA-Download -AppID $AppID -AppName $AppName -BundleID $BundleID
+			IPA-Download -AppID $AppID -AppName $AppName -BundleID $BundleID -ExternalVersionID $ExternalVersionID
 		}
 		"SelectVersions" {
 			IPA-Select-Versions -AppID $AppID -BundleID $BundleID
@@ -2196,7 +2284,10 @@ function Invoke-AppsBatch {
 	$AppsCurrent = 0
 	foreach ($App in @($Apps)) {
 		$AppsCurrent++
-		Invoke-AppAction -AppID $App.ID -BundleID $App.BundleID -AppName $App.Name -DisplayName $App.Display -Action $Action -Current $AppsCurrent -Total $AppsTotal
+		Invoke-AppAction -AppID $App.ID -BundleID $App.BundleID -AppName $App.Name -DisplayName $App.Display -ExternalVersionID $App.ExternalVersionID -Action $Action -Current $AppsCurrent -Total $AppsTotal
+		
+		# Прерывание обработки остальных приложений при вводе 0:
+		if ($script:BatchCancelled) { break }
 	}
 }
 
@@ -2216,13 +2307,16 @@ function Invoke-AccountsBatch {
 	
 	if ($null -eq $Apps) { return }
 	
+	# Сброс признака прерывания пакетной обработки:
+	$script:BatchCancelled = $false
+	
 	# Выбор версий приложений на текущем аккаунте:
 	if ($Action -eq "DownloadVersion") {
 		$script:VersionSelections = @{}
 		Invoke-AppsBatch -Apps $Apps -Action "SelectVersions"
 		
-		# Возврат в главное меню при отсутствии выбранных версий:
-		if ($script:VersionSelections.Count -eq 0) { return }
+		# Возврат в главное меню при вводе 0 или отсутствии выбранных версий:
+		if ($script:BatchCancelled -or $script:VersionSelections.Count -eq 0) { return }
 	}
 	
 	# Исходный аккаунт и список аккаунтов для выполнения действия:
@@ -2436,6 +2530,15 @@ function Get-Apps-From-List {
 		$HintKey = 'BatchHintDownload'
 	}
 	
+	# Добавление пункта со списком версий для определенной iOS при наличии сохраненных версий в пользовательском списке:
+	$CustomIOSMap = $null
+	if ($ListMode -eq "Download") {
+		$CustomIOSMap = Read-CustomIOSVersionMap
+		if (@($CustomIOSMap.IOSVersions).Count -gt 0) {
+			$MenuItems += (Get-Lang 'CustomIOSListMenu')
+		}
+	}
+	
 	$MenuText = (@("$MenuTitle $(Get-Lang 'CancelStep')") + $MenuItems) -join "`n"
 	
 	while ($true) {
@@ -2446,6 +2549,7 @@ function Get-Apps-From-List {
 		$AppItems = @()
 		$ShowPurchaseDate = $false
 		$ShowDeviceApps = $false
+		$CustomIOSMajor = $null
 		
 		# 1. Список популярных приложений:
 		if ($ListChoice -eq '1') {
@@ -2512,6 +2616,7 @@ function Get-Apps-From-List {
 		# 3. Список приложений, установленных на устройстве и 4. Список сгруженных приложений, установленных на устройстве:
 		elseif ($ListMode -ne "Purchase" -and ($ListChoice -eq '3' -or $ListChoice -eq '4')) {
 			$DeviceResult = Get-DeviceApps -OnlyPlaceholders:($ListChoice -eq '4')
+			if ($DeviceResult.Status -eq "Cancel") { return $null }
 			if ($DeviceResult.Status -ne "Ok") {
 				Separator
 				continue
@@ -2532,6 +2637,16 @@ function Get-Apps-From-List {
 			$AppItems = @($CustomList)
 		}
 		
+		# 6. Список версий приложений для определенной iOS:
+		elseif ($ListMode -eq "Download" -and $ListChoice -eq '6') {
+			Separator
+			$CustomIOSMajor = Read-CustomIOSVersion -IOSVersions $CustomIOSMap.IOSVersions
+			if ($null -eq $CustomIOSMajor) { return $null }
+			
+			# Отбор приложений с ID версии для выбранной iOS:
+			$AppItems = @(Get-Custom-List | Where-Object { $CustomIOSMap.VersionsByID.ContainsKey([string]$_.ID) -and $CustomIOSMap.VersionsByID[[string]$_.ID].ContainsKey($CustomIOSMajor) })
+		}
+		
 		if ($AppItems.Count -eq 0) {
 			Show-Error "ErrorNoAppsFound"
 			Separator
@@ -2542,6 +2657,7 @@ function Get-Apps-From-List {
 		$TableData = @(
 			for ($i = 0; $i -lt $AppItems.Count; $i++) {
 				$DisplayName = [string]$AppItems[$i].Name
+				$SavedEVID = if ($null -ne $CustomIOSMajor) { [string]$CustomIOSMap.VersionsByID[[string]$AppItems[$i].ID][$CustomIOSMajor] } else { '' }
 				
 				[PSCustomObject]@{
 					Num = $i + 1
@@ -2552,6 +2668,7 @@ function Get-Apps-From-List {
 					Version = [string]$AppItems[$i].Version
 					Kind = [string]$AppItems[$i].Kind
 					PurchaseDate = [string]$AppItems[$i].PurchaseDate
+					ExternalVersionID = $SavedEVID
 				}
 			}
 		)
@@ -2561,6 +2678,8 @@ function Get-Apps-From-List {
 			Out-Table -Data $TableData -Headers (Get-Lang "HeaderNum"), (Get-Lang "HeaderAppName"), (Get-Lang "HeaderAppID"), (Get-Lang "HeaderKind"), (Get-Lang "HeaderPurchaseDate") -Properties "Num", "DisplayName", "ID", "Kind", "PurchaseDate"
 		} elseif ($ShowDeviceApps) {
 			Out-Table -Data $TableData -Headers (Get-Lang "HeaderNum"), (Get-Lang "HeaderAppName"), (Get-Lang "HeaderAppID"), (Get-Lang "HeaderVersion"), (Get-Lang "HeaderBundleID") -Properties "Num", "DisplayName", "ID", "Version", "BundleID"
+		} elseif ($null -ne $CustomIOSMajor) {
+			Out-Table -Data $TableData -Headers (Get-Lang "HeaderNum"), (Get-Lang "HeaderAppName"), (Get-Lang "HeaderAppID"), (Get-Lang "HeaderVersionID") -Properties "Num", "DisplayName", "ID", "ExternalVersionID"
 		} else {
 			Out-Table -Data $TableData -Headers (Get-Lang "HeaderNum"), (Get-Lang "HeaderAppName"), (Get-Lang "HeaderAppID") -Properties "Num", "DisplayName", "ID"
 		}
@@ -2588,6 +2707,7 @@ function Get-Apps-From-List {
 					BundleID = $SelectedObject.BundleID
 					Name = $SelectedAppName
 					Display = $SelectedAppName
+					ExternalVersionID = [string]$SelectedObject.ExternalVersionID
 				}
 			}
 		}
@@ -3233,7 +3353,7 @@ function Get-DeviceApps {
 	Separator
 	
 	while ($true) {
-		$SelectedDeviceIndices = Read-NumberSelection -PromptKey 'AskDeviceNumApps' -MaxCount $Devices.Count -CancelKey 'CancelStepList'
+		$SelectedDeviceIndices = Read-NumberSelection -PromptKey 'AskDeviceNumApps' -MaxCount $Devices.Count
 		if ($null -eq $SelectedDeviceIndices) { return $CancelResult }
 		
 		# Запрос списка приложений у одного устройства:
@@ -3870,7 +3990,7 @@ $(Get-Lang 'DownloaderMenu12')`n
 			# 6. Выбор готового списка приложений и загрузка (с выбором версии):
 			"6" {
 				Separator
-				Invoke-AccountsBatch -Apps (Get-Apps-From-List -ListMode "Download") -Action "DownloadVersion"
+				Invoke-AccountsBatch -Apps (Get-Apps-From-List -ListMode "DownloadVersion") -Action "DownloadVersion"
 			}
 			
 			# 7. Проверка минимальной версии iOS для приложений в папке Apps:
