@@ -53,7 +53,7 @@ A script for downloading apps previously purchased in the App Store, including d
 * To download apps, they must be previously acquired in the App Store
 * Apps are downloaded directly from the App Store
 * It is recommended to disable security keys and switch to standard two-factor authentication (2FA)
-* The script supports bulk purchasing/downloading/installing apps. Simply enter the index numbers (#) of the apps/versions from the tables, separated by commas or hyphens, for example, entering `1, 2, 3-5` will purchase/download/install the apps with index numbers (#) `1, 2, 3, 4, and 5`
+* The script supports bulk purchasing/downloading/installing apps. Simply enter the index numbers (#) of the apps/versions from the tables, separated by spaces, commas or hyphens, for example, entering `1 2 3-5` will purchase/download/install the apps with index numbers (#) `1, 2, 3, 4, and 5`
 * It is possible to create a custom list of applications; you just need to add data in the format `App name: its ID`, for example: `Google: 284815942` to the file Files/AppsListCustom.txt
 * The IPA_Installer mode (installing apps only) works without authorization
 
@@ -337,7 +337,7 @@ A script for downloading apps previously purchased in the App Store, including d
 * Press Enter
 * Enter command 3 (List of apps installed on the device)
 * Press Enter
-* Enter the index numbers (#) of the apps separated by commas or hyphens, for example, `1, 2, 3-5`
+* Enter the index numbers (#) of the apps separated by spaces, commas or hyphens, for example, `1 2 3-5`
 * Press Enter
 * Wait for the selected apps to download
 * Connect the new iPhone via USB and tap `Trust` when the `Trust This Computer?` prompt appears
@@ -345,7 +345,7 @@ A script for downloading apps previously purchased in the App Store, including d
 * Press Enter
 * Select the iPhone on which to install the apps
 * Press Enter
-* Enter the index numbers (#) of the apps separated by commas or hyphens, for example, `1, 2, 3-5`
+* Enter the index numbers (#) of the apps separated by spaces, commas or hyphens, for example, `1 2 3-5`
 * Press Enter
 * Wait for the apps to be installed on the new iPhone
 
@@ -359,7 +359,7 @@ A script for downloading apps previously purchased in the App Store, including d
 * Press Enter
 * Select the iPhone on which to install the apps
 * Press Enter
-* Enter the index numbers (#) of the apps separated by commas or hyphens, for example, `1, 2, 3-5`
+* Enter the index numbers (#) of the apps separated by spaces commas or hyphens, for example, `1 2 3-5`
 * Press Enter
 * Wait for the apps to be installed on the other person’s iPhone
 * When launching an app for the first time, you must enter the password for the Apple account from which the required apps were purchased
@@ -487,7 +487,7 @@ C:\Users\%username%\AppData\Roaming\Apple Computer\
 ### 7. I have another issue, what should I do?
 #### Please provide the following information:
 * The operating system and version of IPA_Downloader being used
-* Enable developer mode, reproduce the action that leads to the error, and send the result
+* Enable developer mode, reproduce the action that leads to the error, and send the DebugLog.txt file from the Files folder
 * A screenshot of the error
 
 ## Thank the developer:
