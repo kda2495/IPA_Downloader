@@ -330,7 +330,7 @@ A script for downloading apps previously purchased in the App Store, including d
 * The script will change its interface language
 
 ## Frequently Asked Questions:
-1. How do I transfer apps from an old iPhone to a new one?
+### 1. How do I transfer apps from an old iPhone to a new one?
 * Sign in to the script with the Apple account that previously purchased the required apps
 * Connect the old iPhone via USB and tap `Trust` when the `Trust This Computer?` prompt appears
 * Enter command 5 (Select a prepared app list and download the latest version)
@@ -349,7 +349,7 @@ A script for downloading apps previously purchased in the App Store, including d
 * Press Enter
 * Wait for the apps to be installed on the new iPhone
 
-2. Can I install my apps on another person’s device?
+### 2. Can I install my apps on another person’s device?
 * Yes, you can!
 * Sign in to the script with the Apple account that previously purchased the required apps
 * Use command 2 (Search for apps by name or ID and download the latest version) or 5 (5. Select a prepared app list and download the latest version)
