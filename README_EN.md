@@ -2,7 +2,7 @@
 [![License](https://img.shields.io/github/license/kda2495/IPA_Downloader.svg?label=License&color=blue)](https://github.com/kda2495/IPA_Downloader/blob/main/LICENSE)
 [![Downloads](https://img.shields.io/github/downloads/kda2495/IPA_Downloader/total?label=Downloads&color=blue)](https://github.com/kda2495/IPA_Downloader/releases)
 [![Downloads](https://img.shields.io/github/downloads/kda2495/IPA_Downloader/latest/total?label=Downloads%20(latest)&color=blue)](https://github.com/kda2495/IPA_Downloader/releases)  
-[![CloudTips](https://img.shields.io/badge/Tip_Jar_on-CloudTips-blue?style=flat)](https://pay.cloudtips.ru/p/93c0b094)
+[![CloudTips](https://img.shields.io/badge/Thank_the_developer_via-CloudTips-blue?style=flat)](https://pay.cloudtips.ru/p/93c0b094)
 
 # IPA_Downloader
 [![Russian README](https://img.shields.io/badge/README-Russian-blue.svg)](README.md)  
@@ -294,7 +294,7 @@ A script for downloading apps previously purchased in the App Store, including d
 * Enter the index numbers (#) of the apps to install on the devices
 * Press Enter
 * The script will install the selected apps on the devices
-#### 9. Apple Account operations:
+#### 9. Apple account operations (add, switch, sign out):
 * Enter the required action:
 1. Add account
 2. Switch account
@@ -302,7 +302,7 @@ A script for downloading apps previously purchased in the App Store, including d
 * Press Enter
 #### 10. Enable/disable developer mode:
 * The script will enable or disable developer mode to collect additional information
-#### 11. Tip Jar:
+#### 11. Thank the developer:
 * The script will navigate to the CloudTips page
 #### 12. Change Language (Сменить язык):
 * The script will change its interface language
@@ -322,7 +322,7 @@ A script for downloading apps previously purchased in the App Store, including d
 * The script will install the selected apps on the devices
 #### 3. Enable/disable developer mode:
 * The script will enable or disable developer mode to collect additional information
-#### 4. Tip Jar:
+#### 4. Thank the developer:
 * The script will navigate to the CloudTips page
 #### 5. Switch to IPA_Downloader (downloading and installing apps):
 * The script will switch the mode to IPA_Downloader
@@ -365,7 +365,12 @@ A script for downloading apps previously purchased in the App Store, including d
 * When launching an app for the first time, you must enter the password for the Apple account from which the required apps were purchased
 * After that, you will not need to enter the password again
 
-### 3. How to find an App ID?
+### 3. How to update the script?
+* Download the new version of the script
+* Unpack the IPA_Downloader.zip archive using any archiver (for example: [7-Zip](https://www.7-zip.org) for Windows or [Keka](https://www.keka.io) on macOS)
+* If necessary, move the Apps and Files folders from the folder containing the old version of the script to the folder containing the new version of the script, overwriting any existing files
+
+### 4. How to find an App ID?
 #### Option 1:
 * Find the app link in the App Store and copy the value after `id` in the URL
 <details>
@@ -384,11 +389,11 @@ A script for downloading apps previously purchased in the App Store, including d
 * Next, enter the app name in the search box on the [appmagic.rocks](https://appmagic.rocks/top-charts/apps) website and go to the app's page
 * On the app page, select the Select App option with the App Store icon and copy the value at the end of the URL
 
-### 4. Where can I track new app releases?
+### 5. Where can I track new app releases?
 - [The 4PDA thread](https://4pda.to/forum/index.php?showtopic=1046078)
 - [AppBank Website](https://pwa.appbank.pw)
 
-### 5. I have an issue, what should I do?
+### 6. I have an issue, what should I do?
 #### Possible errors and solutions:
 **1. command not found: pwsh:**
 * PowerShell (pwsh) is not installed
@@ -479,13 +484,13 @@ C:\Users\%username%\AppData\Roaming\Apple Computer\
 * Sign in to the App Store using the account from which the app was downloaded, and install any free app
 * After that, launch the problematic app again
 
-### 6. I have another issue, what should I do?
+### 7. I have another issue, what should I do?
 #### Please provide the following information:
 * The operating system and version of IPA_Downloader being used
 * Enable developer mode, reproduce the action that leads to the error, and send the result
 * A screenshot of the error
 
-## Tip Jar:
+## Thank the developer:
 * IPA_Downloader is completely free, however, if you want to support the project voluntarily, you can do so via the link below or using the QR code:
 - [Support via CloudTips](https://pay.cloudtips.ru/p/93c0b094)
 
