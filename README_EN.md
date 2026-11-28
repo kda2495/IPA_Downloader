@@ -42,11 +42,11 @@ A script for downloading apps previously purchased in the App Store, including d
 4. List of offloaded apps installed on the device
 5. Custom apps list
 * Check the minimum iOS version for apps in the Apps folder
-* Install apps from Apps folder
+* Install apps from the Apps folder
 
 #### IPA_Installer (installing apps only):
 * Check the minimum iOS version for apps in the Apps folder
-* Install apps from Apps folder
+* Install apps from the Apps folder
 
 #### Note:
 * All actions after entering commands are confirmed by pressing the Enter key
@@ -285,7 +285,7 @@ A script for downloading apps previously purchased in the App Store, including d
 #### 7. Check the minimum iOS version for apps in the Apps folder:
 * Move the .ipa files to the Apps folder
 * The script will check the minimum iOS version required to install the app
-#### 8. Install apps from Apps folder:
+#### 8. Install apps from the Apps folder:
 * Move the .ipa files to the Apps folder
 * Connect the device/devices using a cable
 * Tap `Trust` when the `Trust This Computer?` prompt appears
@@ -311,7 +311,7 @@ A script for downloading apps previously purchased in the App Store, including d
 #### 1. Check the minimum iOS version for apps in the Apps folder:
 * Move the .ipa files to the Apps folder
 * The script will check the minimum iOS version required to install the app
-#### 2. Install apps from Apps folder:
+#### 2. Install apps from the Apps folder:
 * Move the .ipa files to the Apps folder
 * Connect the device/devices using a cable
 * Tap `Trust` when the `Trust This Computer?` prompt appears
@@ -329,8 +329,67 @@ A script for downloading apps previously purchased in the App Store, including d
 #### 6. Change Language (Сменить язык):
 * The script will change its interface language
 
-## Possible errors and solutions:
-### Troubleshooting errors:
+## Frequently Asked Questions:
+1. How do I transfer apps from an old iPhone to a new one?
+* Sign in to the script with the Apple account that previously purchased the required apps
+* Connect the old iPhone via USB and tap `Trust` when the `Trust This Computer?` prompt appears
+* Enter command 5 (Select a prepared app list and download the latest version)
+* Press Enter
+* Enter command 3 (List of apps installed on the device)
+* Press Enter
+* Enter the index numbers (#) of the apps separated by commas or hyphens, for example, `1, 2, 3-5`
+* Press Enter
+* Wait for the selected apps to download
+* Connect the new iPhone via USB and tap `Trust` when the `Trust This Computer?` prompt appears
+* Enter command 8 (Install apps from the Apps folder)
+* Press Enter
+* Select the iPhone on which to install the apps
+* Press Enter
+* Enter the index numbers (#) of the apps separated by commas or hyphens, for example, `1, 2, 3-5`
+* Press Enter
+* Wait for the apps to be installed on the new iPhone
+
+2. Can I install my apps on another person’s device?
+* Yes, you can!
+* Sign in to the script with the Apple account that previously purchased the required apps
+* Use command 2 (Search for apps by name or ID and download the latest version) or 5 (5. Select a prepared app list and download the latest version)
+* Download the required apps
+* Connect the other person’s iPhone via USB and tap `Trust` when the `Trust This Computer?` prompt appears
+* Enter command 8 (Install apps from the Apps folder)
+* Press Enter
+* Select the iPhone on which to install the apps
+* Press Enter
+* Enter the index numbers (#) of the apps separated by commas or hyphens, for example, `1, 2, 3-5`
+* Press Enter
+* Wait for the apps to be installed on the other person’s iPhone
+* When launching an app for the first time, you must enter the password for the Apple account from which the required apps were purchased
+* After that, you will not need to enter the password again
+
+### 3. How to find an App ID?
+#### Option 1:
+* Find the app link in the App Store and copy the value after `id` in the URL
+<details>
+ <summary>Screenshot (click to view)</summary>
+<img width="389" height="36" alt="AppStore_Link" src="https://github.com/user-attachments/assets/e73fd860-ed11-4293-8600-aef61fe3dc7f" />
+</details>
+
+#### Option 2:
+* If the app is installed on your device, press and hold the app icon:
+* The Share App option will appear
+* Copy the link and paste it into a browser
+* Copy the value after `id` in the URL
+
+#### Option 3:
+* You can view the full list of purchased apps via the website [reportaproblem.apple.com](https://reportaproblem.apple.com)
+* Next, enter the app name in the search box on the [appmagic.rocks](https://appmagic.rocks/top-charts/apps) website and go to the app's page
+* On the app page, select the Select App option with the App Store icon and copy the value at the end of the URL
+
+### 4. Where can I track new app releases?
+- [The 4PDA thread](https://4pda.to/forum/index.php?showtopic=1046078)
+- [AppBank Website](https://pwa.appbank.pw)
+
+### 5. I have an issue, what should I do?
+#### Possible errors and solutions:
 **1. command not found: pwsh:**
 * PowerShell (pwsh) is not installed
 
@@ -365,7 +424,7 @@ A script for downloading apps previously purchased in the App Store, including d
 * In the script, you need to sign out of your Apple account and sign in again
 
 **9. Download error: invalid response: empty songList:**
-* Re-sign in to the script using Apple account
+* Sign in again to the script using Apple account
 
 **10. Download error: HTTP request failed: Couldn't resolve host name:**
 * Failed to connect to Apple servers, check your internet connection
@@ -375,7 +434,7 @@ A script for downloading apps previously purchased in the App Store, including d
 
 **12. Download failed after retries: Failure when receiving data from the peer:**
 * Failed to connect to Apple servers, check your internet connection
-* Or re-sign in to the script using Apple account
+* Or sign in again to the script using Apple account
 
 **13. Error: license is required:**
 * The app was not previously purchased on this Apple account
@@ -390,7 +449,7 @@ A script for downloading apps previously purchased in the App Store, including d
 **16. Error: This Apple Account is temporarily unable to be used in the iTunes Store because it could not be found. Try again later:**
 * Make any free purchase in the App Store
 
-**17. Error: No connected devices found.`nConnect a device and trust this computer:**
+**17. Error: No connected devices found. Connect a device and trust this computer:**
 * Connect the device and tap `Trust` when the `Trust This Computer?` prompt appears
 * Make sure the AppleMobileDeviceSupport64 driver is installed
 * Reinstall/install iTunes/Apple Devices or AppleMobileDeviceSupport64
@@ -420,35 +479,11 @@ C:\Users\%username%\AppData\Roaming\Apple Computer\
 * Sign in to the App Store using the account from which the app was downloaded, and install any free app
 * After that, launch the problematic app again
 
-### If you encounter an issue:
+### 6. I have another issue, what should I do?
 #### Please provide the following information:
 * The operating system and version of IPA_Downloader being used
 * Enable developer mode, reproduce the action that leads to the error, and send the result
 * A screenshot of the error
-
-## Useful information:
-### Finding an App ID:
-#### Option 1:
-* Find the app link in the App Store and copy the value after `id` in the URL
-<details>
- <summary>Screenshot (click to view)</summary>
-<img width="389" height="36" alt="AppStore_Link" src="https://github.com/user-attachments/assets/e73fd860-ed11-4293-8600-aef61fe3dc7f" />
-</details>
-
-#### Option 2:
-* If the app is installed on your device, press and hold the app icon:
-* The Share App option will appear
-* Copy the link and paste it into a browser
-* Copy the value after `id` in the URL
-
-#### Option 3:
-* You can view the full list of purchased apps via the website [reportaproblem.apple.com](https://reportaproblem.apple.com)
-* Next, enter the app name in the search box on the [appmagic.rocks](https://appmagic.rocks/top-charts/apps) website and go to the app's page
-* On the app page, select Select App with the App Store icon and copy the value at the end of the URL
-
-### Tracking new app releases:
-- [The 4PDA thread](https://4pda.to/forum/index.php?showtopic=1046078)
-- [AppBank Website](https://pwa.appbank.pw)
 
 ## Tip Jar:
 * IPA_Downloader is completely free, however, if you want to support the project voluntarily, you can do so via the link below or using the QR code:
